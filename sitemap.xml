@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+    <!-- Page principale -->
+    <url>
+        <loc>https://www.fleursdenila.fr/</loc>
+        <lastmod>2026-03-10</lastmod>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/boutique-fleuriste-nimes-livraison-fleurs.webp</image:loc>
+            <image:title>Devanture de la boutique Fleurs de Nila à Nîmes</image:title>
+            <image:caption>Boutique fleuriste artisan Fleurs de Nila, 3 rue Auguste-Pellet, Nîmes</image:caption>
+        </image:image>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/bouquet-fleurs-fraiches-nimes.webp</image:loc>
+            <image:title>Bouquet de fleurs fraîches de saison - Fleuriste Nîmes</image:title>
+            <image:caption>Composition florale artisanale avec fleurs de saison - Fleurs de Nila</image:caption>
+        </image:image>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/bouquet-fleurs-sechees-decoration-durable-nimes.webp</image:loc>
+            <image:title>Bouquet de fleurs séchées - Fleuriste Nîmes</image:title>
+            <image:caption>Bouquet de fleurs séchées durable - Fleuriste artisan Nîmes</image:caption>
+        </image:image>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/detail-floral-artisanal-nimes.webp</image:loc>
+            <image:title>Détail composition florale artisanale Nîmes</image:title>
+            <image:caption>Macro détail de pétales - Art floral artisanal Fleurs de Nila</image:caption>
+        </image:image>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/decoration-florale-mariage-nimes.webp</image:loc>
+            <image:title>Décoration florale mariage Nîmes</image:title>
+            <image:caption>Création florale pour mariage par Fleurs de Nila, fleuriste à Nîmes</image:caption>
+        </image:image>
+    </url>
+
+    <!-- Blog -->
+    <url>
+        <loc>https://www.fleursdenila.fr/blog.html</loc>
+        <lastmod>2026-03-10</lastmod>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/bouquet-fleurs-fraiches-nimes.webp</image:loc>
+            <image:title>Bouquet de fleurs fraîches - Blog Fleurs de Nila</image:title>
+            <image:caption>Conseils floraux et inspirations par Fleurs de Nila, fleuriste à Nîmes</image:caption>
+        </image:image>
+    </url>
+
+    <!-- Article 1 : Entretien bouquets -->
+    <url>
+        <loc>https://www.fleursdenila.fr/entretien-bouquets-fleurs-fraiches.html</loc>
+        <lastmod>2026-03-10</lastmod>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/bouquet-fleurs-fraiches-nimes.webp</image:loc>
+            <image:title>Conseils entretien bouquet de fleurs fraîches</image:title>
+            <image:caption>Comment prolonger la tenue de vos bouquets - Fleurs de Nila Nîmes</image:caption>
+        </image:image>
+    </url>
+
+    <!-- Article 2 : Fleurs séchées déco -->
+    <url>
+        <loc>https://www.fleursdenila.fr/decoration-fleurs-sechees-idees.html</loc>
+        <lastmod>2026-03-10</lastmod>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/bouquet-fleurs-sechees-decoration-durable-nimes.webp</image:loc>
+            <image:title>Idées décoration fleurs séchées</image:title>
+            <image:caption>Fleurs séchées décoration intérieure - Fleurs de Nila Nîmes</image:caption>
+        </image:image>
+    </url>
+
+    <!-- Article 3 : Livraison de fleurs à Nîmes -->
+    <url>
+        <loc>https://www.fleursdenila.fr/livraison-fleurs-nimes-zones-tarifs.html</loc>
+        <lastmod>2026-03-03</lastmod>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/boutique-fleuriste-nimes-livraison-fleurs.webp</image:loc>
+            <image:title>Livraison de fleurs à Nîmes - Boutique Fleurs de Nila</image:title>
+            <image:caption>Service de livraison de fleurs à domicile à Nîmes et agglomération par Fleurs de Nila</image:caption>
+        </image:image>
+    </url>
+
+    <!-- Mariage -->
+    <url>
+        <loc>https://www.fleursdenila.fr/mariage.html</loc>
+        <lastmod>2026-03-10</lastmod>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/decoration-florale-mariage-nimes.webp</image:loc>
+            <image:title>Décoration florale mariage Nîmes — Fleurs de Nila</image:title>
+            <image:caption>Création florale pour mariage par Fleurs de Nila, fleuriste artisan à Nîmes</image:caption>
+        </image:image>
+    </url>
+
+    <!-- À propos -->
+    <url>
+        <loc>https://www.fleursdenila.fr/a-propos.html</loc>
+        <lastmod>2026-03-10</lastmod>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/atelier-fleuriste-nimes-fleurs-de-nila.webp</image:loc>
+            <image:title>Atelier Fleurs de Nila, fleuriste artisan à Nîmes</image:title>
+            <image:caption>L'atelier Fleurs de Nila, 3 rue Auguste-Pellet, Nîmes — bouquets de saison et compositions sur mesure</image:caption>
+        </image:image>
+    </url>
+
+
+</urlset>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paiement | Fleurs de Nila</title>
+  <link rel="preload" as="font" href="../FleurDeLeah-Regular.woff2" type="font/woff2" crossorigin>
+  <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../tailwind.css">
+  <style>#nav { background: #ffffff; backdrop-filter: none; }</style>
+</head>
+
+<body class="font-sans text-primary bg-cream antialiased">
+
+  <!-- Navigation -->
+  <nav id="nav" class="fixed w-full z-50 transition-all duration-500 border-b border-primary bg-white">
+    <!-- Mobile Layout -->
+    <div class="lg:hidden w-full px-4 py-2">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <a href="panier.html" class="relative inline-flex p-2" aria-label="Panier">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span id="cart-count-mobile" class="absolute top-0 right-0 bg-primary text-white text-xs w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+          </a>
+        </div>
+        <a href="../index.html" class="transition-opacity hover:opacity-80 flex-shrink-0">
+          <img src="../images/logo-fleurs-de-nila-fleuriste-nimes-400w.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes" width="1013" height="564" class="h-16 sm:h-20 w-auto">
+        </a>
+        <div class="flex-1 flex justify-end">
+          <button id="mobile-menu-btn" class="text-primary p-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Desktop Layout -->
+    <div class="hidden lg:grid w-full" style="grid-template-columns: 20% 70% 10%;">
+      <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center h-24">
+        <a href="../index.html" class="transition-opacity hover:opacity-80">
+          <img src="../images/logo-fleurs-de-nila-fleuriste-nimes-400w.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes" width="1013" height="564" class="h-16 lg:h-20 w-auto">
+        </a>
+      </div>
+      <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center justify-center h-24">
+        <div class="flex items-center justify-center gap-6 lg:gap-10 xl:gap-14 w-full">
+          <a href="../index.html" class="nav-link text-sm lg:text-base xl:text-lg">Accueil</a>
+          <a href="../index.html#collections" class="nav-link text-sm lg:text-base xl:text-lg">Collections</a>
+          <a href="../index.html#evenementiel" class="nav-link text-sm lg:text-base xl:text-lg">Événementiel</a>
+          <a href="index.html" class="nav-link text-sm lg:text-base xl:text-lg">Boutique</a>
+          <a href="../index.html#apropos" class="nav-link text-sm lg:text-base xl:text-lg">À propos</a>
+          <a href="../blog.html" class="nav-link text-sm lg:text-base xl:text-lg">Blog</a>
+          <a href="../index.html#contact" class="nav-link text-sm lg:text-base xl:text-lg">Contact</a>
+        </div>
+      </div>
+      <div class="px-4 py-4 flex items-center justify-center h-24">
+        <a href="panier.html" class="relative p-2" aria-label="Panier">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <span id="cart-count" class="absolute -top-2 -right-2 bg-primary text-white text-xs w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Menu Mobile Fullscreen -->
+  <div id="mobile-menu" class="fixed inset-0 bg-cream z-40 hidden opacity-0 transition-opacity duration-500">
+    <div class="flex flex-col items-center justify-center h-full space-y-5 relative">
+      <button id="close-menu-btn" class="absolute top-6 right-6 text-primary p-2">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <a href="../index.html" class="mobile-nav-link text-6xl">Accueil</a>
+      <a href="../index.html#collections" class="mobile-nav-link text-6xl">Collections</a>
+      <a href="../index.html#evenementiel" class="mobile-nav-link text-6xl">Événementiel</a>
+      <a href="index.html" class="mobile-nav-link text-6xl">Boutique</a>
+      <a href="../index.html#apropos" class="mobile-nav-link text-6xl">À propos</a>
+      <a href="../blog.html" class="mobile-nav-link text-6xl">Blog</a>
+      <a href="../index.html#contact" class="mobile-nav-link text-6xl">Contact</a>
+    </div>
+  </div>
+
+  <main class="pt-24 min-h-screen">
+
+    <!-- En-tête -->
+    <div class="border-b border-primary bg-white">
+      <div class="px-6 lg:px-16 py-12 max-w-6xl mx-auto">
+        <p class="text-sm tracking-widest uppercase text-gray-500 mb-3">Étape 3 sur 3</p>
+        <h1 class="font-display text-5xl lg:text-7xl text-primary">Paiement</h1>
+      </div>
+    </div>
+
+    <div class="px-6 lg:px-16 py-12 max-w-6xl mx-auto lg:grid lg:grid-cols-[1fr_360px] lg:gap-12">
+
+      <!-- Formulaire coordonnées -->
+      <div>
+        <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-6">Vos coordonnées</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Nom complet *</label>
+            <input id="customer-name" type="text" autocomplete="name" required
+              class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
+              placeholder="Marie Dupont">
+          </div>
+          <div>
+            <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Email *</label>
+            <input id="customer-email" type="email" autocomplete="email" required
+              class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
+              placeholder="marie@exemple.fr">
+          </div>
+          <div>
+            <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Téléphone</label>
+            <input id="customer-phone" type="tel" autocomplete="tel"
+              class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
+              placeholder="06 12 34 56 78">
+          </div>
+        </div>
+
+        <!-- Récap créneau -->
+        <div id="slot-recap" class="mt-8 border border-gray-100 bg-white p-5">
+          <h3 class="text-xs tracking-widest uppercase text-gray-400 mb-3">Récapitulatif</h3>
+          <div id="slot-recap-content" class="text-sm text-gray-600 space-y-1"></div>
+        </div>
+
+        <!-- Erreur -->
+        <div id="error-msg" class="hidden mt-6 text-sm text-red-600 border border-red-200 bg-red-50 px-4 py-3"></div>
+
+        <!-- Note créneau expiré -->
+        <div id="slot-expired" class="hidden mt-6 text-sm text-orange-700 border border-orange-200 bg-orange-50 px-4 py-3">
+          Votre créneau a expiré.
+          <a href="livraison.html" class="underline">Retourner au choix du créneau</a>
+        </div>
+      </div>
+
+      <!-- Récap commande + bouton paiement -->
+      <div class="mt-10 lg:mt-0">
+        <div class="border border-primary bg-white p-6 sticky top-28">
+          <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-5">Votre commande</h2>
+          <div id="cart-summary" class="space-y-2 text-sm text-gray-600 mb-5"></div>
+          <div class="border-t border-gray-100 pt-4 flex justify-between font-medium">
+            <span>Total</span>
+            <span id="total-display">—</span>
+          </div>
+
+          <button id="pay-btn"
+            class="mt-6 w-full bg-primary text-white py-4 text-sm tracking-widest uppercase transition-colors duration-300 hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+            <span id="pay-label">Procéder au paiement</span>
+            <svg id="pay-spinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </button>
+          <p class="mt-3 text-xs text-gray-400 text-center">Paiement sécurisé via SumUp</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-primary bg-white mt-16">
+    <div class="px-6 lg:px-16 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      <span>© 2026 Fleurs de Nila · Nîmes</span>
+      <div class="flex gap-6">
+        <a href="../mentions-legales.html" class="hover:text-primary transition-colors">Mentions légales</a>
+        <a href="../politique-confidentialite.html" class="hover:text-primary transition-colors">Confidentialité</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const API = 'http://localhost:3000';
+    const DELIVERY_THRESHOLD = 60;
+    const DELIVERY_PRICE = 5;
+
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const orderSlot = JSON.parse(localStorage.getItem('order_slot') || 'null');
+
+    // Rediriger si panier vide ou pas de créneau
+    if (!cart.length) { window.location.href = 'panier.html'; }
+    if (!orderSlot) { window.location.href = 'livraison.html'; }
+
+    // Plus de système d'expiration de créneau (créneaux non exclusifs)
+
+    function cartTotal() {
+      const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      const delivery = (orderSlot?.mode === 'delivery' && sub < DELIVERY_THRESHOLD) ? DELIVERY_PRICE : 0;
+      return { sub, delivery, total: sub + delivery };
+    }
+
+    function updateCartBadge() {
+      const count = cart.reduce((s, i) => s + i.qty, 0);
+      ['cart-count', 'cart-count-mobile'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = count;
+        el.classList.toggle('hidden', count === 0);
+      });
+    }
+
+    function renderSummary() {
+      const { sub, delivery, total } = cartTotal();
+      document.getElementById('cart-summary').innerHTML = [
+        ...cart.map(i => `<div class="flex justify-between"><span>${i.name} ×${i.qty}</span><span>${(i.price * i.qty).toFixed(2)} €</span></div>`),
+        delivery > 0
+          ? `<div class="flex justify-between text-gray-400"><span>Livraison</span><span>${delivery.toFixed(2)} €</span></div>`
+          : `<div class="text-green-700 text-xs">Livraison offerte</div>`
+      ].join('');
+      document.getElementById('total-display').textContent = total.toFixed(2) + ' €';
+    }
+
+    function renderSlotRecap() {
+      if (!orderSlot) return;
+      const modeLabel = orderSlot.mode === 'delivery' ? 'Livraison à domicile' : 'Retrait en boutique';
+      let html = `<div class="font-medium">${modeLabel}</div>`;
+      if (orderSlot.date) {
+        // Utiliser T12:00:00 pour éviter le décalage UTC → jour précédent
+        const dateLabel = new Date(orderSlot.date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+        html += `<div>${dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)}</div>`;
+      }
+      if (orderSlot.slotLabel) {
+        html += `<div>Créneau : <strong>${orderSlot.slotLabel}</strong></div>`;
+      }
+      if (orderSlot.address) {
+        const a = orderSlot.address;
+        html += `<div class="mt-1 text-gray-400">${a.street}, ${a.zip} ${a.city}</div>`;
+      }
+      document.getElementById('slot-recap-content').innerHTML = html;
+    }
+
+    document.getElementById('pay-btn').addEventListener('click', async () => {
+      const name = document.getElementById('customer-name').value.trim();
+      const email = document.getElementById('customer-email').value.trim();
+      const phone = document.getElementById('customer-phone').value.trim();
+      const errEl = document.getElementById('error-msg');
+      errEl.classList.add('hidden');
+
+      if (!name || !email) {
+        errEl.textContent = 'Veuillez renseigner votre nom et votre email.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errEl.textContent = 'Adresse email invalide.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('pay-btn');
+      btn.disabled = true;
+      document.getElementById('pay-label').textContent = 'Redirection en cours…';
+      document.getElementById('pay-spinner').classList.remove('hidden');
+
+      try {
+        const { total } = cartTotal();
+        const res = await fetch(`${API}/api/checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customer_name: name,
+            customer_email: email,
+            customer_phone: phone || null,
+            cart,
+            slot_id: orderSlot.slotId,
+            delivery_type: orderSlot.mode,
+            delivery_address: orderSlot.address || null
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.status === 409) {
+          document.getElementById('slot-expired').classList.remove('hidden');
+          btn.disabled = true;
+          document.getElementById('pay-label').textContent = 'Procéder au paiement';
+          document.getElementById('pay-spinner').classList.add('hidden');
+          return;
+        }
+
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Une erreur est survenue. Veuillez réessayer.';
+          errEl.classList.remove('hidden');
+          btn.disabled = false;
+          document.getElementById('pay-label').textContent = 'Procéder au paiement';
+          document.getElementById('pay-spinner').classList.add('hidden');
+          return;
+        }
+
+        localStorage.setItem('order_email', email);
+        if (data.simulation) {
+          // Mode test sans SumUp : redirection relative (fonctionne depuis file://)
+          window.location.href = `confirmation.html?sim=1&orderId=${data.orderId}`;
+        } else {
+          window.location.href = data.checkoutUrl;
+        }
+
+      } catch {
+        errEl.textContent = 'Erreur de connexion. Vérifiez que le serveur est démarré.';
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        document.getElementById('pay-label').textContent = 'Procéder au paiement';
+        document.getElementById('pay-spinner').classList.add('hidden');
+      }
+    });
+
+    // Bouton fermer menu mobile
+    document.getElementById('close-menu-btn')?.addEventListener('click', () => {
+      const m = document.getElementById('mobile-menu');
+      m.classList.remove('opacity-100');
+      m.classList.add('opacity-0');
+      setTimeout(() => m.classList.add('hidden'), 500);
+      document.body.style.overflow = '';
+    });
+
+    updateCartBadge();
+    renderSummary();
+    renderSlotRecap();
+  </script>
+  <script src="../script.js"></script>
+  <script src="cart-drawer.js"></script>
+</body>
+</html>

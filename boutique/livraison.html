@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Livraison | Fleurs de Nila</title>
+  <link rel="preload" as="font" href="../FleurDeLeah-Regular.woff2" type="font/woff2" crossorigin>
+  <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../tailwind.css">
+  <style>#nav { background: #ffffff; backdrop-filter: none; }</style>
+</head>
+
+<body class="font-sans text-primary bg-cream antialiased">
+
+  <!-- Navigation -->
+  <nav id="nav" class="fixed w-full z-50 transition-all duration-500 border-b border-primary bg-white">
+    <!-- Mobile Layout -->
+    <div class="lg:hidden w-full px-4 py-2">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <a href="panier.html" class="relative inline-flex p-2" aria-label="Panier">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span id="cart-count-mobile" class="absolute top-0 right-0 bg-primary text-white text-xs w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+          </a>
+        </div>
+        <a href="../index.html" class="transition-opacity hover:opacity-80 flex-shrink-0">
+          <img src="../images/logo-fleurs-de-nila-fleuriste-nimes-400w.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes" width="1013" height="564" class="h-16 sm:h-20 w-auto">
+        </a>
+        <div class="flex-1 flex justify-end">
+          <button id="mobile-menu-btn" class="text-primary p-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Desktop Layout -->
+    <div class="hidden lg:grid w-full" style="grid-template-columns: 20% 70% 10%;">
+      <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center h-24">
+        <a href="../index.html" class="transition-opacity hover:opacity-80">
+          <img src="../images/logo-fleurs-de-nila-fleuriste-nimes-400w.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes" width="1013" height="564" class="h-16 lg:h-20 w-auto">
+        </a>
+      </div>
+      <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center justify-center h-24">
+        <div class="flex items-center justify-center gap-6 lg:gap-10 xl:gap-14 w-full">
+          <a href="../index.html" class="nav-link text-sm lg:text-base xl:text-lg">Accueil</a>
+          <a href="../index.html#collections" class="nav-link text-sm lg:text-base xl:text-lg">Collections</a>
+          <a href="../index.html#evenementiel" class="nav-link text-sm lg:text-base xl:text-lg">Événementiel</a>
+          <a href="index.html" class="nav-link text-sm lg:text-base xl:text-lg">Boutique</a>
+          <a href="../index.html#apropos" class="nav-link text-sm lg:text-base xl:text-lg">À propos</a>
+          <a href="../blog.html" class="nav-link text-sm lg:text-base xl:text-lg">Blog</a>
+          <a href="../index.html#contact" class="nav-link text-sm lg:text-base xl:text-lg">Contact</a>
+        </div>
+      </div>
+      <div class="px-4 py-4 flex items-center justify-center h-24">
+        <a href="panier.html" class="relative p-2" aria-label="Panier">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <span id="cart-count" class="absolute -top-2 -right-2 bg-primary text-white text-xs w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Menu Mobile Fullscreen -->
+  <div id="mobile-menu" class="fixed inset-0 bg-cream z-40 hidden opacity-0 transition-opacity duration-500">
+    <div class="flex flex-col items-center justify-center h-full space-y-5 relative">
+      <button id="close-menu-btn" class="absolute top-6 right-6 text-primary p-2">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <a href="../index.html" class="mobile-nav-link text-6xl">Accueil</a>
+      <a href="../index.html#collections" class="mobile-nav-link text-6xl">Collections</a>
+      <a href="../index.html#evenementiel" class="mobile-nav-link text-6xl">Événementiel</a>
+      <a href="index.html" class="mobile-nav-link text-6xl">Boutique</a>
+      <a href="../index.html#apropos" class="mobile-nav-link text-6xl">À propos</a>
+      <a href="../blog.html" class="mobile-nav-link text-6xl">Blog</a>
+      <a href="../index.html#contact" class="mobile-nav-link text-6xl">Contact</a>
+    </div>
+  </div>
+
+  <main class="pt-24 min-h-screen">
+
+    <!-- En-tête -->
+    <div class="border-b border-primary bg-white">
+      <div class="px-6 lg:px-16 py-12 max-w-6xl mx-auto">
+        <p class="text-sm tracking-widest uppercase text-gray-500 mb-3">Étape 2 sur 3</p>
+        <h1 class="font-display text-5xl lg:text-7xl text-primary">Livraison</h1>
+      </div>
+    </div>
+
+    <div class="px-6 lg:px-16 py-12 max-w-6xl mx-auto lg:grid lg:grid-cols-[1fr_360px] lg:gap-12">
+
+      <!-- Colonne gauche -->
+      <div>
+
+        <!-- Mode de livraison -->
+        <div class="mb-10">
+          <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-4">Mode de récupération</h2>
+          <div class="grid grid-cols-2 gap-3">
+            <button id="btn-delivery" data-mode="delivery"
+              class="mode-btn border border-primary bg-primary text-white py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200">
+              Livraison à domicile
+            </button>
+            <button id="btn-pickup" data-mode="pickup"
+              class="mode-btn border border-primary text-primary py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200 hover:bg-primary hover:text-white">
+              Retrait en boutique
+            </button>
+          </div>
+        </div>
+
+        <!-- Adresse (livraison uniquement) -->
+        <div id="address-block" class="mb-10">
+          <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-4">Adresse de livraison</h2>
+          <div class="space-y-3">
+            <input id="address-street" type="text" placeholder="Adresse"
+              class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white">
+            <div class="grid grid-cols-2 gap-3">
+              <input id="address-zip" type="text" placeholder="Code postal"
+                class="border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white">
+              <input id="address-city" type="text" placeholder="Ville"
+                class="border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- Sélection de la date (livraison uniquement) -->
+        <div id="date-block" class="mb-8">
+          <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-4">Choisir une date</h2>
+          <div id="date-tabs" class="flex gap-2 flex-wrap"></div>
+        </div>
+
+        <!-- Créneaux horaires (livraison uniquement) -->
+        <div id="slots-block">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm tracking-widest uppercase text-gray-500">Créneau horaire</h2>
+          </div>
+          <div id="slots-loading" class="text-sm text-gray-400">Chargement des créneaux…</div>
+          <div id="slots-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+          <div id="slots-empty" class="hidden text-sm text-gray-400">Aucun créneau disponible pour cette date.</div>
+          <div id="slots-error" class="hidden text-sm text-red-500">Erreur lors du chargement des créneaux.</div>
+        </div>
+
+        <!-- Retrait en boutique : info adresse (affiché sous les créneaux en mode pickup) -->
+        <div id="pickup-info" style="display:none" class="mt-4 border border-gray-100 bg-gray-50 p-4">
+          <p class="text-xs text-gray-500">📍 Fleurs de Nila — venez récupérer votre commande à notre boutique au créneau choisi.</p>
+        </div>
+
+      </div>
+
+      <!-- Colonne droite — récap commande -->
+      <div class="mt-10 lg:mt-0">
+        <div class="border border-primary bg-white p-6 sticky top-28">
+          <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-5">Votre commande</h2>
+          <div id="cart-summary" class="space-y-2 text-sm text-gray-600 mb-5"></div>
+          <div class="border-t border-gray-100 pt-4 flex justify-between font-medium">
+            <span>Total</span>
+            <span id="total-display">—</span>
+          </div>
+
+          <button id="next-btn" disabled
+            class="mt-6 w-full bg-primary text-white py-4 text-sm tracking-widest uppercase transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:bg-secondary">
+            Finaliser la commande →
+          </button>
+          <p id="next-hint" class="mt-3 text-xs text-gray-400 text-center">Sélectionnez un créneau pour continuer</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-primary bg-white mt-16">
+    <div class="px-6 lg:px-16 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      <span>© 2026 Fleurs de Nila · Nîmes</span>
+      <div class="flex gap-6">
+        <a href="../mentions-legales.html" class="hover:text-primary transition-colors">Mentions légales</a>
+        <a href="../politique-confidentialite.html" class="hover:text-primary transition-colors">Confidentialité</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const API = 'http://localhost:3000';
+    const DELIVERY_THRESHOLD = 60;
+    const DELIVERY_PRICE = 5;
+
+    let selectedMode = 'delivery';
+    let selectedDate = null;
+    let selectedSlotId = null;
+    let selectedSlotLabel = null;
+
+    // --- Panier ---
+    function getCart() { return JSON.parse(localStorage.getItem('cart') || '[]'); }
+
+    function cartTotal() {
+      const sub = getCart().reduce((s, i) => s + i.price * i.qty, 0);
+      const delivery = (selectedMode === 'delivery' && sub < DELIVERY_THRESHOLD) ? DELIVERY_PRICE : 0;
+      return { sub, delivery, total: sub + delivery };
+    }
+
+    function updateCartBadge() {
+      const count = getCart().reduce((s, i) => s + i.qty, 0);
+      ['cart-count','cart-count-mobile'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = count;
+        el.classList.toggle('hidden', count === 0);
+      });
+    }
+
+    function renderCartSummary() {
+      const cart = getCart();
+      const { sub, delivery, total } = cartTotal();
+      document.getElementById('cart-summary').innerHTML = [
+        ...cart.map(i => `<div class="flex justify-between"><span>${i.name} ×${i.qty}</span><span>${(i.price * i.qty).toFixed(2)} €</span></div>`),
+        delivery > 0 ? `<div class="flex justify-between text-gray-400"><span>Livraison</span><span>${delivery.toFixed(2)} €</span></div>` : `<div class="text-green-700 text-xs">Livraison offerte</div>`
+      ].join('');
+      document.getElementById('total-display').textContent = total.toFixed(2) + ' €';
+    }
+
+    // --- Dates disponibles (J+1 à J+7) ---
+    function buildDateTabs() {
+      const tabs = document.getElementById('date-tabs');
+      tabs.innerHTML = '';
+      for (let i = 1; i <= 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const iso = d.toISOString().split('T')[0];
+        const label = d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+        const btn = document.createElement('button');
+        btn.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+        btn.dataset.date = iso;
+        btn.className = 'date-tab border border-gray-200 px-4 py-2 text-sm tracking-wide transition-colors duration-200 hover:border-primary';
+        btn.addEventListener('click', () => selectDate(iso, btn));
+        tabs.appendChild(btn);
+      }
+    }
+
+    function selectDate(date, btn) {
+      selectedDate = date;
+      selectedSlotId = null;
+      selectedSlotLabel = null;
+      document.querySelectorAll('.date-tab').forEach(b => {
+        b.className = b === btn
+          ? 'date-tab border border-primary bg-primary text-white px-4 py-2 text-sm tracking-wide transition-colors duration-200'
+          : 'date-tab border border-gray-200 px-4 py-2 text-sm tracking-wide transition-colors duration-200 hover:border-primary';
+      });
+      loadSlots(date);
+      updateNextBtn();
+    }
+
+    // --- Créneaux (non exclusifs, pas de réservation API) ---
+    async function loadSlots(date) {
+      document.getElementById('slots-loading').classList.remove('hidden');
+      document.getElementById('slots-grid').classList.add('hidden');
+      document.getElementById('slots-empty').classList.add('hidden');
+      document.getElementById('slots-error').classList.add('hidden');
+
+      try {
+        const res = await fetch(`${API}/api/slots?date=${date}`);
+        if (!res.ok) throw new Error();
+        const slots = await res.json();
+
+        document.getElementById('slots-loading').classList.add('hidden');
+
+        if (!slots.length) {
+          document.getElementById('slots-empty').classList.remove('hidden');
+          return;
+        }
+
+        const grid = document.getElementById('slots-grid');
+        grid.classList.remove('hidden');
+        grid.innerHTML = slots.map(s => `
+          <button class="slot-btn border border-gray-200 py-3 px-2 text-sm text-center transition-colors duration-200 hover:border-primary"
+            data-id="${s.id}" data-label="${s.start_time} – ${s.end_time}">
+            ${s.start_time} – ${s.end_time}
+          </button>`).join('');
+
+        grid.querySelectorAll('.slot-btn').forEach(btn => {
+          btn.addEventListener('click', () => selectSlot(btn));
+        });
+      } catch {
+        document.getElementById('slots-loading').classList.add('hidden');
+        document.getElementById('slots-error').classList.remove('hidden');
+      }
+    }
+
+    function selectSlot(btn) {
+      selectedSlotId = parseInt(btn.dataset.id);
+      selectedSlotLabel = btn.dataset.label;
+      document.querySelectorAll('.slot-btn').forEach(b => {
+        b.className = b === btn
+          ? 'slot-btn border border-primary bg-primary text-white py-3 px-2 text-sm text-center transition-colors duration-200'
+          : 'slot-btn border border-gray-200 py-3 px-2 text-sm text-center transition-colors duration-200 hover:border-primary';
+      });
+      updateNextBtn();
+    }
+
+    // --- Mode livraison / retrait ---
+    document.getElementById('btn-delivery').addEventListener('click', () => setMode('delivery'));
+    document.getElementById('btn-pickup').addEventListener('click', () => setMode('pickup'));
+
+    function setMode(mode) {
+      selectedMode = mode;
+      const isDelivery = mode === 'delivery';
+
+      document.getElementById('btn-delivery').className = isDelivery
+        ? 'mode-btn border border-primary bg-primary text-white py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200'
+        : 'mode-btn border border-primary text-primary py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200 hover:bg-primary hover:text-white';
+      document.getElementById('btn-pickup').className = isDelivery
+        ? 'mode-btn border border-primary text-primary py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200 hover:bg-primary hover:text-white'
+        : 'mode-btn border border-primary bg-primary text-white py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200';
+
+      // L'adresse est uniquement pour la livraison
+      document.getElementById('address-block').style.display = isDelivery ? '' : 'none';
+      // La sélection date + créneaux s'affiche dans les deux modes
+      document.getElementById('date-block').style.display = '';
+      document.getElementById('slots-block').style.display = '';
+      // Info boutique sous les créneaux en mode retrait
+      document.getElementById('pickup-info').style.display = isDelivery ? 'none' : '';
+
+      // Titre du bloc créneaux
+      document.querySelector('#slots-block h2').textContent =
+        isDelivery ? 'Créneau horaire' : 'Créneau de retrait';
+
+      selectedSlotId = null;
+      selectedSlotLabel = null;
+      renderCartSummary();
+      updateNextBtn();
+    }
+
+    // --- Bouton suivant ---
+    function updateNextBtn() {
+      const btn = document.getElementById('next-btn');
+      const hint = document.getElementById('next-hint');
+      const ok = selectedSlotId !== null;
+      btn.disabled = !ok;
+      hint.textContent = ok ? '' : 'Sélectionnez une date et un créneau pour continuer';
+    }
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+      if (!selectedSlotId) return;
+
+      const address = selectedMode === 'delivery' ? {
+        street: document.getElementById('address-street').value.trim(),
+        zip: document.getElementById('address-zip').value.trim(),
+        city: document.getElementById('address-city').value.trim(),
+      } : null;
+
+      if (selectedMode === 'delivery' && (!address.street || !address.zip || !address.city)) {
+        alert('Veuillez renseigner votre adresse de livraison.');
+        return;
+      }
+
+      localStorage.setItem('order_slot', JSON.stringify({
+        slotId: selectedSlotId,
+        slotLabel: selectedSlotLabel,
+        date: selectedDate,
+        mode: selectedMode,
+        address
+      }));
+
+      window.location.href = 'commande.html';
+    });
+
+    // Bouton fermer menu mobile
+    document.getElementById('close-menu-btn')?.addEventListener('click', () => {
+      const m = document.getElementById('mobile-menu');
+      m.classList.remove('opacity-100');
+      m.classList.add('opacity-0');
+      setTimeout(() => m.classList.add('hidden'), 500);
+      document.body.style.overflow = '';
+    });
+
+    // --- Init ---
+    updateCartBadge();
+    renderCartSummary();
+    buildDateTabs();
+    updateNextBtn();
+  </script>
+  <script src="../script.js"></script>
+  <script src="cart-drawer.js"></script>
+</body>
+</html>

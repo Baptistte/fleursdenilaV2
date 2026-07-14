@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Votre boutique en ligne — Fleurs de Nila</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      color: #111;
+      padding: 30px 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 { font-size: 14pt; margin-bottom: 4px; }
+    .sub { font-size: 10pt; color: #555; margin-bottom: 24px; }
+
+    h2 {
+      font-size: 12pt;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 4px;
+      margin-top: 28px;
+      margin-bottom: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+      margin-bottom: 20px;
+    }
+
+    thead th {
+      background: #1a365d;
+      color: #fff;
+      padding: 7px 10px;
+      text-align: left;
+      font-weight: normal;
+    }
+
+    tbody td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #ddd;
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) { background: #f5f5f5; }
+
+    .check { text-align: center; font-weight: bold; }
+    .stripe { color: #1a7f5a; }
+    .custom { color: #276749; }
+
+    .note {
+      font-size: 9.5pt;
+      color: #444;
+      background: #f0f7ff;
+      border-left: 3px solid #1a365d;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+    }
+
+    .footer {
+      font-size: 9pt;
+      color: #888;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      margin-top: 32px;
+    }
+
+    @media print {
+      body { padding: 20px; }
+      .no-print { display: none; }
+      @page { size: A4; margin: 15mm; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="sub">Fleurs de Nila · fleursdenila.fr · Avril 2026</div>
+
+<h2>1. Ce que fait chaque partie</h2>
+<div class="note">
+  La boutique s'appuie sur deux piliers : <strong>SumUp</strong>, qui gère tout ce qui touche au paiement et à l'argent, et un <strong>développement sur mesure</strong> qui couvre tout ce qui est propre à ton activité : tes créneaux, tes stocks, ton catalogue.
+</div>
+<table>
+  <thead>
+    <tr>
+      <th style="width:35%">Fonctionnalité</th>
+      <th style="width:10%">SumUp</th>
+      <th style="width:10%">Sur mesure</th>
+      <th>Ce que ça veut dire pour toi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Paiement par carte bancaire</td>
+      <td class="check stripe">✓</td>
+      <td></td>
+      <td>Tes clients paient directement sur ton site, en toute sécurité</td>
+    </tr>
+    <tr>
+      <td>Email de confirmation au client</td>
+      <td class="check stripe">✓</td>
+      <td></td>
+      <td>Chaque client reçoit automatiquement un reçu après sa commande</td>
+    </tr>
+    <tr>
+      <td>Historique de toutes tes commandes</td>
+      <td class="check stripe">✓</td>
+      <td></td>
+      <td>Consulte n'importe quelle commande passée, depuis n'importe quel navigateur</td>
+    </tr>
+    <tr>
+      <td>Remboursement d'un client</td>
+      <td class="check stripe">✓</td>
+      <td></td>
+      <td>Total ou partiel, en un clic, sans manipulation bancaire</td>
+    </tr>
+    <tr>
+      <td>Export des ventes pour ton comptable</td>
+      <td class="check stripe">✓</td>
+      <td></td>
+      <td>Téléchargement d'un fichier tableur avec toutes les transactions</td>
+    </tr>
+    <tr>
+      <td>Virements sur ton compte bancaire</td>
+      <td class="check stripe">✓</td>
+      <td></td>
+      <td>L'argent est viré automatiquement selon la fréquence que tu choisis</td>
+    </tr>
+    <tr>
+      <td>Boutique sur ton site, à ton adresse</td>
+      <td></td>
+      <td class="check custom">✓</td>
+      <td>Tout s'affiche sur fleursdenila.fr, tes clients ne quittent jamais ton site</td>
+    </tr>
+    <tr>
+      <td>Catalogue de produits avec photos</td>
+      <td></td>
+      <td class="check custom">✓</td>
+      <td>De 5 à 15 produits, modifiables à tout moment depuis ton espace admin</td>
+    </tr>
+    <tr>
+      <td>Options par produit (couleur, taille, message)</td>
+      <td></td>
+      <td class="check custom">✓</td>
+      <td>Ton client choisit ses options au moment de la commande</td>
+    </tr>
+    <tr>
+      <td>Gestion des stocks</td>
+      <td></td>
+      <td class="check custom">✓</td>
+      <td>Un produit épuisé disparaît automatiquement de la boutique</td>
+    </tr>
+    <tr>
+      <td>Créneaux de livraison (1 client par créneau)</td>
+      <td></td>
+      <td class="check custom">✓</td>
+      <td>Un créneau pris est immédiatement bloqué pour les autres clients</td>
+    </tr>
+    <tr>
+      <td>Livraison à domicile ou retrait en boutique</td>
+      <td></td>
+      <td class="check custom">✓</td>
+      <td>Ton client choisit son mode de récupération au moment de la commande</td>
+    </tr>
+    <tr>
+      <td>Livraison offerte au-dessus d'un seuil</td>
+      <td></td>
+      <td class="check custom">✓</td>
+      <td>Montant configurable à tout moment selon tes besoins</td>
+    </tr>
+    <tr>
+      <td>Notification à chaque nouvelle commande</td>
+      <td></td>
+      <td class="check custom">✓</td>
+      <td>Tu reçois un email dès qu'une commande est confirmée</td>
+    </tr>
+    <tr>
+      <td>Design aux couleurs de Fleurs de Nila</td>
+      <td></td>
+      <td class="check custom">✓</td>
+      <td>La boutique reprend exactement les couleurs et polices de ton site actuel</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. Ce que tu gères au quotidien</h2>
+<div class="note">
+  Deux outils à ta disposition : ton espace admin sur fleursdenila.fr pour tes produits et ta tournée, et le tableau de bord SumUp pour tes paiements et tes ventes.
+</div>
+<table>
+  <thead>
+    <tr>
+      <th style="width:25%">Action</th>
+      <th style="width:20%">Où ?</th>
+      <th>Ce que tu peux faire</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Ajouter ou modifier un produit</td>
+      <td>Ton espace admin</td>
+      <td>Ajoute un bouquet, modifie un prix, change une photo, désactive un produit temporairement</td>
+    </tr>
+    <tr>
+      <td>Mettre à jour tes stocks</td>
+      <td>Ton espace admin</td>
+      <td>Indique le nombre de pièces disponibles — la boutique se met à jour automatiquement</td>
+    </tr>
+    <tr>
+      <td>Voir la tournée du lendemain</td>
+      <td>Ton espace admin</td>
+      <td>Liste de toutes les livraisons triées par créneau horaire, avec adresse et contenu de chaque commande (imprimable)</td>
+    </tr>
+    <tr>
+      <td>Consulter tes commandes</td>
+      <td>SumUp Dashboard</td>
+      <td>Retrouve toutes tes commandes, le détail de chaque vente et l'état des virements</td>
+    </tr>
+    <tr>
+      <td>Rembourser un client</td>
+      <td>SumUp Dashboard</td>
+      <td>Remboursement total ou partiel en quelques secondes, directement depuis le tableau de bord</td>
+    </tr>
+    <tr>
+      <td>Exporter tes ventes</td>
+      <td>SumUp Dashboard</td>
+      <td>Télécharge un fichier tableur de toutes tes transactions à transmettre à ton comptable</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. Le détail de chaque fonctionnalité développée</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:20%">Fonctionnalité</th>
+      <th style="width:12%">Qui l'utilise</th>
+      <th>Ce qu'on peut faire</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Catalogue produits</strong></td>
+      <td>Client</td>
+      <td>
+        Voir tous les produits disponibles avec photo, nom et prix.<br>
+        Les produits épuisés sont automatiquement masqués.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Options par produit</strong></td>
+      <td>Client</td>
+      <td>
+        Choisir une couleur, une taille (S, M ou L), et ajouter un message personnalisé à joindre au bouquet.<br>
+        Le prix s'ajuste selon les options choisies.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Panier</strong></td>
+      <td>Client</td>
+      <td>
+        Ajouter un ou plusieurs produits.<br>
+        Modifier les quantités ou supprimer un article.<br>
+        Voir le total et savoir si la livraison est offerte ou non.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Créneaux de livraison</strong></td>
+      <td>Client</td>
+      <td>
+        Voir les créneaux disponibles pour le lendemain.<br>
+        Choisir un créneau horaire. Dès la sélection, le créneau est bloqué pendant 10 minutes pour les autres visiteurs.<br>
+        Choisir entre livraison à domicile ou retrait en boutique.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Récapitulatif et paiement</strong></td>
+      <td>Client</td>
+      <td>
+        Voir le résumé complet de la commande (produits, options, créneau, mode de livraison, total).<br>
+        Renseigner ses coordonnées (nom, adresse, téléphone).<br>
+        Payer par carte bancaire de façon sécurisée.<br>
+        Recevoir une confirmation par email après le paiement.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Gestion des produits</strong></td>
+      <td>Manon (admin)</td>
+      <td>
+        Ajouter un nouveau produit (nom, description, photo, prix, options disponibles, stock initial).<br>
+        Modifier les informations d'un produit existant.<br>
+        Activer ou désactiver un produit (le retirer temporairement de la boutique sans le supprimer).<br>
+        Supprimer un produit définitivement.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Gestion des stocks</strong></td>
+      <td>Manon (admin)</td>
+      <td>
+        Voir le stock actuel de chaque produit.<br>
+        Mettre à jour le stock en un clic (après un arrivage par exemple).<br>
+        Le stock se décrémente automatiquement à chaque commande confirmée.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Tournée du lendemain</strong></td>
+      <td>Manon (admin)</td>
+      <td>
+        Voir la liste complète des livraisons du lendemain, triées par créneau horaire.<br>
+        Pour chaque commande : nom du client, adresse, produits commandés avec options, mode (livraison ou retrait).<br>
+        Imprimer la liste pour l'emmener en tournée.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Notification nouvelle commande</strong></td>
+      <td>Manon</td>
+      <td>
+        Recevoir un email automatique dès qu'une commande est confirmée et payée.<br>
+        L'email contient le récapitulatif de la commande et le créneau choisi par le client.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Connexion espace admin</strong></td>
+      <td>Manon (admin)</td>
+      <td>
+        Se connecter avec un identifiant et un mot de passe.<br>
+        L'espace admin est accessible uniquement par toi, protégé et non visible des clients.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  Creation Edition Broderie · Avril 2026
+</div>
+
+<div class="no-print" style="margin-top: 24px; text-align: right;">
+  <button onclick="window.print()" style="padding:8px 20px;background:#1a365d;color:#fff;border:none;font-size:11pt;cursor:pointer;">
+    Imprimer / Exporter PDF
+  </button>
+</div>
+
+</body>
+</html>

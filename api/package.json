@@ -1,0 +1,24 @@
+{
+  "name": "fleurs-de-nila-api",
+  "version": "1.0.0",
+  "description": "API backend boutique Fleurs de Nila",
+  "main": "app.js",
+  "scripts": {
+    "predev": "sh -c 'lsof -ti :3000 | xargs kill -9 2>/dev/null; true'",
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "connect-sqlite3": "^0.9.13",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "nodemailer": "^6.9.13",
+    "resend": "^3.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

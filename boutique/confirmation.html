@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commande confirmée | Fleurs de Nila</title>
+  <link rel="preload" as="font" href="../FleurDeLeah-Regular.woff2" type="font/woff2" crossorigin>
+  <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../tailwind.css">
+  <style>#nav { background: #ffffff; backdrop-filter: none; }</style>
+</head>
+
+<body class="font-sans text-primary bg-cream antialiased">
+
+  <!-- Navigation -->
+  <nav id="nav" class="fixed w-full z-50 transition-all duration-500 border-b border-primary bg-white">
+    <!-- Mobile Layout -->
+    <div class="lg:hidden w-full px-4 py-2">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <a href="index.html" class="relative inline-flex p-2" aria-label="Boutique">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          </a>
+        </div>
+        <a href="../index.html" class="transition-opacity hover:opacity-80 flex-shrink-0">
+          <img src="../images/logo-fleurs-de-nila-fleuriste-nimes-400w.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes" width="1013" height="564" class="h-16 sm:h-20 w-auto">
+        </a>
+        <div class="flex-1 flex justify-end">
+          <button id="mobile-menu-btn" class="text-primary p-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Desktop Layout -->
+    <div class="hidden lg:grid w-full" style="grid-template-columns: 20% 70% 10%;">
+      <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center h-24">
+        <a href="../index.html" class="transition-opacity hover:opacity-80">
+          <img src="../images/logo-fleurs-de-nila-fleuriste-nimes-400w.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes" width="1013" height="564" class="h-16 lg:h-20 w-auto">
+        </a>
+      </div>
+      <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center justify-center h-24">
+        <div class="flex items-center justify-center gap-6 lg:gap-10 xl:gap-14 w-full">
+          <a href="../index.html" class="nav-link text-sm lg:text-base xl:text-lg">Accueil</a>
+          <a href="../index.html#collections" class="nav-link text-sm lg:text-base xl:text-lg">Collections</a>
+          <a href="../index.html#evenementiel" class="nav-link text-sm lg:text-base xl:text-lg">Événementiel</a>
+          <a href="index.html" class="nav-link text-sm lg:text-base xl:text-lg">Boutique</a>
+          <a href="../index.html#apropos" class="nav-link text-sm lg:text-base xl:text-lg">À propos</a>
+          <a href="../blog.html" class="nav-link text-sm lg:text-base xl:text-lg">Blog</a>
+          <a href="../index.html#contact" class="nav-link text-sm lg:text-base xl:text-lg">Contact</a>
+        </div>
+      </div>
+      <div class="px-4 py-4 flex items-center justify-center h-24">
+      </div>
+    </div>
+  </nav>
+
+  <!-- Menu Mobile Fullscreen -->
+  <div id="mobile-menu" class="fixed inset-0 bg-cream z-40 hidden opacity-0 transition-opacity duration-500">
+    <div class="flex flex-col items-center justify-center h-full space-y-5 relative">
+      <button id="close-menu-btn" class="absolute top-6 right-6 text-primary p-2">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <a href="../index.html" class="mobile-nav-link text-6xl">Accueil</a>
+      <a href="../index.html#collections" class="mobile-nav-link text-6xl">Collections</a>
+      <a href="../index.html#evenementiel" class="mobile-nav-link text-6xl">Événementiel</a>
+      <a href="index.html" class="mobile-nav-link text-6xl">Boutique</a>
+      <a href="../index.html#apropos" class="mobile-nav-link text-6xl">À propos</a>
+      <a href="../blog.html" class="mobile-nav-link text-6xl">Blog</a>
+      <a href="../index.html#contact" class="mobile-nav-link text-6xl">Contact</a>
+    </div>
+  </div>
+
+  <main class="pt-24 min-h-screen flex items-center justify-center px-6 lg:px-16 py-20">
+    <div class="max-w-lg w-full text-center">
+      <!-- Icône succès -->
+      <div class="w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center mx-auto mb-8">
+        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+
+      <h1 class="font-display text-5xl lg:text-6xl text-primary mb-4">Merci !</h1>
+      <p class="text-gray-600 leading-relaxed mb-2">Votre commande a bien été reçue et votre paiement confirmé.</p>
+      <p id="confirm-email" class="text-sm text-gray-400 mb-10"></p>
+
+      <div id="order-recap" class="border border-gray-100 bg-white p-6 text-left mb-10 space-y-2 text-sm text-gray-600"></div>
+
+      <a href="index.html"
+        class="inline-block bg-primary text-white py-4 px-10 text-sm tracking-widest uppercase hover:bg-secondary transition-colors duration-300">
+        Retour à la boutique
+      </a>
+    </div>
+  </main>
+
+  <footer class="border-t border-primary bg-white">
+    <div class="px-6 lg:px-16 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      <span>© 2026 Fleurs de Nila · Nîmes</span>
+      <div class="flex gap-6">
+        <a href="../mentions-legales.html" class="hover:text-primary transition-colors">Mentions légales</a>
+        <a href="../politique-confidentialite.html" class="hover:text-primary transition-colors">Confidentialité</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Nettoyer le panier et les données de commande
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const orderSlot = JSON.parse(localStorage.getItem('order_slot') || 'null');
+    const email = localStorage.getItem('order_email') || '';
+
+    localStorage.removeItem('cart');
+    localStorage.removeItem('order_slot');
+    localStorage.removeItem('order_email');
+
+    if (email) {
+      document.getElementById('confirm-email').textContent = `Un email de confirmation a été envoyé à ${email}`;
+    }
+
+    if (orderSlot) {
+      const modeLabel = orderSlot.mode === 'delivery' ? 'Livraison à domicile' : 'Retrait en boutique';
+      const dateLabel = new Date(orderSlot.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+      let html = `<div class="font-medium text-primary mb-2">${modeLabel}</div>`;
+      html += `<div>${dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)}</div>`;
+      if (orderSlot.address) {
+        const a = orderSlot.address;
+        html += `<div class="text-gray-400">${a.street}, ${a.zip} ${a.city}</div>`;
+      }
+      if (cart.length) {
+        html += `<div class="border-t border-gray-100 mt-3 pt-3 space-y-1">`;
+        cart.forEach(i => {
+          html += `<div class="flex justify-between"><span>${i.name} ×${i.qty}</span><span>${(i.price * i.qty).toFixed(2)} €</span></div>`;
+        });
+        html += `</div>`;
+      }
+      document.getElementById('order-recap').innerHTML = html;
+    } else {
+      document.getElementById('order-recap').style.display = 'none';
+    }
+
+    // Bouton fermer menu mobile
+    document.getElementById('close-menu-btn')?.addEventListener('click', () => {
+      const m = document.getElementById('mobile-menu');
+      m.classList.remove('opacity-100');
+      m.classList.add('opacity-0');
+      setTimeout(() => m.classList.add('hidden'), 500);
+      document.body.style.overflow = '';
+    });
+  </script>
+  <script src="../script.js"></script>
+</body>
+</html>

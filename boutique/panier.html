@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panier | Fleurs de Nila</title>
+  <link rel="preload" as="font" href="../FleurDeLeah-Regular.woff2" type="font/woff2" crossorigin>
+  <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../tailwind.css">
+  <style>#nav { background: #ffffff; backdrop-filter: none; }</style>
+</head>
+
+<body class="font-sans text-primary bg-cream antialiased">
+
+  <!-- Navigation -->
+  <nav id="nav" class="fixed w-full z-50 transition-all duration-500 border-b border-primary bg-white">
+    <!-- Mobile Layout -->
+    <div class="lg:hidden w-full px-4 py-2">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <a href="panier.html" class="relative inline-flex p-2" aria-label="Panier">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span id="cart-count-mobile" class="absolute top-0 right-0 bg-primary text-white text-xs w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+          </a>
+        </div>
+        <a href="../index.html" class="transition-opacity hover:opacity-80 flex-shrink-0">
+          <img src="../images/logo-fleurs-de-nila-fleuriste-nimes-400w.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes" width="1013" height="564" class="h-16 sm:h-20 w-auto">
+        </a>
+        <div class="flex-1 flex justify-end">
+          <button id="mobile-menu-btn" class="text-primary p-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Desktop Layout -->
+    <div class="hidden lg:grid w-full" style="grid-template-columns: 20% 70% 10%;">
+      <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center h-24">
+        <a href="../index.html" class="transition-opacity hover:opacity-80">
+          <img src="../images/logo-fleurs-de-nila-fleuriste-nimes-400w.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes" width="1013" height="564" class="h-16 lg:h-20 w-auto">
+        </a>
+      </div>
+      <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center justify-center h-24">
+        <div class="flex items-center justify-center gap-6 lg:gap-10 xl:gap-14 w-full">
+          <a href="../index.html" class="nav-link text-sm lg:text-base xl:text-lg">Accueil</a>
+          <a href="../index.html#collections" class="nav-link text-sm lg:text-base xl:text-lg">Collections</a>
+          <a href="../index.html#evenementiel" class="nav-link text-sm lg:text-base xl:text-lg">Événementiel</a>
+          <a href="index.html" class="nav-link text-sm lg:text-base xl:text-lg">Boutique</a>
+          <a href="../index.html#apropos" class="nav-link text-sm lg:text-base xl:text-lg">À propos</a>
+          <a href="../blog.html" class="nav-link text-sm lg:text-base xl:text-lg">Blog</a>
+          <a href="../index.html#contact" class="nav-link text-sm lg:text-base xl:text-lg">Contact</a>
+        </div>
+      </div>
+      <div class="px-4 py-4 flex items-center justify-center h-24">
+        <a href="panier.html" class="relative p-2" aria-label="Panier">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <span id="cart-count" class="absolute -top-2 -right-2 bg-primary text-white text-xs w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Menu Mobile Fullscreen -->
+  <div id="mobile-menu" class="fixed inset-0 bg-cream z-40 hidden opacity-0 transition-opacity duration-500">
+    <div class="flex flex-col items-center justify-center h-full space-y-5 relative">
+      <button id="close-menu-btn" class="absolute top-6 right-6 text-primary p-2">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <a href="../index.html" class="mobile-nav-link text-6xl">Accueil</a>
+      <a href="../index.html#collections" class="mobile-nav-link text-6xl">Collections</a>
+      <a href="../index.html#evenementiel" class="mobile-nav-link text-6xl">Événementiel</a>
+      <a href="index.html" class="mobile-nav-link text-6xl">Boutique</a>
+      <a href="../index.html#apropos" class="mobile-nav-link text-6xl">À propos</a>
+      <a href="../blog.html" class="mobile-nav-link text-6xl">Blog</a>
+      <a href="../index.html#contact" class="mobile-nav-link text-6xl">Contact</a>
+    </div>
+  </div>
+
+  <main class="pt-24 lg:pt-24 min-h-screen">
+
+    <!-- En-tête -->
+    <div class="border-b border-primary bg-white">
+      <div class="px-6 lg:px-16 py-12 max-w-6xl mx-auto">
+        <p class="text-sm tracking-widest uppercase text-gray-500 mb-3">Récapitulatif</p>
+        <h1 class="font-display text-5xl lg:text-7xl text-primary">Mon panier</h1>
+      </div>
+    </div>
+
+    <div class="px-6 lg:px-16 py-12 max-w-6xl mx-auto">
+
+      <!-- Panier vide -->
+      <div id="empty-cart" class="hidden text-center py-24">
+        <p class="text-gray-400 text-lg mb-6">Votre panier est vide.</p>
+        <a href="index.html" class="inline-block border border-primary text-primary px-8 py-3 text-sm tracking-widest uppercase hover:bg-primary hover:text-white transition-colors duration-300">
+          Voir la boutique
+        </a>
+      </div>
+
+      <!-- Contenu panier -->
+      <div id="cart-content" class="hidden lg:grid lg:grid-cols-[1fr_360px] lg:gap-12">
+
+        <!-- Liste des articles -->
+        <div>
+          <div id="cart-items" class="divide-y divide-gray-100"></div>
+
+          <a href="index.html" class="inline-flex items-center gap-2 mt-8 text-sm text-gray-400 hover:text-primary transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/></svg>
+            Continuer mes achats
+          </a>
+        </div>
+
+        <!-- Récapitulatif commande -->
+        <div class="mt-8 lg:mt-0">
+          <div class="border border-primary bg-white p-6 sticky top-28">
+            <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-6">Votre commande</h2>
+
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Sous-total</span>
+                <span id="subtotal">0 €</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Livraison</span>
+                <span id="delivery-cost" class="text-green-700">—</span>
+              </div>
+            </div>
+
+            <!-- Barre de progression livraison offerte -->
+            <div id="delivery-progress-wrap" class="mt-4">
+              <div class="flex justify-between text-xs text-gray-400 mb-1">
+                <span id="delivery-msg"></span>
+                <span id="delivery-threshold-label"></span>
+              </div>
+              <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+                <div id="delivery-bar" class="h-full bg-primary transition-all duration-500" style="width:0%"></div>
+              </div>
+            </div>
+
+            <div class="border-t border-gray-100 mt-6 pt-6 flex justify-between font-medium text-base">
+              <span>Total</span>
+              <span id="total">0 €</span>
+            </div>
+
+            <button id="checkout-btn"
+              class="mt-6 w-full bg-primary text-white py-4 text-sm tracking-widest uppercase hover:bg-secondary transition-colors duration-300">
+              Choisir un créneau →
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-primary bg-white mt-16">
+    <div class="px-6 lg:px-16 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      <span>© 2026 Fleurs de Nila · Nîmes</span>
+      <div class="flex gap-6">
+        <a href="../mentions-legales.html" class="hover:text-primary transition-colors">Mentions légales</a>
+        <a href="../politique-confidentialite.html" class="hover:text-primary transition-colors">Confidentialité</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const DELIVERY_THRESHOLD = 60;   // livraison offerte au-dessus de ce montant
+    const DELIVERY_PRICE     = 5;    // frais de livraison en dessous du seuil
+
+    function getCart() {
+      return JSON.parse(localStorage.getItem('cart') || '[]');
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    function updateCartBadge(cart) {
+      const count = cart.reduce((sum, item) => sum + item.qty, 0);
+      ['cart-count', 'cart-count-mobile'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = count;
+        el.classList.toggle('hidden', count === 0);
+      });
+    }
+
+    function optionsLabel(options) {
+      return Object.entries(options)
+        .map(([k, v]) => `${k} : ${v}`)
+        .join(' · ');
+    }
+
+    function renderItem(item, index) {
+      const img = item.image || '../images/bouquet-fleurs-fraiches-nimes.webp';
+      const opts = optionsLabel(item.options);
+      return `
+        <div class="flex gap-4 py-6" data-index="${index}">
+          <a href="produit.html?id=${item.id}" class="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 overflow-hidden bg-gray-50 border border-gray-100">
+            <img src="${img}" alt="${item.name}" class="w-full h-full object-cover">
+          </a>
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-start gap-2">
+              <a href="produit.html?id=${item.id}" class="font-display text-xl text-primary hover:opacity-70 transition-opacity leading-tight">${item.name}</a>
+              <button class="remove-btn flex-shrink-0 text-gray-300 hover:text-primary transition-colors p-1" data-index="${index}" aria-label="Supprimer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            ${opts ? `<p class="text-xs text-gray-400 mt-1 capitalize">${opts}</p>` : ''}
+            ${item.message ? `<p class="text-xs text-gray-400 mt-1 italic">"${item.message}"</p>` : ''}
+            <div class="flex items-center justify-between mt-3">
+              <div class="flex items-center border border-gray-200">
+                <button class="qty-btn w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors" data-index="${index}" data-delta="-1">−</button>
+                <span class="w-8 text-center text-sm">${item.qty}</span>
+                <button class="qty-btn w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors" data-index="${index}" data-delta="1">+</button>
+              </div>
+              <span class="text-sm font-medium">${(item.price * item.qty).toFixed(2)} €</span>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function renderSummary(cart) {
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const freeDelivery = subtotal >= DELIVERY_THRESHOLD;
+      const deliveryCost = freeDelivery ? 0 : DELIVERY_PRICE;
+      const total = subtotal + deliveryCost;
+
+      document.getElementById('subtotal').textContent = subtotal.toFixed(2) + ' €';
+      document.getElementById('total').textContent = total.toFixed(2) + ' €';
+
+      const deliveryEl = document.getElementById('delivery-cost');
+      if (freeDelivery) {
+        deliveryEl.textContent = 'Offerte';
+        deliveryEl.className = 'text-green-700 text-sm';
+      } else {
+        deliveryEl.textContent = deliveryCost.toFixed(2) + ' €';
+        deliveryEl.className = 'text-sm';
+      }
+
+      // Barre de progression
+      const remaining = Math.max(0, DELIVERY_THRESHOLD - subtotal);
+      const pct = Math.min(100, (subtotal / DELIVERY_THRESHOLD) * 100);
+      document.getElementById('delivery-bar').style.width = pct + '%';
+      document.getElementById('delivery-threshold-label').textContent = DELIVERY_THRESHOLD + ' €';
+
+      const msg = document.getElementById('delivery-msg');
+      if (freeDelivery) {
+        msg.textContent = 'Livraison offerte ✓';
+        msg.className = 'text-xs text-green-700';
+      } else {
+        msg.textContent = `Plus que ${remaining.toFixed(2)} € pour la livraison offerte`;
+        msg.className = 'text-xs text-gray-400';
+      }
+    }
+
+    function render() {
+      const cart = getCart();
+      updateCartBadge(cart);
+
+      if (cart.length === 0) {
+        document.getElementById('empty-cart').classList.remove('hidden');
+        document.getElementById('cart-content').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('empty-cart').classList.add('hidden');
+      document.getElementById('cart-content').classList.remove('hidden');
+      document.getElementById('cart-items').innerHTML = cart.map((item, i) => renderItem(item, i)).join('');
+      renderSummary(cart);
+    }
+
+    // Délégation d'événements sur les boutons qty et remove
+    document.getElementById('cart-items')?.addEventListener('click', e => {
+      const qtyBtn = e.target.closest('.qty-btn');
+      const removeBtn = e.target.closest('.remove-btn');
+
+      if (qtyBtn) {
+        const index = parseInt(qtyBtn.dataset.index);
+        const delta = parseInt(qtyBtn.dataset.delta);
+        const cart = getCart();
+        cart[index].qty = Math.max(1, cart[index].qty + delta);
+        saveCart(cart);
+        render();
+      }
+
+      if (removeBtn) {
+        const index = parseInt(removeBtn.dataset.index);
+        const cart = getCart();
+        cart.splice(index, 1);
+        saveCart(cart);
+        render();
+      }
+    });
+
+    document.getElementById('checkout-btn')?.addEventListener('click', () => {
+      const cart = getCart();
+      if (cart.length === 0) return;
+      window.location.href = 'livraison.html';
+    });
+
+    // Bouton fermer menu mobile
+    document.getElementById('close-menu-btn')?.addEventListener('click', () => {
+      const m = document.getElementById('mobile-menu');
+      m.classList.remove('opacity-100');
+      m.classList.add('opacity-0');
+      setTimeout(() => m.classList.add('hidden'), 500);
+      document.body.style.overflow = '';
+    });
+
+    render();
+  </script>
+  <script src="../script.js"></script>
+</body>
+</html>

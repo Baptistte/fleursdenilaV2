@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boutique | Fleurs de Nila — Fleuriste à Nîmes</title>
+  <meta name="description" content="Commandez en ligne vos bouquets et compositions florales. Livraison à domicile ou retrait en boutique à Nîmes.">
+  <link rel="preload" as="font" href="../FleurDeLeah-Regular.woff2" type="font/woff2" crossorigin>
+  <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../tailwind.css">
+  <style>
+    #nav { background: #ffffff; backdrop-filter: none; }
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      text-decoration: none;
+      transition: box-shadow 0.3s ease;
+    }
+    .product-card:hover {
+      box-shadow: 0 8px 32px rgba(26,20,16,0.10);
+    }
+    .product-card:hover .card-img {
+      transform: scale(1.04);
+    }
+    .product-card .card-img {
+      transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .card-tag {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #b5a898;
+      border: 1px solid #e8e0d4;
+      padding: 3px 8px;
+      margin-bottom: 12px;
+    }
+    .card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #1a1410;
+      border-bottom: 1px solid #1a1410;
+      padding-bottom: 1px;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .product-card:hover .card-cta {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body class="font-sans text-primary bg-cream antialiased">
+
+  <!-- Navigation -->
+  <nav id="nav" class="fixed w-full z-50 transition-all duration-500 border-b border-primary bg-white">
+    <!-- Mobile Layout -->
+    <div class="lg:hidden w-full px-4 py-2">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <a href="panier.html" class="relative inline-flex p-2" aria-label="Panier">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span id="cart-count-mobile" class="absolute top-0 right-0 bg-primary text-white text-xs w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+          </a>
+        </div>
+        <a href="../index.html" class="transition-opacity hover:opacity-80 flex-shrink-0">
+          <img src="../images/logo-fleurs-de-nila-fleuriste-nimes-400w.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes" width="1013" height="564" class="h-16 sm:h-20 w-auto">
+        </a>
+        <div class="flex-1 flex justify-end">
+          <button id="mobile-menu-btn" class="text-primary p-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop Layout -->
+    <div class="hidden lg:grid w-full" style="grid-template-columns: 20% 70% 10%;">
+      <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center h-24">
+        <a href="../index.html" class="transition-opacity hover:opacity-80">
+          <img src="../images/logo-fleurs-de-nila-fleuriste-nimes-400w.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes" width="1013" height="564" class="h-16 lg:h-20 w-auto">
+        </a>
+      </div>
+      <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center justify-center h-24">
+        <div class="flex items-center justify-center gap-6 lg:gap-10 xl:gap-14 w-full">
+          <a href="../index.html" class="nav-link text-sm lg:text-base xl:text-lg">Accueil</a>
+          <a href="../index.html#collections" class="nav-link text-sm lg:text-base xl:text-lg">Collections</a>
+          <a href="../index.html#evenementiel" class="nav-link text-sm lg:text-base xl:text-lg">Événementiel</a>
+          <a href="index.html" class="nav-link text-sm lg:text-base xl:text-lg">Boutique</a>
+          <a href="../index.html#apropos" class="nav-link text-sm lg:text-base xl:text-lg">À propos</a>
+          <a href="../blog.html" class="nav-link text-sm lg:text-base xl:text-lg">Blog</a>
+          <a href="../index.html#contact" class="nav-link text-sm lg:text-base xl:text-lg">Contact</a>
+        </div>
+      </div>
+      <div class="px-4 py-4 flex items-center justify-center h-24">
+        <a href="panier.html" class="relative p-2" aria-label="Panier">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <span id="cart-count" class="absolute -top-2 -right-2 bg-primary text-white text-xs w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Menu Mobile Fullscreen -->
+  <div id="mobile-menu" class="fixed inset-0 bg-cream z-40 hidden opacity-0 transition-opacity duration-500">
+    <div class="flex flex-col items-center justify-center h-full space-y-5 relative">
+      <button id="close-menu-btn" class="absolute top-6 right-6 text-primary p-2">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <a href="../index.html" class="mobile-nav-link text-6xl">Accueil</a>
+      <a href="../index.html#collections" class="mobile-nav-link text-6xl">Collections</a>
+      <a href="../index.html#evenementiel" class="mobile-nav-link text-6xl">Événementiel</a>
+      <a href="index.html" class="mobile-nav-link text-6xl">Boutique</a>
+      <a href="../index.html#apropos" class="mobile-nav-link text-6xl">À propos</a>
+      <a href="../blog.html" class="mobile-nav-link text-6xl">Blog</a>
+      <a href="../index.html#contact" class="mobile-nav-link text-6xl">Contact</a>
+    </div>
+  </div>
+
+  <!-- Bandeau boutique -->
+  <div class="pt-24 lg:pt-24" style="background:#1e3a5f">
+    <div class="px-6 lg:px-16 max-w-6xl mx-auto" style="padding-top:18px;padding-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <svg width="18" height="18" fill="none" stroke="#ffffff" viewBox="0 0 24 24" style="opacity:0.75;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        <h1 style="font-size:13px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#ffffff;margin:0">Boutique en ligne</h1>
+        <span style="width:1px;height:14px;background:rgba(255,255,255,0.25);display:inline-block"></span>
+        <span style="font-size:12px;color:rgba(255,255,255,0.65);letter-spacing:0.04em">Fleurs fraîches · Compositions florales</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px">
+        <span style="font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:0.06em">
+          <span style="color:#7dd3b0;margin-right:5px">✓</span>Livraison à domicile
+        </span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:0.06em">
+          <span style="color:#7dd3b0;margin-right:5px">✓</span>Retrait en boutique
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grille produits -->
+  <main class="px-6 lg:px-16 max-w-6xl mx-auto" style="padding-top:36px;padding-bottom:60px">
+
+    <!-- État chargement -->
+    <div id="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style="gap:28px">
+      <div class="bg-white animate-pulse" style="height:420px;border:1px solid #ede8df"></div>
+      <div class="bg-white animate-pulse" style="height:420px;border:1px solid #ede8df"></div>
+      <div class="bg-white animate-pulse" style="height:420px;border:1px solid #ede8df"></div>
+    </div>
+
+    <!-- Grille réelle (injectée par JS) -->
+    <div id="products-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style="gap:28px"></div>
+
+    <!-- Erreur -->
+    <div id="error" class="hidden text-center py-20">
+      <p class="text-gray-500">Impossible de charger les produits. Veuillez réessayer.</p>
+    </div>
+
+  </main>
+
+  <!-- Footer simplifié -->
+  <footer class="border-t border-primary bg-white mt-16">
+    <div class="px-6 lg:px-16 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      <span>© 2026 Fleurs de Nila · Nîmes</span>
+      <div class="flex gap-6">
+        <a href="../mentions-legales.html" class="hover:text-primary transition-colors">Mentions légales</a>
+        <a href="../politique-confidentialite.html" class="hover:text-primary transition-colors">Confidentialité</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const API = 'http://localhost:3000';
+
+    // Panier badge
+    function updateCartBadge() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const count = cart.reduce((sum, item) => sum + item.qty, 0);
+      ['cart-count', 'cart-count-mobile'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = count;
+        el.classList.toggle('hidden', count === 0);
+      });
+    }
+
+    const productsMap = {};
+
+    // Rendu d'une carte produit
+    function renderCard(p) {
+      const img = p.images[0] || '../images/bouquet-fleurs-fraiches-nimes.webp';
+      const hasOptions = p.options && p.options.length > 0;
+      const tag = hasOptions ? 'Plusieurs formats' : 'Format unique';
+      return `
+        <div class="product-card" data-id="${p.id}" style="border:1px solid #ede8df">
+          <a href="produit.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block">
+            <div class="overflow-hidden" style="height:300px;background:#f9f7f4">
+              <img src="${img}" alt="${p.name}" class="card-img w-full h-full object-cover" loading="lazy">
+            </div>
+            <div style="padding:22px 22px 0">
+              <span class="card-tag">${tag}</span>
+              <h2 class="font-display text-primary" style="font-size:1.45rem;line-height:1.15;margin:0 0 10px">${p.name}</h2>
+              <p style="font-size:13px;color:#9b8f80;line-height:1.65;margin:0 0 20px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${p.description}</p>
+            </div>
+          </a>
+          <div style="padding:0 22px 22px">
+            <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f0ece5;padding-top:16px">
+              <span style="font-size:15px;font-weight:600;color:#1a1410">${p.price} €</span>
+              <div style="display:flex;align-items:center;gap:10px">
+                <button class="quick-add-btn" data-id="${p.id}" title="Ajouter au panier"
+                  style="width:32px;height:32px;border:1px solid #1a1410;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1a1410;flex-shrink:0;transition:background 0.2s,color 0.2s">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </button>
+                <a href="produit.html?id=${p.id}" class="card-cta" style="opacity:1;transform:none">Commander →</a>
+              </div>
+            </div>
+            <!-- Quick-add panel -->
+            <div class="quick-panel" style="display:none;margin-top:12px;padding:14px;background:#faf8f5;border:1px solid #e8e0d4"></div>
+          </div>
+        </div>`;
+    }
+
+    function openQuickPanel(productId, btn) {
+      const p = productsMap[productId];
+      if (!p) return;
+      // Le bouton est dans: .product-card > div > div > button
+      // On remonte jusqu'au .product-card via parentElement
+      const card = btn.closest('.product-card') || btn.parentElement?.parentElement?.parentElement;
+      if (!card) return;
+      const panel = card.querySelector('.quick-panel');
+      if (!panel) return;
+
+      // Fermer tous les autres panneaux
+      document.querySelectorAll('.quick-panel').forEach(el => {
+        if (el !== panel) { el.style.display = 'none'; el._qty = undefined; }
+      });
+      document.querySelectorAll('.quick-add-btn').forEach(b => {
+        if (b !== btn) { b.style.background = 'none'; b.style.color = '#1a1410'; }
+      });
+
+      if (panel.style.display !== 'none') {
+        panel.style.display = 'none';
+        btn.style.background = 'none'; btn.style.color = '#1a1410';
+        return;
+      }
+
+      btn.style.background = '#1a1410'; btn.style.color = '#fff';
+
+      const hasOptions = p.options && p.options.length > 0;
+      const selectedOpts = {};
+      let qty = 1;
+
+      let html = '';
+      if (hasOptions) {
+        for (const opt of p.options) {
+          html += `<div style="margin-bottom:10px">
+            <p style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#9b8f80;margin:0 0 6px">${opt.label}</p>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">`;
+          opt.choices.forEach((choice, i) => {
+            const lbl = choice.priceDelta > 0 ? `${choice.label} (+${choice.priceDelta}€)` : choice.priceDelta < 0 ? `${choice.label} (${choice.priceDelta}€)` : choice.label;
+            html += `<button class="qopt" data-type="${opt.type}" data-value="${choice.value}" data-delta="${choice.priceDelta}"
+              style="padding:5px 12px;border:1px solid ${i===0?'#1a1410':'#e8e0d4'};background:${i===0?'#1a1410':'none'};color:${i===0?'#fff':'#1a1410'};cursor:pointer;font-size:11px;transition:all 0.15s">${lbl}</button>`;
+            if (i === 0) { selectedOpts[opt.type] = { value: choice.value, delta: choice.priceDelta }; }
+          });
+          html += `</div></div>`;
+        }
+      }
+
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:10px">
+        <div style="display:inline-flex;align-items:center;border:1px solid #e8e0d4;flex-shrink:0">
+          <button class="q-dec" style="width:30px;height:30px;border:none;background:none;cursor:pointer;font-size:16px;color:#6b5f55">−</button>
+          <span class="q-val" style="width:34px;text-align:center;font-size:13px;font-weight:500;color:#1a1410;border-left:1px solid #e8e0d4;border-right:1px solid #e8e0d4;height:30px;line-height:30px">1</span>
+          <button class="q-inc" style="width:30px;height:30px;border:none;background:none;cursor:pointer;font-size:16px;color:#6b5f55">+</button>
+        </div>
+        <button class="q-add" style="flex:1;padding:0 14px;height:30px;background:#1a1410;color:#fff;border:none;cursor:pointer;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap">Ajouter au panier</button>
+      </div>`;
+
+      panel.innerHTML = html;
+      panel.style.display = 'block';
+
+      // Options
+      panel.querySelectorAll('.qopt').forEach(b => {
+        b.addEventListener('click', () => {
+          const type = b.dataset.type;
+          panel.querySelectorAll(`.qopt[data-type="${type}"]`).forEach(x => {
+            x.style.background = 'none'; x.style.color = '#1a1410'; x.style.borderColor = '#e8e0d4';
+          });
+          b.style.background = '#1a1410'; b.style.color = '#fff'; b.style.borderColor = '#1a1410';
+          selectedOpts[type] = { value: b.dataset.value, delta: parseFloat(b.dataset.delta) };
+        });
+      });
+
+      // Quantité
+      const qVal = panel.querySelector('.q-val');
+      panel.querySelector('.q-dec').addEventListener('click', () => { if (qty > 1) { qty--; qVal.textContent = qty; } });
+      panel.querySelector('.q-inc').addEventListener('click', () => { qty++; qVal.textContent = qty; });
+
+      // Ajouter
+      panel.querySelector('.q-add').addEventListener('click', () => {
+        let price = p.price;
+        const opts = {};
+        for (const [type, sel] of Object.entries(selectedOpts)) {
+          opts[type] = sel.value;
+          price += sel.delta;
+        }
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const existing = cart.find(c => c.id === p.id && JSON.stringify(c.options) === JSON.stringify(opts) && !c.message);
+        if (existing) existing.qty += qty;
+        else cart.push({ id: p.id, name: p.name, image: p.images[0] || '', price, options: opts, message: '', qty });
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartBadge();
+        panel.style.display = 'none';
+        btn.style.background = 'none'; btn.style.color = '#1a1410';
+        if (window.openCart) window.openCart();
+      });
+    }
+
+    async function loadProducts() {
+      try {
+        const res = await fetch(`${API}/api/products`);
+        if (!res.ok) throw new Error();
+        const products = await res.json();
+
+        document.getElementById('loading').classList.add('hidden');
+        const grid = document.getElementById('products-grid');
+        grid.classList.remove('hidden');
+
+        if (products.length === 0) {
+          grid.innerHTML = '<p class="col-span-3 text-center py-20 text-gray-500">Aucun produit disponible pour le moment.</p>';
+          return;
+        }
+
+        products.forEach(p => productsMap[p.id] = p);
+        grid.innerHTML = products.map(renderCard).join('');
+
+        grid.querySelectorAll('.quick-add-btn').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            openQuickPanel(btn.dataset.id, btn);
+          });
+        });
+      } catch {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.remove('hidden');
+      }
+    }
+
+    // Bouton fermer menu mobile (script.js gère l'ouverture)
+    document.getElementById('close-menu-btn')?.addEventListener('click', () => {
+      const m = document.getElementById('mobile-menu');
+      m.classList.remove('opacity-100');
+      m.classList.add('opacity-0');
+      setTimeout(() => m.classList.add('hidden'), 500);
+      document.body.style.overflow = '';
+    });
+
+    updateCartBadge();
+    loadProducts();
+  </script>
+  <script src="../script.js"></script>
+  <script src="cart-drawer.js"></script>
+</body>
+</html>

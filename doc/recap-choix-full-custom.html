@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Récapitulatif — Pourquoi le full custom</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      color: #111;
+      padding: 30px 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 14pt;
+      margin-bottom: 4px;
+    }
+
+    .sub {
+      font-size: 10pt;
+      color: #555;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      font-size: 12pt;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 4px;
+      margin-top: 28px;
+      margin-bottom: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+      margin-bottom: 24px;
+    }
+
+    thead th {
+      background: #1a365d;
+      color: #fff;
+      padding: 7px 10px;
+      text-align: left;
+      font-weight: normal;
+    }
+
+    tbody td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #ddd;
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) { background: #f5f5f5; }
+
+    tbody tr.recommended { background: #fff8e6; font-weight: bold; }
+
+    .ok  { color: #276749; font-weight: bold; }
+    .no  { color: #9b2c2c; font-weight: bold; }
+    .mid { color: #7b5e00; }
+
+    .note {
+      font-size: 9.5pt;
+      color: #444;
+      background: #f0f7ff;
+      border-left: 3px solid #1a365d;
+      padding: 8px 12px;
+      margin-bottom: 20px;
+    }
+
+    .footer {
+      font-size: 9pt;
+      color: #888;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      margin-top: 32px;
+    }
+
+    @media print {
+      body { padding: 20px; }
+      @page { size: A4; margin: 15mm; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Récapitulatif — Pourquoi le développement full custom</h1>
+<div class="sub">Fleurs de Nila — fleursdenila.fr — Avril 2026</div>
+
+<!-- TABLE 1 : CRITÈRES MANON -->
+<h2>1. Les critères non négociables de Manon</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Critère</th>
+      <th>Détail</th>
+      <th>Priorité</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Même site, même URL</td>
+      <td>La boutique doit s'afficher sur fleursdenila.fr, sans redirection ni sous-domaine</td>
+      <td class="ok">Indispensable</td>
+    </tr>
+    <tr>
+      <td>Créneaux de livraison avec limite</td>
+      <td>1 seule livraison par créneau — un créneau pris doit être bloqué en temps réel pour les autres clients</td>
+      <td class="ok">Indispensable</td>
+    </tr>
+    <tr>
+      <td>Variantes produits</td>
+      <td>Couleur, taille (S/M/L), message personnalisé à joindre au bouquet</td>
+      <td class="ok">Indispensable</td>
+    </tr>
+    <tr>
+      <td>Gestion des stocks</td>
+      <td>Ruptures fréquentes — désactivation automatique produit à stock zéro</td>
+      <td class="ok">Indispensable</td>
+    </tr>
+    <tr>
+      <td>Retrait boutique + livraison</td>
+      <td>Les deux modes disponibles, livraison offerte au-dessus d'un seuil</td>
+      <td class="ok">Indispensable</td>
+    </tr>
+    <tr>
+      <td>Back-office simple</td>
+      <td>Vue tournée du lendemain, gestion produits/stocks, export CSV comptable</td>
+      <td class="ok">Indispensable</td>
+    </tr>
+    <tr>
+      <td>Zéro abonnement mensuel fixe</td>
+      <td>Pas de plateforme SaaS à payer chaque mois</td>
+      <td class="mid">Souhaité</td>
+    </tr>
+    <tr>
+      <td>Design cohérent avec le site existant</td>
+      <td>Même charte graphique, même police, mêmes couleurs</td>
+      <td class="mid">Souhaité</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- TABLE 2 : COMPARATIF SOLUTIONS -->
+<h2>2. Comparatif des solutions étudiées</h2>
+<div class="note">
+  Toutes les solutions du marché ont été étudiées et testées au regard des critères ci-dessus. Deux critères ont été bloquants pour chaque solution SaaS : la gestion des créneaux avec capacité limitée et/ou l'intégration sur le même site.
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Solution</th>
+      <th>Même site</th>
+      <th>Créneaux limités</th>
+      <th>Stock</th>
+      <th>Variantes</th>
+      <th>Coût mensuel</th>
+      <th>Verdict</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Stripe Payment Links</td>
+      <td class="no">✗</td>
+      <td class="no">✗</td>
+      <td class="no">✗</td>
+      <td class="no">✗</td>
+      <td>0 € + comm.</td>
+      <td class="no">Écarté</td>
+    </tr>
+    <tr>
+      <td>Shopify Buy Button</td>
+      <td class="mid">Partiel</td>
+      <td class="no">✗ SDK déprécié jan. 2025</td>
+      <td class="ok">✓</td>
+      <td class="ok">✓</td>
+      <td>~29 €/mois</td>
+      <td class="no">Écarté</td>
+    </tr>
+    <tr>
+      <td>Ecwid</td>
+      <td class="ok">✓</td>
+      <td class="no">✗ non supporté</td>
+      <td class="ok">✓</td>
+      <td class="ok">✓</td>
+      <td>~19 €/mois</td>
+      <td class="no">Écarté</td>
+    </tr>
+    <tr>
+      <td>Snipcart</td>
+      <td class="ok">✓</td>
+      <td class="no">✗ note simple seulement</td>
+      <td class="mid">Basique</td>
+      <td class="ok">✓</td>
+      <td>10 $/mois + 2 %</td>
+      <td class="no">Écarté</td>
+    </tr>
+    <tr>
+      <td>Shoprocket</td>
+      <td class="ok">✓</td>
+      <td class="no">✗ note simple seulement</td>
+      <td class="ok">✓</td>
+      <td class="ok">✓</td>
+      <td>~19 $/mois</td>
+      <td class="no">Écarté</td>
+    </tr>
+    <tr>
+      <td>WooCommerce + plugin</td>
+      <td class="no">✗ migration complète</td>
+      <td class="ok">✓ natif</td>
+      <td class="ok">✓</td>
+      <td class="ok">✓</td>
+      <td>~15 €/mois</td>
+      <td class="mid">Risque SEO</td>
+    </tr>
+    <tr class="recommended">
+      <td>Full custom (JS + PHP + MySQL)</td>
+      <td class="ok">✓</td>
+      <td class="ok">✓ natif</td>
+      <td class="ok">✓</td>
+      <td class="ok">✓</td>
+      <td class="ok">0 €</td>
+      <td class="ok">★ Retenu</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- TABLE 3 : POURQUOI FULL CUSTOM -->
+<h2>3. Pourquoi le full custom répond à tout</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Critère Manon</th>
+      <th>Comment le full custom y répond</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Même site / même URL</td>
+      <td>La boutique est développée directement dans le site existant — aucun service tiers, aucune redirection</td>
+    </tr>
+    <tr>
+      <td>Créneaux limités (1 livraison / créneau)</td>
+      <td>API PHP + MySQL : chaque créneau est verrouillé en base à la réservation. Deux clients simultanés ne peuvent pas prendre le même créneau (transaction MySQL)</td>
+    </tr>
+    <tr>
+      <td>Variantes produits</td>
+      <td>Gérées en base de données, affichées dynamiquement en JS, transmises à Stripe en métadonnées</td>
+    </tr>
+    <tr>
+      <td>Gestion des stocks</td>
+      <td>Stock décrémenté côté serveur PHP à chaque webhook Stripe confirmé — jamais côté client (non falsifiable)</td>
+    </tr>
+    <tr>
+      <td>Retrait boutique + livraison</td>
+      <td>Deux modes configurables dans la base de données, seuil de livraison offerte calculé côté serveur</td>
+    </tr>
+    <tr>
+      <td>Back-office simple</td>
+      <td>Page admin.html dédiée, protégée par session PHP — vue tournée du lendemain, CRUD produits, export CSV</td>
+    </tr>
+    <tr>
+      <td>Zéro abonnement mensuel</td>
+      <td>MySQL et PHP inclus dans l'hébergement LWS existant — aucun service SaaS supplémentaire</td>
+    </tr>
+    <tr>
+      <td>Design cohérent</td>
+      <td>HTML/CSS développé directement avec la charte Fleurs de Nila (couleurs, polices, espacements identiques)</td>
+    </tr>
+    <tr>
+      <td>Sécurité paiement</td>
+      <td>Stripe Checkout : les numéros de carte ne transitent jamais par le serveur. Webhook signé et vérifié côté PHP</td>
+    </tr>
+    <tr>
+      <td>Données hébergées en France</td>
+      <td>LWS est un hébergeur français — toutes les données clients restent sur des serveurs français (conformité RGPD facilitée)</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- TABLE 4 : COÛTS -->
+<h2>4. Synthèse des coûts</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Poste</th>
+      <th>Full custom</th>
+      <th>Solution SaaS moyenne (ex. Ecwid)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Développement initial</td>
+      <td>1 500 € HT (forfait unique)</td>
+      <td>500 – 2 000 € (intégration agence)</td>
+    </tr>
+    <tr>
+      <td>Abonnement mensuel plateforme</td>
+      <td class="ok">0 €/mois</td>
+      <td class="no">15 – 30 €/mois</td>
+    </tr>
+    <tr>
+      <td>Base de données / hébergement</td>
+      <td class="ok">0 € (inclus LWS)</td>
+      <td class="no">Inclus dans l'abonnement SaaS</td>
+    </tr>
+    <tr>
+      <td>Frais transaction</td>
+      <td>1,5 % + 0,25 € / vente (Stripe)</td>
+      <td>1,5 – 2 % + commission plateforme</td>
+    </tr>
+    <tr>
+      <td>Créneaux limités natifs</td>
+      <td class="ok">Inclus</td>
+      <td class="no">Non disponible</td>
+    </tr>
+    <tr>
+      <td><strong>Coût total sur 3 ans</strong></td>
+      <td><strong>~1 500 €</strong></td>
+      <td><strong>~2 540 € (1 000 + 540 € abonnements)</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="note">
+  Sur 3 ans, le full custom est moins cher qu'une solution SaaS — tout en répondant à 100 % aux besoins de Manon, là où aucune plateforme du marché n'y répond nativement.
+</div>
+
+<div class="footer">
+  Proposition préparée par Baptiste Grincourt — baptistegrincourt@gmail.com — Avril 2026
+</div>
+
+<script>
+  // Bouton impression (masqué à l'impression)
+</script>
+<div style="margin-top:24px; text-align:right;">
+  <button onclick="window.print()" style="padding:8px 20px;background:#1a365d;color:#fff;border:none;font-size:11pt;cursor:pointer;">
+    Imprimer / Exporter PDF
+  </button>
+</div>
+
+</body>
+</html>

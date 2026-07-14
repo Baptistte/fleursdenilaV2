@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+api/.env
+api/db/*.sqlite
+api/db/*.sqlite-shm
+api/db/*.sqlite-wal
+api/db/sessions.sqlite

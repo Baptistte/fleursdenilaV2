@@ -1,0 +1,32 @@
+# Robots.txt pour Fleurs de Nila
+# https://www.fleursdenila.fr/
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.fleursdenila.fr/sitemap.xml
+
+# Interdire l'accès aux dossiers inutiles
+Disallow: /images_backup/
+Disallow: /doc/
+
+# Autoriser l'indexation des images
+User-agent: Googlebot-Image
+Allow: /images/
+
+# Autoriser les IA (ChatGPT, Perplexity, etc.)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Plan d'action développement — Fleurs de Nila</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      color: #111;
+      padding: 30px 40px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    h1 { font-size: 15pt; margin-bottom: 2px; }
+    .sub { font-size: 10pt; color: #555; margin-bottom: 28px; }
+
+    h2 {
+      font-size: 12pt;
+      background: #1a365d;
+      color: #fff;
+      padding: 6px 10px;
+      margin-top: 32px;
+      margin-bottom: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+      margin-bottom: 6px;
+    }
+
+    thead th {
+      background: #2d5282;
+      color: #fff;
+      padding: 6px 10px;
+      text-align: left;
+      font-weight: normal;
+    }
+
+    tbody td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #ddd;
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) { background: #f7f7f7; }
+
+    .tag {
+      display: inline-block;
+      font-size: 8.5pt;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+    .tag-php    { background: #dbeafe; color: #1e40af; }
+    .tag-js     { background: #fef9c3; color: #854d0e; }
+    .tag-mysql  { background: #dcfce7; color: #166534; }
+    .tag-stripe { background: #f3e8ff; color: #6b21a8; }
+    .tag-stripe-zero { background: #6b21a8; color: #fff; }
+    .tag-secu   { background: #fee2e2; color: #991b1b; }
+    .tag-ui     { background: #e0f2fe; color: #075985; }
+
+    .total-row td {
+      background: #1a365d;
+      color: #fff;
+      font-weight: bold;
+      border: none;
+    }
+
+    .note {
+      font-size: 9.5pt;
+      color: #444;
+      background: #f0f7ff;
+      border-left: 3px solid #1a365d;
+      padding: 8px 12px;
+      margin: 8px 0 20px 0;
+    }
+
+    .arch {
+      font-family: 'Courier New', monospace;
+      font-size: 9pt;
+      background: #f4f4f4;
+      border: 1px solid #ddd;
+      padding: 12px 16px;
+      margin: 10px 0 20px 0;
+      line-height: 1.7;
+    }
+
+    .footer {
+      font-size: 9pt;
+      color: #888;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      margin-top: 32px;
+    }
+
+    .legend {
+      font-size: 9pt;
+      margin: 10px 0 0 0;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media print {
+      body { padding: 0; }
+      h2 { page-break-before: auto; }
+      @page { size: A4; margin: 14mm; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Plan d'action — Développement e-commerce Fleurs de Nila</h1>
+<div class="sub">Développement full custom · fleursdenila.fr · LWS · Avril 2026</div>
+
+<!-- ARCHITECTURE -->
+<h2>Architecture technique</h2>
+<div class="arch">
+fleursdenila.fr (hébergement LWS)
+│
+├── boutique.html          → catalogue produits + panier JS
+├── checkout.html          → récap commande + sélecteur créneaux + Stripe
+├── confirmation.html      → page post-paiement
+├── admin/
+│   ├── index.php          → login (session PHP)
+│   ├── produits.php       → CRUD produits + stocks
+│   └── tournee.php        → vue livraisons du lendemain
+│
+└── api/
+    ├── products.php       → GET liste produits + stocks
+    ├── slots.php          → GET créneaux dispo / POST réservation / DELETE expiration
+    ├── checkout.php       → POST création session Stripe (prix serveur)
+    └── webhook.php        → POST Stripe → confirme créneau + décrémente stock
+
+MySQL LWS
+├── products    (id, nom, description, prix, stock, actif, variantes JSON)
+├── slots       (id, date, heure, statut, order_id, expires_at)
+└── orders      (id, stripe_id, produits JSON, slot_id, client JSON, created_at)
+
+Back-office commandes / paiements / exports → Stripe Dashboard (natif, zéro dev)
+</div>
+
+<!-- STRIPE NATIF vs DEV CUSTOM -->
+<h2>Périmètre : Stripe Dashboard natif vs développement custom</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width:40%">Fonctionnalité</th>
+      <th>Qui le fournit ?</th>
+      <th style="width:12%">Dev nécessaire</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Historique des commandes</strong> (date, montant, produits, client)</td>
+      <td><span class="tag tag-stripe-zero">Stripe natif</span> Stripe Dashboard — onglet "Paiements"</td>
+      <td style="color:#276749; font-weight:bold;">0h</td>
+    </tr>
+    <tr>
+      <td><strong>Remboursements</strong> total ou partiel</td>
+      <td><span class="tag tag-stripe-zero">Stripe natif</span> Stripe Dashboard — bouton "Rembourser"</td>
+      <td style="color:#276749; font-weight:bold;">0h</td>
+    </tr>
+    <tr>
+      <td><strong>Export comptable CSV</strong> de toutes les transactions</td>
+      <td><span class="tag tag-stripe-zero">Stripe natif</span> Stripe Dashboard — section "Rapports"</td>
+      <td style="color:#276749; font-weight:bold;">0h</td>
+    </tr>
+    <tr>
+      <td><strong>Email de confirmation</strong> au client après paiement</td>
+      <td><span class="tag tag-stripe-zero">Stripe natif</span> Stripe envoie automatiquement un reçu</td>
+      <td style="color:#276749; font-weight:bold;">0h</td>
+    </tr>
+    <tr>
+      <td><strong>Virements bancaires</strong> vers le compte de Manon</td>
+      <td><span class="tag tag-stripe-zero">Stripe natif</span> Planifié automatiquement (hebdo ou quotidien)</td>
+      <td style="color:#276749; font-weight:bold;">0h</td>
+    </tr>
+    <tr>
+      <td><strong>Catalogue produits</strong> + variantes (couleur, taille, message)</td>
+      <td><span class="tag tag-php">PHP</span> <span class="tag tag-js">JS</span> <span class="tag tag-mysql">MySQL</span> Développé sur mesure</td>
+      <td>Phase 2 &amp; 3</td>
+    </tr>
+    <tr>
+      <td><strong>Gestion des stocks</strong> — décrémentation automatique</td>
+      <td><span class="tag tag-php">PHP</span> <span class="tag tag-mysql">MySQL</span> Webhook Stripe → PHP → MySQL</td>
+      <td>Phase 2</td>
+    </tr>
+    <tr>
+      <td><strong>Créneaux de livraison</strong> (1 client/créneau, anti-doublon)</td>
+      <td><span class="tag tag-php">PHP</span> <span class="tag tag-js">JS</span> <span class="tag tag-mysql">MySQL</span> Développé sur mesure</td>
+      <td>Phase 2 &amp; 3</td>
+    </tr>
+    <tr>
+      <td><strong>Panier + règle livraison offerte</strong></td>
+      <td><span class="tag tag-js">JS</span> Développé sur mesure</td>
+      <td>Phase 3</td>
+    </tr>
+    <tr>
+      <td><strong>Admin produits/stocks</strong> + vue tournée du lendemain</td>
+      <td><span class="tag tag-php">PHP</span> Développé sur mesure</td>
+      <td>Phase 4</td>
+    </tr>
+  </tbody>
+</table>
+<div class="note">
+  <strong>Résumé :</strong> Stripe Dashboard couvre nativement tout ce qui touche à l'argent (commandes, paiements, remboursements, exports, virements) — sans une ligne de code. Le développement custom couvre tout ce qui est spécifique au métier de Manon : créneaux, stocks, catalogue et tournée du lendemain.
+</div>
+
+<div class="legend">
+  <span class="tag tag-php">PHP</span> API & back-office — à développer
+  <span class="tag tag-js">JS</span> Frontend vanilla — à développer
+  <span class="tag tag-mysql">MySQL</span> Base de données LWS — à développer
+  <span class="tag tag-stripe">Stripe</span> Intégration API Stripe — à développer
+  <span class="tag tag-stripe-zero">Stripe natif</span> Fourni par Stripe Dashboard — zéro dev
+  <span class="tag tag-secu">Sécu</span> Points de sécurité — à développer
+  <span class="tag tag-ui">UI</span> Intégration visuelle — à développer
+</div>
+
+<!-- PHASE 1 -->
+<h2>Phase 1 — Infrastructure & base de données</h2>
+<table>
+  <thead>
+    <tr><th style="width:40%">Tâche</th><th>Détail</th><th style="width:9%">Type</th><th style="width:9%">Temps</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Création base MySQL LWS</td>
+      <td>Création BDD via cPanel LWS, utilisateur dédié avec droits limités (SELECT/INSERT/UPDATE/DELETE uniquement — pas de DROP)</td>
+      <td><span class="tag tag-mysql">MySQL</span></td>
+      <td>1h</td>
+    </tr>
+    <tr>
+      <td>Création des tables</td>
+      <td>Tables <code>products</code>, <code>slots</code>, <code>orders</code> avec index, contraintes et champ <code>expires_at</code> pour les réservations temporaires</td>
+      <td><span class="tag tag-mysql">MySQL</span></td>
+      <td>2h</td>
+    </tr>
+    <tr>
+      <td>Jeu de données initial</td>
+      <td>Insertion des 5-15 premiers produits avec variantes (couleurs, tailles S/M/L), stocks initiaux et génération des créneaux de la semaine suivante</td>
+      <td><span class="tag tag-mysql">MySQL</span></td>
+      <td>2h</td>
+    </tr>
+    <tr>
+      <td>Configuration compte Stripe</td>
+      <td>Création ou liaison compte Stripe de Manon, récupération clés API (test + prod), configuration webhook endpoint sur le serveur LWS</td>
+      <td><span class="tag tag-stripe">Stripe</span></td>
+      <td>1h</td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="3">Total phase 1</td>
+      <td>6h</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- PHASE 2 -->
+<h2>Phase 2 — API PHP</h2>
+<table>
+  <thead>
+    <tr><th style="width:40%">Tâche</th><th>Détail</th><th style="width:9%">Type</th><th style="width:9%">Temps</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Classe de connexion BDD</td>
+      <td>Singleton PDO avec requêtes préparées systématiques, gestion des erreurs, fichier de config hors racine web (<code>config.php</code> protégé par .htaccess)</td>
+      <td><span class="tag tag-php">PHP</span></td>
+      <td>2h</td>
+    </tr>
+    <tr>
+      <td><code>api/products.php</code></td>
+      <td>GET : liste produits actifs avec variantes et stock. Filtre automatique des produits à stock 0. Réponse JSON.</td>
+      <td><span class="tag tag-php">PHP</span></td>
+      <td>3h</td>
+    </tr>
+    <tr>
+      <td><code>api/slots.php</code> — lecture</td>
+      <td>GET : liste des créneaux disponibles du lendemain (statut = libre). Nettoyage automatique des réservations expirées (expires_at dépassé).</td>
+      <td><span class="tag tag-php">PHP</span></td>
+      <td>3h</td>
+    </tr>
+    <tr>
+      <td><code>api/slots.php</code> — réservation temporaire</td>
+      <td>POST : réservation d'un créneau pour 10 min via transaction MySQL (verrouillage SELECT FOR UPDATE pour éviter les doublons simultanés). Retourne un token de session.</td>
+      <td><span class="tag tag-php">PHP</span></td>
+      <td>4h</td>
+    </tr>
+    <tr>
+      <td><code>api/checkout.php</code></td>
+      <td>POST : vérification stock + créneau toujours disponible, calcul prix côté serveur (jamais depuis le client), création session Stripe Checkout avec métadonnées commande.</td>
+      <td><span class="tag tag-stripe">Stripe</span></td>
+      <td>4h</td>
+    </tr>
+    <tr>
+      <td><code>api/webhook.php</code></td>
+      <td>POST Stripe <code>checkout.session.completed</code> : vérification signature HMAC, confirmation définitive du créneau en base, décrémentation stock, envoi email Manon (mail() ou SMTP LWS).</td>
+      <td><span class="tag tag-stripe">Stripe</span></td>
+      <td>4h</td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="3">Total phase 2</td>
+      <td>20h</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- PHASE 3 -->
+<h2>Phase 3 — Frontend JS (côté client)</h2>
+<table>
+  <thead>
+    <tr><th style="width:40%">Tâche</th><th>Détail</th><th style="width:9%">Type</th><th style="width:9%">Temps</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Page boutique — catalogue</td>
+      <td>Chargement dynamique des produits via <code>api/products.php</code>, affichage des variantes (couleur, taille, message), badge "rupture de stock" automatique.</td>
+      <td><span class="tag tag-js">JS</span></td>
+      <td>6h</td>
+    </tr>
+    <tr>
+      <td>Panier JS</td>
+      <td>Ajout/suppression/modification quantité, persistance localStorage, calcul sous-total, règle livraison offerte au-dessus du seuil défini, badge compteur panier.</td>
+      <td><span class="tag tag-js">JS</span></td>
+      <td>7h</td>
+    </tr>
+    <tr>
+      <td>Sélecteur de créneaux</td>
+      <td>Calendrier JS : appel <code>api/slots.php</code> pour afficher les créneaux disponibles du lendemain. Créneaux pris = grisés. Sélection → réservation temporaire 10 min. Choix livraison domicile ou retrait boutique.</td>
+      <td><span class="tag tag-js">JS</span></td>
+      <td>7h</td>
+    </tr>
+    <tr>
+      <td>Page checkout</td>
+      <td>Récapitulatif commande (produits, créneau, mode livraison, total). Formulaire client (nom, adresse, téléphone). Bouton → appel <code>api/checkout.php</code> → redirection Stripe.</td>
+      <td><span class="tag tag-js">JS</span></td>
+      <td>5h</td>
+    </tr>
+    <tr>
+      <td>Page confirmation</td>
+      <td>Page post-paiement affichant le récapitulatif de commande et le créneau confirmé. Lecture des paramètres Stripe retournés dans l'URL.</td>
+      <td><span class="tag tag-js">JS</span></td>
+      <td>2h</td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="3">Total phase 3</td>
+      <td>27h</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- PHASE 4 -->
+<h2>Phase 4 — Back-office Manon</h2>
+<div class="note">
+  La gestion des commandes, paiements et exports comptables est assurée nativement par <strong>Stripe Dashboard</strong> — aucun développement nécessaire pour cette partie.
+  Le back-office custom couvre uniquement la gestion produits/stocks et la vue tournée du lendemain.
+</div>
+<table>
+  <thead>
+    <tr><th style="width:40%">Tâche</th><th>Détail</th><th style="width:9%">Type</th><th style="width:9%">Temps</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Authentification admin</td>
+      <td>Page login PHP avec session sécurisée (password_hash / password_verify), protection de toutes les pages admin, déconnexion automatique après inactivité.</td>
+      <td><span class="tag tag-php">PHP</span></td>
+      <td>2h</td>
+    </tr>
+    <tr>
+      <td>Gestion produits &amp; stocks</td>
+      <td>Liste des produits, ajout / modification / désactivation, mise à jour du stock en un clic. Interface simple, utilisable sans formation technique.</td>
+      <td><span class="tag tag-php">PHP</span></td>
+      <td>4h</td>
+    </tr>
+    <tr>
+      <td>Vue tournée du lendemain</td>
+      <td>Page affichant la liste des livraisons du lendemain triée par créneau horaire : client, adresse, produits commandés, mode (livraison/retrait). Imprimable.</td>
+      <td><span class="tag tag-php">PHP</span></td>
+      <td>2h</td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="3">Total phase 4</td>
+      <td>8h</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- PHASE 5 -->
+<h2>Phase 5 — Sécurité & conformité</h2>
+<table>
+  <thead>
+    <tr><th style="width:40%">Tâche</th><th>Détail</th><th style="width:9%">Type</th><th style="width:9%">Temps</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Protection fichiers sensibles</td>
+      <td>Règles .htaccess pour bloquer l'accès direct à <code>config.php</code>, au dossier <code>api/</code> hors appels AJAX, et à l'admin hors session active.</td>
+      <td><span class="tag tag-secu">Sécu</span></td>
+      <td>1h</td>
+    </tr>
+    <tr>
+      <td>Vérification webhook Stripe</td>
+      <td>Validation obligatoire de l'en-tête <code>Stripe-Signature</code> (HMAC SHA-256) dans <code>webhook.php</code> — toute requête non signée est rejetée.</td>
+      <td><span class="tag tag-secu">Sécu</span></td>
+      <td>1h</td>
+    </tr>
+    <tr>
+      <td>Anti-injection SQL</td>
+      <td>100 % des requêtes SQL via PDO avec paramètres préparés — aucune concaténation de variable dans les requêtes.</td>
+      <td><span class="tag tag-secu">Sécu</span></td>
+      <td>1h</td>
+    </tr>
+    <tr>
+      <td>Rate limiting réservations</td>
+      <td>Limitation à 1 réservation de créneau active par session — blocage des tentatives d'accaparement automatisé des créneaux.</td>
+      <td><span class="tag tag-secu">Sécu</span></td>
+      <td>2h</td>
+    </tr>
+    <tr>
+      <td>Sanitisation des données</td>
+      <td>Échappement systématique des données affichées en back-office (htmlspecialchars), validation des types reçus dans les API (dates, entiers, chaînes).</td>
+      <td><span class="tag tag-secu">Sécu</span></td>
+      <td>1h</td>
+    </tr>
+    <tr>
+      <td>RGPD</td>
+      <td>Données clients hébergées en France (LWS). Mise à jour de la politique de confidentialité existante (mention du traitement des données de commande et durée de conservation).</td>
+      <td><span class="tag tag-secu">Sécu</span></td>
+      <td>1h</td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="3">Total phase 5</td>
+      <td>7h</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- PHASE 6 -->
+<h2>Phase 6 — Intégration visuelle & tests</h2>
+<table>
+  <thead>
+    <tr><th style="width:40%">Tâche</th><th>Détail</th><th style="width:9%">Type</th><th style="width:9%">Temps</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Intégration charte Fleurs de Nila</td>
+      <td>Application des couleurs (#1a365d, #bee3f8), police Fleur de Leah pour les titres, espacements et style Tailwind cohérents avec le reste du site sur toutes les pages boutique.</td>
+      <td><span class="tag tag-ui">UI</span></td>
+      <td>5h</td>
+    </tr>
+    <tr>
+      <td>Responsive mobile</td>
+      <td>Vérification et ajustements de l'affichage sur mobile (catalogue, panier, sélecteur créneaux, checkout) — Manon a des clients qui commandent depuis leur téléphone.</td>
+      <td><span class="tag tag-ui">UI</span></td>
+      <td>3h</td>
+    </tr>
+    <tr>
+      <td>Tests fonctionnels</td>
+      <td>Parcours client complet (ajout panier → créneau → paiement → confirmation). Test double réservation simultanée. Test stock à 0. Test webhook. Test export CSV Stripe.</td>
+      <td><span class="tag tag-js">JS</span></td>
+      <td>5h</td>
+    </tr>
+    <tr>
+      <td>Tests de sécurité</td>
+      <td>Tentative d'injection SQL, falsification de prix, accès admin sans session, replay de webhook. Vérification des en-têtes HTTP de sécurité existants (.htaccess).</td>
+      <td><span class="tag tag-secu">Sécu</span></td>
+      <td>3h</td>
+    </tr>
+    <tr>
+      <td>Mise en production LWS</td>
+      <td>Bascule des clés Stripe test → prod, vérification HTTPS, mise à jour sitemap.xml et robots.txt si nécessaire, test final en conditions réelles.</td>
+      <td><span class="tag tag-php">PHP</span></td>
+      <td>2h</td>
+    </tr>
+    <tr>
+      <td>Formation Manon (1h)</td>
+      <td>Prise en main du back-office : gérer les produits/stocks, lire la tournée du lendemain, consulter les commandes dans Stripe Dashboard, exporter pour le comptable.</td>
+      <td><span class="tag tag-ui">UI</span></td>
+      <td>1h</td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="3">Total phase 6</td>
+      <td>19h</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- RÉCAPITULATIF -->
+<h2>Récapitulatif général</h2>
+<table>
+  <thead>
+    <tr><th>Phase</th><th>Contenu</th><th style="width:12%">Temps</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Phase 1</td>
+      <td>Infrastructure — MySQL LWS + Stripe</td>
+      <td>6h</td>
+    </tr>
+    <tr>
+      <td>Phase 2</td>
+      <td>API PHP — produits, créneaux, paiement, webhook</td>
+      <td>20h</td>
+    </tr>
+    <tr>
+      <td>Phase 3</td>
+      <td>Frontend JS — catalogue, panier, créneaux, checkout</td>
+      <td>27h</td>
+    </tr>
+    <tr>
+      <td>Phase 4</td>
+      <td>Back-office Manon — admin produits + tournée</td>
+      <td>8h</td>
+    </tr>
+    <tr>
+      <td>Phase 5</td>
+      <td>Sécurité & conformité RGPD</td>
+      <td>7h</td>
+    </tr>
+    <tr>
+      <td>Phase 6</td>
+      <td>Intégration visuelle, tests, mise en prod, formation</td>
+      <td>19h</td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="2"><strong>Total estimé</strong></td>
+      <td><strong>87h</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <strong>Ce qui n'est pas dans le périmètre :</strong> rédaction des textes produits, photos des bouquets, création du compte Stripe (Manon, ~10 min), domaine et hébergement LWS (déjà en place).
+  <br><br>
+  <strong>Back-office commandes :</strong> intégralement géré par Stripe Dashboard — historique, remboursements, export comptable CSV, emails automatiques aux clients. Aucun développement supplémentaire nécessaire.
+</div>
+
+<div class="footer">
+  Plan d'action préparé par Baptiste Grincourt — baptistegrincourt@gmail.com — Avril 2026
+</div>
+
+<div class="no-print" style="margin-top:24px; text-align:right;">
+  <button onclick="window.print()" style="padding:8px 20px;background:#1a365d;color:#fff;border:none;font-size:11pt;cursor:pointer;">
+    Imprimer / Exporter PDF
+  </button>
+</div>
+
+</body>
+</html>

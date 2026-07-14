@@ -1,0 +1,22 @@
+Fonctionnalité,Stripe natif,Dev custom (PHP + JS + MySQL),Détail technique
+Paiement par carte bancaire,✅,,Stripe Checkout — les numéros de carte ne transitent jamais par le serveur
+Email de confirmation au client,✅,,Stripe envoie automatiquement un reçu après paiement
+Historique des commandes,✅,,Stripe Dashboard — onglet Paiements
+Remboursement (total ou partiel),✅,,Stripe Dashboard — bouton Rembourser
+Export comptable CSV,✅,,Stripe Dashboard — section Rapports
+Virements bancaires automatiques,✅,,Planifiés hebdo ou quotidien selon les préférences Stripe
+Tableau de bord des ventes,✅,,Stripe Dashboard — graphiques et métriques natifs
+Catalogue produits,,✅,PHP (API) + JS (affichage dynamique) + MySQL (stockage)
+Variantes par produit (couleur / taille / message),,✅,Stockées en JSON MySQL — affichées dynamiquement en JS — transmises en métadonnées Stripe
+Gestion des stocks (décrémentation automatique),,✅,PHP traite le webhook Stripe → décrémente le stock en MySQL — jamais côté client
+Créneaux de livraison (1 seul client par créneau),,✅,PHP + MySQL — réservation temporaire 10 min avec SELECT FOR UPDATE
+Anti-doublon créneau (simultanéité),,✅,Transaction MySQL — deux clients simultanés ne peuvent pas prendre le même créneau
+Panier,,✅,JS vanilla — persistance localStorage — calcul côté client
+Livraison offerte au-dessus d'un seuil,,✅,Règle configurable — calculée côté serveur PHP lors du checkout
+Choix livraison domicile / retrait boutique,,✅,Deux modes configurables en BDD — sélection côté JS — transmis à Stripe en métadonnée
+Création de la session Stripe Checkout,,✅,PHP appelle l'API Stripe avec prix calculés côté serveur (non falsifiables)
+Admin produits & stocks,,✅,PHP — interface protégée par session — CRUD produits + mise à jour stock en 1 clic
+Vue tournée du lendemain,,✅,PHP + MySQL — liste des livraisons triée par créneau — imprimable
+Notification email à Manon (nouvelle commande),,✅,PHP — envoi via SMTP LWS au moment du webhook Stripe confirmé
+Design cohérent avec Fleurs de Nila,,✅,HTML + CSS + Tailwind — couleurs et polices identiques au site existant
+Sécurité (anti-injection SQL + signature webhook),,✅,PDO requêtes préparées + vérification HMAC Stripe-Signature + .htaccess

@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proposition E-commerce — Fleurs de Nila</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fleur+De+Leah&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       VARIABLES & RESET
+    ============================================================ */
+    :root {
+      --navy:    #1a365d;
+      --navy2:   #2d5282;
+      --accent:  #bee3f8;
+      --accent2: #90cdf4;
+      --cream:   #fafafa;
+      --gold:    #c9a96e;
+      --gold-lt: #f0e4cc;
+      --text:    #1a202c;
+      --muted:   #718096;
+      --border:  #e2e8f0;
+      --ok:      #276749;
+      --no:      #9b2c2c;
+
+      --page-w: 210mm;
+      --page-h: 297mm;
+      --margin: 18mm;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 10.5pt; }
+
+    body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: #e8edf2;
+      color: var(--text);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ============================================================
+       PAGE SHELL
+    ============================================================ */
+    .page {
+      width: var(--page-w);
+      min-height: var(--page-h);
+      margin: 24px auto;
+      background: var(--cream);
+      box-shadow: 0 8px 48px rgba(26,54,93,.18);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page + .page { margin-top: 32px; }
+
+    /* ============================================================
+       DECORATIVE ELEMENTS
+    ============================================================ */
+    .deco-line {
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--navy) 0%, var(--gold) 50%, var(--navy) 100%);
+    }
+
+    .deco-line-thin {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--border) 100%);
+      margin: 6mm 0;
+    }
+
+    /* ============================================================
+       COVER PAGE
+    ============================================================ */
+    .cover {
+      height: var(--page-h);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Left navy stripe */
+    .cover::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0;
+      width: 6mm;
+      height: 100%;
+      background: var(--navy);
+    }
+
+    /* Top bar */
+    .cover-top {
+      background: var(--navy);
+      padding: 10mm var(--margin) 8mm calc(var(--margin) + 6mm);
+      margin-left: 6mm;
+    }
+
+    .cover-brand {
+      font-family: 'Fleur De Leah', cursive;
+      font-size: 38pt;
+      color: #fff;
+      letter-spacing: .01em;
+      line-height: 1;
+    }
+
+    .cover-brand-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 9pt;
+      color: var(--accent);
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      margin-top: 2mm;
+    }
+
+    /* Center zone */
+    .cover-center {
+      flex: 1;
+      margin-left: 6mm;
+      padding: 0 var(--margin);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Watermark */
+    .cover-center::before {
+      content: 'Fleurs de Nila';
+      font-family: 'Fleur De Leah', cursive;
+      font-size: 90pt;
+      color: rgba(26,54,93,.04);
+      position: absolute;
+      right: -10mm;
+      bottom: 20mm;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .cover-eyebrow {
+      font-size: 8pt;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 5mm;
+    }
+
+    .cover-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 30pt;
+      font-weight: 300;
+      color: var(--navy);
+      line-height: 1.1;
+      margin-bottom: 3mm;
+    }
+
+    .cover-title em {
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .cover-subtitle {
+      font-size: 11pt;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 14mm;
+    }
+
+    /* Gold rule */
+    .cover-rule {
+      width: 40mm;
+      height: 1px;
+      background: var(--gold);
+      margin-bottom: 10mm;
+    }
+
+    /* Meta block */
+    .cover-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6mm 8mm;
+      max-width: 130mm;
+    }
+
+    .cover-meta-item label {
+      display: block;
+      font-size: 7pt;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1mm;
+    }
+
+    .cover-meta-item span {
+      font-size: 9.5pt;
+      color: var(--navy);
+      font-weight: 500;
+    }
+
+    /* Bottom band */
+    .cover-bottom {
+      margin-left: 6mm;
+      background: var(--navy);
+      padding: 6mm var(--margin);
+      display: flex;
+      align-items: center;
+      gap: 4mm;
+    }
+
+    .cover-bottom-dot {
+      width: 4mm; height: 4mm;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    .cover-bottom-text {
+      font-size: 8pt;
+      color: var(--accent);
+      letter-spacing: .08em;
+    }
+
+    .cover-bottom-text strong {
+      color: #fff;
+    }
+
+    /* ============================================================
+       INNER PAGES
+    ============================================================ */
+    .inner {
+      min-height: var(--page-h);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Left accent line */
+    .inner::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0;
+      width: 2mm;
+      height: 100%;
+      background: linear-gradient(180deg, var(--navy) 0%, var(--gold) 100%);
+    }
+
+    .inner-header {
+      padding: 8mm var(--margin) 6mm calc(var(--margin) + 6mm);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .inner-header-brand {
+      font-family: 'Fleur De Leah', cursive;
+      font-size: 16pt;
+      color: var(--navy);
+    }
+
+    .inner-header-title {
+      font-size: 8pt;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .inner-body {
+      flex: 1;
+      padding: 8mm var(--margin) 8mm calc(var(--margin) + 2mm);
+    }
+
+    .inner-footer {
+      padding: 5mm var(--margin) 5mm calc(var(--margin) + 2mm);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .inner-footer-text {
+      font-size: 7.5pt;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .page-num {
+      font-size: 8pt;
+      color: var(--navy);
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       SECTION HEADINGS
+    ============================================================ */
+    .section {
+      margin-bottom: 8mm;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 3mm;
+      margin-bottom: 5mm;
+    }
+
+    .section-num {
+      width: 7mm; height: 7mm;
+      background: var(--navy);
+      color: #fff;
+      font-size: 8pt;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14pt;
+      font-weight: 500;
+      color: var(--navy);
+      letter-spacing: .02em;
+    }
+
+    .section-title em {
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    /* ============================================================
+       BODY TEXT
+    ============================================================ */
+    p {
+      font-size: 10pt;
+      line-height: 1.65;
+      color: #2d3748;
+      margin-bottom: 3mm;
+    }
+
+    .highlight-box {
+      background: #eef6ff;
+      border-left: 3px solid var(--navy2);
+      padding: 4mm 5mm;
+      margin: 4mm 0;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .highlight-box p {
+      margin: 0;
+      font-size: 9.5pt;
+      color: var(--navy);
+      font-style: italic;
+    }
+
+    /* ============================================================
+       NEEDS GRID
+    ============================================================ */
+    .needs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3mm;
+      margin-top: 3mm;
+    }
+
+    .need-card {
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 3.5mm 4mm;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .need-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0;
+      width: 2px;
+      height: 100%;
+      background: var(--gold);
+    }
+
+    .need-card-label {
+      font-size: 7pt;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5mm;
+      font-weight: 600;
+    }
+
+    .need-card-value {
+      font-size: 9pt;
+      color: var(--navy);
+      line-height: 1.5;
+    }
+
+    /* ============================================================
+       COMPARISON TABLE
+    ============================================================ */
+    .cmp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      margin-top: 3mm;
+    }
+
+    .cmp-table thead th {
+      background: var(--navy);
+      color: #fff;
+      padding: 3mm 3.5mm;
+      text-align: left;
+      font-weight: 500;
+      letter-spacing: .05em;
+      font-size: 8pt;
+    }
+
+    .cmp-table thead th:first-child { border-radius: 0; }
+
+    .cmp-table tbody tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cmp-table tbody tr:nth-child(even):not(.ecwid-row) {
+      background: #f7fafc;
+    }
+
+    .cmp-table tbody td {
+      padding: 3mm 3.5mm;
+      vertical-align: middle;
+      color: var(--text);
+    }
+
+    .cmp-table tbody td:first-child {
+      font-weight: 500;
+      color: var(--navy2);
+    }
+
+    /* Recommended row highlight */
+    .recommended-row {
+      background: var(--gold-lt) !important;
+    }
+
+    .recommended-row td {
+      color: var(--navy) !important;
+    }
+
+    .recommended-row td:first-child {
+      font-weight: 700 !important;
+      color: var(--navy) !important;
+    }
+
+    /* Ecwid row — alternative, subtle */
+    .ecwid-row {
+      background: #f7fafc !important;
+      opacity: .85;
+    }
+
+    .badge-star {
+      display: inline-block;
+      background: var(--gold);
+      color: #fff;
+      font-size: 7pt;
+      padding: 0.5mm 2mm;
+      border-radius: 1px;
+      margin-left: 1.5mm;
+      font-weight: 700;
+      letter-spacing: .05em;
+      vertical-align: middle;
+    }
+
+    .ok  { color: var(--ok);  font-weight: 700; }
+    .no  { color: var(--no);  font-weight: 700; }
+    .mid { color: #7b5e00; font-weight: 500; font-style: italic; }
+
+    /* ============================================================
+       ADVANTAGES LIST
+    ============================================================ */
+    .adv-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3mm;
+      margin-top: 3mm;
+    }
+
+    .adv-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 2.5mm;
+    }
+
+    .adv-dot {
+      width: 2mm; height: 2mm;
+      border-radius: 50%;
+      background: var(--gold);
+      margin-top: 2mm;
+      flex-shrink: 0;
+    }
+
+    .adv-text {
+      font-size: 9pt;
+      color: var(--navy);
+      line-height: 1.5;
+    }
+
+    .adv-text strong {
+      display: block;
+      font-size: 8pt;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--navy2);
+      margin-bottom: .5mm;
+    }
+
+    /* ============================================================
+       INTEGRATION STEPS
+    ============================================================ */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5mm;
+      margin-top: 3mm;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 3.5mm;
+    }
+
+    .step-num {
+      width: 6mm; height: 6mm;
+      background: var(--navy);
+      color: #fff;
+      font-size: 8pt;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: .5mm;
+    }
+
+    .step-content {
+      flex: 1;
+      padding-bottom: 2.5mm;
+      border-bottom: 1px dotted var(--border);
+    }
+
+    .step:last-child .step-content { border-bottom: none; }
+
+    .step-label {
+      font-size: 9.5pt;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    .step-desc {
+      font-size: 8.5pt;
+      color: var(--muted);
+      margin-top: .5mm;
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    /* ============================================================
+       INVESTMENT TABLE
+    ============================================================ */
+    .inv-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 3mm;
+      font-size: 9.5pt;
+    }
+
+    .inv-table tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .inv-table tr:last-child { border-bottom: none; }
+
+    .inv-table td {
+      padding: 3mm 4mm;
+      vertical-align: middle;
+    }
+
+    .inv-table .inv-label {
+      color: var(--navy2);
+      font-weight: 500;
+    }
+
+    .inv-table .inv-value {
+      text-align: right;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    .inv-table .inv-note {
+      font-size: 8pt;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .inv-table .inv-highlight {
+      background: var(--gold-lt);
+    }
+
+    .inv-note-box {
+      background: #f0fff4;
+      border-left: 3px solid var(--ok);
+      padding: 3mm 4mm;
+      border-radius: 0 2px 2px 0;
+      margin-top: 4mm;
+    }
+
+    .inv-note-box p {
+      font-size: 9pt;
+      color: var(--ok);
+      margin: 0;
+    }
+
+    /* ============================================================
+       SIGNATURE BLOCK
+    ============================================================ */
+    .signature-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10mm;
+      margin-top: 8mm;
+      padding-top: 6mm;
+      border-top: 1px solid var(--border);
+    }
+
+    .sig-box {
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 4mm 5mm;
+    }
+
+    .sig-box-label {
+      font-size: 7pt;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8mm;
+    }
+
+    .sig-line {
+      border-top: 1px solid var(--navy);
+      padding-top: 1.5mm;
+      font-size: 8pt;
+      color: var(--navy2);
+    }
+
+    /* ============================================================
+       PRINT STYLES
+    ============================================================ */
+    @media print {
+      body {
+        background: white;
+        font-size: 10.5pt;
+      }
+
+      .page {
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+      }
+
+      .page:last-child {
+        page-break-after: avoid;
+      }
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+
+    /* ============================================================
+       SCREEN ONLY — print button
+    ============================================================ */
+    @media screen {
+      .print-btn-wrap {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 100;
+      }
+
+      .print-btn {
+        background: var(--navy);
+        color: #fff;
+        border: none;
+        padding: 10px 22px;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 11pt;
+        letter-spacing: .08em;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(26,54,93,.35);
+        transition: background .2s;
+      }
+
+      .print-btn:hover { background: var(--gold); }
+    }
+
+    @media print {
+      .print-btn-wrap { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     PAGE 1 — COUVERTURE
+============================================================ -->
+<div class="page">
+  <div class="cover">
+    <div class="cover-top">
+      <div class="cover-brand">Fleurs de Nila</div>
+      <div class="cover-brand-sub">Artisan Fleuriste &nbsp;·&nbsp; Nîmes</div>
+    </div>
+
+    <div class="cover-center">
+      <div class="cover-eyebrow">Proposition commerciale</div>
+      <div class="cover-title">Intégration<br><em>e-commerce</em></div>
+      <div class="cover-subtitle">Boutique en ligne — fleursdenila.fr</div>
+      <div class="cover-rule"></div>
+      <div class="cover-meta">
+        <div class="cover-meta-item">
+          <label>Préparée par</label>
+          <span>Baptiste Grincourt</span>
+        </div>
+        <div class="cover-meta-item">
+          <label>Destinataire</label>
+          <span>Manon — Fleurs de Nila</span>
+        </div>
+        <div class="cover-meta-item">
+          <label>Date</label>
+          <span>25 avril 2026</span>
+        </div>
+        <div class="cover-meta-item">
+          <label>Référence</label>
+          <span>FDN-ECOM-2026</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-bottom">
+      <div class="cover-bottom-dot"></div>
+      <div class="cover-bottom-text">
+        <strong>baptistegrincourt@gmail.com</strong>
+        &nbsp;·&nbsp; fleursdenila.fr &nbsp;·&nbsp; Avril 2026
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 2 — CONTEXTE + BESOINS
+============================================================ -->
+<div class="page">
+  <div class="inner">
+    <div class="inner-header">
+      <div class="inner-header-brand">Fleurs de Nila</div>
+      <div class="inner-header-title">Proposition E-commerce — Avril 2026</div>
+    </div>
+
+    <div class="inner-body">
+
+      <!-- SECTION 1 -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-num">1</div>
+          <div class="section-title">Contexte &amp; <em>Objectif</em></div>
+        </div>
+
+        <p>
+          Le site <strong>fleursdenila.fr</strong> est aujourd'hui un site vitrine entièrement statique (HTML, Tailwind CSS, JavaScript vanilla), hébergé sur un serveur Apache. Il bénéficie d'un travail SEO soigné : balises Schema.org, balises canoniques, sitemap optimisé, règles de cache avancées dans le <code>.htaccess</code>, et des temps de chargement très performants.
+        </p>
+        <p>
+          L'objectif de ce projet est d'y intégrer une boutique en ligne sans altérer ni la structure existante, ni le référencement naturel acquis.
+        </p>
+
+        <div class="highlight-box">
+          <p>
+            Exigence exprimée par Manon&nbsp;: la boutique doit s'afficher sur le même site, à la même URL <strong>fleursdenila.fr</strong>, avec le même design — sans redirection vers un domaine tiers ni rupture d'expérience pour le client.
+          </p>
+        </div>
+      </div>
+
+      <div class="deco-line-thin"></div>
+
+      <!-- SECTION 2 -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-num">2</div>
+          <div class="section-title">Analyse de <em>vos besoins</em></div>
+        </div>
+
+        <div class="needs-grid">
+          <div class="need-card">
+            <div class="need-card-label">Catalogue</div>
+            <div class="need-card-value">5 à 15 produits, variables selon les arrivages et les saisons</div>
+          </div>
+          <div class="need-card">
+            <div class="need-card-label">Variantes produits</div>
+            <div class="need-card-value">Choix de la couleur, de la taille (S / M / L) et message personnalisé à joindre</div>
+          </div>
+          <div class="need-card">
+            <div class="need-card-label">Gestion des stocks</div>
+            <div class="need-card-value">Ruptures fréquentes — nécessite une gestion de stock en temps réel</div>
+          </div>
+          <div class="need-card">
+            <div class="need-card-label">Livraison</div>
+            <div class="need-card-value">Choix date/heure <strong>indispensable</strong>, livraison offerte au-delà d'un seuil, retrait boutique disponible</div>
+          </div>
+          <div class="need-card">
+            <div class="need-card-label">Gestion quotidienne</div>
+            <div class="need-card-value">Back-office simple et intuitif, export comptable, notifications par SMS à chaque commande</div>
+          </div>
+          <div class="need-card">
+            <div class="need-card-label">Ambition</div>
+            <div class="need-card-value">Développer un vrai canal de vente en ligne, personnalisé à l'image de la boutique</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="inner-footer">
+      <div class="inner-footer-text">Baptiste Grincourt &nbsp;·&nbsp; Proposition e-commerce Fleurs de Nila</div>
+      <div class="page-num">2 / 4</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 3 — COMPARATIF + SOLUTION RECOMMANDÉE
+============================================================ -->
+<div class="page">
+  <div class="inner">
+    <div class="inner-header">
+      <div class="inner-header-brand">Fleurs de Nila</div>
+      <div class="inner-header-title">Proposition E-commerce — Avril 2026</div>
+    </div>
+
+    <div class="inner-body">
+
+      <!-- SECTION 3 -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-num">3</div>
+          <div class="section-title">Solutions étudiées &amp; <em>Solution retenue</em></div>
+        </div>
+
+        <p>Six solutions ont été analysées. Les plateformes SaaS (Shopify, Ecwid, Shoprocket) ont été écartées car aucune ne répond simultanément aux deux critères non négociables : même site/URL et gestion de créneaux avec capacité limitée (1 livraison par créneau). La solution retenue est un développement full custom.</p>
+
+        <table class="cmp-table">
+          <thead>
+            <tr>
+              <th>Solution</th>
+              <th>Même site</th>
+              <th>Créneaux limités</th>
+              <th>Stock</th>
+              <th>Variantes</th>
+              <th>Coût mensuel</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Stripe Payment Links</td>
+              <td class="no">✗</td>
+              <td class="no">✗</td>
+              <td class="no">✗</td>
+              <td class="no">✗</td>
+              <td>0 € + comm.</td>
+            </tr>
+            <tr>
+              <td>Shopify Buy Button</td>
+              <td class="mid">✓ widget</td>
+              <td class="no">✗ SDK déprécié</td>
+              <td class="ok">✓</td>
+              <td class="ok">✓</td>
+              <td>~29 €/mois</td>
+            </tr>
+            <tr>
+              <td>Ecwid</td>
+              <td class="ok">✓</td>
+              <td class="no">✗ non supporté</td>
+              <td class="ok">✓</td>
+              <td class="ok">✓</td>
+              <td>~19 €/mois</td>
+            </tr>
+            <tr>
+              <td>Shoprocket + JS</td>
+              <td class="ok">✓</td>
+              <td class="no">✗ note seulement</td>
+              <td class="ok">✓</td>
+              <td class="ok">✓</td>
+              <td>~19 $/mois</td>
+            </tr>
+            <tr>
+              <td>WooCommerce + plugin</td>
+              <td class="no">✗ migration</td>
+              <td class="ok">✓ natif</td>
+              <td class="ok">✓</td>
+              <td class="ok">✓</td>
+              <td>~15 €/mois</td>
+            </tr>
+            <tr class="recommended-row">
+              <td>Full custom Stripe + Supabase <span class="badge-star">★ Retenu</span></td>
+              <td class="ok">✓</td>
+              <td class="ok">✓ natif</td>
+              <td class="ok">✓</td>
+              <td class="ok">✓</td>
+              <td><strong>0 €</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="deco-line-thin"></div>
+
+      <!-- SECTION 4 -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-num">4</div>
+          <div class="section-title">La solution retenue : <em>développement full custom</em></div>
+        </div>
+
+        <p>
+          La boutique est développée en JavaScript vanilla côté frontend, avec une API PHP hébergée directement sur le serveur LWS existant de fleursdenila.fr. La base de données MySQL (incluse dans l'hébergement LWS) gère les produits, stocks et créneaux. Stripe gère le paiement. Tout est hébergé au même endroit — aucun service externe supplémentaire. Le client <strong>ne quitte jamais fleursdenila.fr</strong>.
+        </p>
+
+        <div class="adv-list">
+          <div class="adv-item">
+            <div class="adv-dot"></div>
+            <div class="adv-text">
+              <strong>Même site, même URL, même design</strong>
+              Aucun sous-domaine, aucune redirection. SEO et charte graphique intacts.
+            </div>
+          </div>
+          <div class="adv-item">
+            <div class="adv-dot"></div>
+            <div class="adv-text">
+              <strong>Créneaux avec capacité limitée</strong>
+              1 livraison par créneau. Un créneau pris disparaît en temps réel pour les autres clients.
+            </div>
+          </div>
+          <div class="adv-item">
+            <div class="adv-dot"></div>
+            <div class="adv-text">
+              <strong>Variantes &amp; personnalisation</strong>
+              Couleurs, tailles S/M/L, message personnalisé à joindre au bouquet.
+            </div>
+          </div>
+          <div class="adv-item">
+            <div class="adv-dot"></div>
+            <div class="adv-text">
+              <strong>Gestion des stocks</strong>
+              Décrémentation automatique, désactivation produit à stock zéro.
+            </div>
+          </div>
+          <div class="adv-item">
+            <div class="adv-dot"></div>
+            <div class="adv-text">
+              <strong>Retrait boutique + livraison</strong>
+              Les deux modes disponibles avec règle de livraison offerte au-dessus d'un seuil.
+            </div>
+          </div>
+          <div class="adv-item">
+            <div class="adv-dot"></div>
+            <div class="adv-text">
+              <strong>Back-office dédié</strong>
+              Vue journée du lendemain, gestion produits/stocks, export CSV comptable.
+            </div>
+          </div>
+          <div class="adv-item">
+            <div class="adv-dot"></div>
+            <div class="adv-text">
+              <strong>Zéro abonnement mensuel</strong>
+              Aucune plateforme SaaS. Uniquement les frais Stripe sur les ventes réalisées.
+            </div>
+          </div>
+          <div class="adv-item">
+            <div class="adv-dot"></div>
+            <div class="adv-text">
+              <strong>Sécurité complète</strong>
+              Signature webhook Stripe, authentification back-office, protection RGPD (données EU).
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="inner-footer">
+      <div class="inner-footer-text">Baptiste Grincourt &nbsp;·&nbsp; Proposition e-commerce Fleurs de Nila</div>
+      <div class="page-num">3 / 4</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 4 — PLAN D'INTÉGRATION + INVESTISSEMENT
+============================================================ -->
+<div class="page">
+  <div class="inner">
+    <div class="inner-header">
+      <div class="inner-header-brand">Fleurs de Nila</div>
+      <div class="inner-header-title">Proposition E-commerce — Avril 2026</div>
+    </div>
+
+    <div class="inner-body">
+
+      <!-- SECTION 5 -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-num">5</div>
+          <div class="section-title">Plan <em>d'intégration</em> — Solution full custom</div>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-label">Mise en place de l'infrastructure (MySQL LWS + Stripe)</div>
+              <div class="step-desc">Création de la base de données MySQL sur l'hébergement LWS existant, tables produits / stocks / créneaux / commandes, configuration compte Stripe.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-label">Développement API PHP — produits &amp; stocks</div>
+              <div class="step-desc">Scripts PHP (PDO + requêtes préparées) : liste produits, variantes, disponibilité stock. Décrémentation automatique à chaque commande confirmée.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-label">Développement API PHP — gestion des créneaux</div>
+              <div class="step-desc">Scripts PHP : créneaux disponibles du lendemain, réservation temporaire (10 min anti-doublon via transaction MySQL), confirmation définitive. 1 livraison maximum par créneau.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-label">Intégration Stripe Checkout + webhook PHP</div>
+              <div class="step-desc">Session de paiement avec prix recalculé côté serveur PHP (non falsifiable). Webhook.php vérifié : paiement confirmé → stock décrémenté, créneau définitivement bloqué, email envoyé.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <div class="step-label">Développement frontend — boutique &amp; panier</div>
+              <div class="step-desc">Page boutique.html : catalogue produits, variantes (couleur, taille, message), panier JS, règle livraison offerte au-dessus du seuil défini.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">6</div>
+            <div class="step-content">
+              <div class="step-label">Développement frontend — sélecteur de créneaux</div>
+              <div class="step-desc">Calendrier JS : affichage des créneaux disponibles en temps réel, grisage automatique des créneaux pris, choix livraison à domicile ou retrait boutique.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">7</div>
+            <div class="step-content">
+              <div class="step-label">Développement back-office Manon</div>
+              <div class="step-desc">Page admin protégée par session PHP (login/mot de passe sécurisé) : vue tournée du lendemain, gestion produits/stocks, historique commandes, export CSV comptable.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">8</div>
+            <div class="step-content">
+              <div class="step-label">Sécurité &amp; conformité RGPD</div>
+              <div class="step-desc">Vérification signature Stripe, requêtes PDO préparées (anti-injection SQL), rate limiting .htaccess, sanitisation des données, données hébergées en France (LWS), mise à jour politique de confidentialité.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">9</div>
+            <div class="step-content">
+              <div class="step-label">Intégration visuelle charte Fleurs de Nila</div>
+              <div class="step-desc">Adaptation complète aux couleurs, polices et espacements du site existant — cohérence parfaite entre vitrine et boutique.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">10</div>
+            <div class="step-content">
+              <div class="step-label">Tests end-to-end &amp; mise en ligne</div>
+              <div class="step-desc">Tests complets : paiement, double réservation simultanée, rupture de stock, webhook, export, back-office. Mise en production sur fleursdenila.fr.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">11</div>
+            <div class="step-content">
+              <div class="step-label">Formation Manon — back-office (1 h)</div>
+              <div class="step-desc">Prise en main complète : consulter la tournée du lendemain, gérer les stocks, modifier un produit, exporter pour le comptable.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="deco-line-thin"></div>
+
+      <!-- SECTION 6 -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-num">6</div>
+          <div class="section-title"><em>Investissement</em></div>
+        </div>
+
+        <table class="inv-table">
+          <tr class="inv-highlight">
+            <td class="inv-label">Développement &amp; intégration complète — forfait fixe</td>
+            <td class="inv-value">1 500 € HT</td>
+            <td class="inv-note">Prestation unique, tout inclus</td>
+          </tr>
+          <tr>
+            <td class="inv-label">Base de données MySQL + hébergement PHP</td>
+            <td class="inv-value">0 € / mois</td>
+            <td class="inv-note">Inclus dans l'hébergement LWS existant</td>
+          </tr>
+          <tr>
+            <td class="inv-label">Frais de transaction Stripe</td>
+            <td class="inv-value">1,5 % + 0,25 € / vente</td>
+            <td class="inv-note">Cartes européennes — payé sur ventes réalisées</td>
+          </tr>
+          <tr>
+            <td class="inv-label">Abonnement mensuel plateforme</td>
+            <td class="inv-value">0 € / mois</td>
+            <td class="inv-note">Aucune plateforme SaaS</td>
+          </tr>
+          <tr>
+            <td class="inv-label">Maintenance corrective (optionnelle)</td>
+            <td class="inv-value">Sur devis</td>
+            <td class="inv-note">Évolutions ou corrections post-livraison</td>
+          </tr>
+        </table>
+
+        <div class="inv-note-box">
+          <p>Coût récurrent fixe : <strong>0 €/mois</strong>. Seuls les frais Stripe s'appliquent proportionnellement aux ventes. À titre d'exemple, pour 2 000 € de ventes mensuelles, les frais Stripe représentent ~35 €.</p>
+        </div>
+      </div>
+
+      <!-- Signature -->
+      <div class="signature-block">
+        <div class="sig-box">
+          <div class="sig-box-label">Bon pour accord — Client</div>
+          <div class="sig-line">Manon &nbsp;·&nbsp; Fleurs de Nila &nbsp;·&nbsp; Date :</div>
+        </div>
+        <div class="sig-box">
+          <div class="sig-box-label">Prestataire</div>
+          <div class="sig-line">Baptiste Grincourt &nbsp;·&nbsp; 25 avril 2026</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="inner-footer">
+      <div class="inner-footer-text">Baptiste Grincourt &nbsp;·&nbsp; baptistegrincourt@gmail.com &nbsp;·&nbsp; fleursdenila.fr — Avril 2026</div>
+      <div class="page-num">4 / 4</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Print button (screen only) -->
+<div class="print-btn-wrap">
+  <button class="print-btn" onclick="window.print()">Imprimer / Exporter PDF</button>
+</div>
+
+</body>
+</html>
