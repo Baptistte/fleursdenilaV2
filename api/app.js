@@ -34,7 +34,7 @@ app.use(session({
 const db = require('./db/database');
 setInterval(() => {
   const now = new Date().toISOString();
-  db.prepare('UPDATE slots SET reserved_until = NULL WHERE reserved_until < ? AND order_id IS NULL').run(now);
+  db.prepare('UPDATE slots SET reserved_until = NULL, reservation_token = NULL WHERE reserved_until < ? AND order_id IS NULL').run(now);
 }, 60 * 1000);
 
 // Routes

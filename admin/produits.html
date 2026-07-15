@@ -780,7 +780,8 @@
     }
 
     /* ──────────────────── RESPONSIVE ──────────────────── */
-    @media (max-width: 960px) {
+    /* Tablette : sidebar réduite aux icônes */
+    @media (min-width: 769px) and (max-width: 960px) {
       :root { --sw: 62px; }
       .nav-item span, .sb-section, .sb-user-info { display: none; }
       .sb-logo img { height: 26px; }
@@ -788,8 +789,101 @@
       #content { padding: 20px; }
       .welcome-title { font-size: 1.5rem; }
     }
-    @media (max-width: 640px) {
-      .kpi-grid { grid-template-columns: 1fr; }
+
+    /* ──────────────────── MOBILE (≤ 768px) ──────────────────── */
+    #menu-btn { display: none; }
+    #sb-backdrop { display: none; }
+
+    @media (max-width: 768px) {
+      /* Sidebar en tiroir off-canvas */
+      #sidebar {
+        width: 260px;
+        transform: translateX(-100%);
+        transition: transform .25s cubic-bezier(.4,0,.2,1);
+        z-index: 90;
+      }
+      body.sb-open #sidebar { transform: translateX(0); }
+      #sb-backdrop {
+        position: fixed; inset: 0; z-index: 80;
+        background: rgba(13,33,55,.45);
+        opacity: 0; pointer-events: none;
+        transition: opacity .25s;
+      }
+      body.sb-open #sb-backdrop { display: block; opacity: 1; pointer-events: auto; }
+      #sb-backdrop { display: block; }
+
+      #main { margin-left: 0; }
+
+      /* Topbar compacte avec hamburger */
+      #menu-btn {
+        display: flex; align-items: center; justify-content: center;
+        width: 38px; height: 38px; flex-shrink: 0;
+        border: 1px solid var(--border); border-radius: 9px;
+        background: var(--white); color: var(--text); cursor: pointer;
+      }
+      #topbar { padding: 0 14px; gap: 10px; }
+      .topbar-date { display: none; }
+
+      #content { padding: 14px; }
+      .welcome-bar { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .welcome-title { font-size: 1.5rem; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .kpi-card { padding: 16px; }
+      .filter-tabs { flex-wrap: wrap; }
+
+      /* Tableaux : défilement horizontal dans leur carte */
+      .card { overflow-x: auto; }
+      .data-table { min-width: 860px; }
+
+      /* Les grilles multi-colonnes posées en style inline s'empilent
+         (sauf le calendrier de l'agenda, qui défile horizontalement) */
+      [style*="grid-template-columns"]:not(.cal-head-row):not(.cal-days-grid) {
+        grid-template-columns: 1fr !important;
+      }
+      /* Sans min-width:0, une piste de grille s'étire à la largeur de son contenu
+         (ex. tableau de 860px) et fait déborder toute la page */
+      [style*="grid-template-columns"] > *, .section, #content, #main { min-width: 0; }
+      #section-agenda { overflow-x: auto; }
+      .cal-head-row, .cal-days-grid { min-width: 720px; }
+
+      .tournee-order { grid-template-columns: 1fr; }
+      #modal-panel, #task-modal-panel { width: 100vw; }
+    }
+
+    /* ──────────────────── CRÉNEAUX RÉCURRENTS ──────────────────── */
+    .rec-day {
+      width: 30px; height: 30px; border-radius: 8px;
+      border: 1px solid #e2e8f0; background: #fff; color: var(--muted);
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: all .15s;
+    }
+    .rec-day:hover { border-color: var(--navy); color: var(--navy); }
+    .rec-day.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+    /* ──────────────────── TOURNÉE ──────────────────── */
+    .tournee-slot-title {
+      font-size: 13px; font-weight: 700; color: var(--text);
+      padding: 10px 4px 8px; display: flex; align-items: center; gap: 8px;
+    }
+    .tournee-order {
+      border: 1px solid #e2e8f0; border-radius: 12px; background: #fff;
+      padding: 14px 16px; margin-bottom: 10px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px;
+      break-inside: avoid;
+    }
+    .tournee-order .to-line { font-size: 12.5px; color: var(--text); }
+    .tournee-order .to-muted { color: #94a3b8; }
+
+    /* ──────────────────── IMPRESSION (tournée uniquement) ──────────────────── */
+    @media print {
+      #sidebar, #topbar, .no-print { display: none !important; }
+      #main { margin-left: 0 !important; }
+      #content { padding: 0 !important; }
+      body { background: #fff !important; }
+      .section { display: none !important; }
+      #section-tournee.active { display: block !important; }
+      #tournee-print-header { display: block !important; font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+      .tournee-order { border-color: #cbd5e1; }
     }
   </style>
 </head>
@@ -812,6 +906,10 @@
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
       <span>Produits</span>
     </button>
+    <button class="nav-item" data-section="accueil">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6m-6 0v-6a1 1 0 011-1h2a1 1 0 011 1v6"/></svg>
+      <span>Boutique page accueil</span>
+    </button>
     <div class="sb-section">Ventes</div>
     <button class="nav-item" data-section="commandes">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -821,6 +919,10 @@
     <button class="nav-item" data-section="creneaux">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       <span>Créneaux</span>
+    </button>
+    <button class="nav-item" data-section="tournee">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      <span>Tournée</span>
     </button>
     <button class="nav-item" data-section="agenda">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -842,11 +944,17 @@
   </div>
 </aside>
 
+<!-- Backdrop du tiroir mobile -->
+<div id="sb-backdrop"></div>
+
 <!-- ═══════════════════ MAIN ═══════════════════ -->
 <div id="main">
 
   <!-- Topbar -->
   <div id="topbar">
+    <button id="menu-btn" aria-label="Ouvrir le menu">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
     <h1 id="page-title">Tableau de bord</h1>
     <span class="topbar-date" id="topbar-date"></span>
     <a href="../boutique/index.html" target="_blank" class="btn btn-ghost btn-sm">
@@ -1072,6 +1180,52 @@
       </div>
     </div>
 
+    <!-- ─── SECTION BOUTIQUE PAGE ACCUEIL ─── -->
+    <div id="section-accueil" class="section">
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:40px;height:40px;border-radius:11px;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="20" height="20" fill="none" stroke="var(--navy2)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6m-6 0v-6a1 1 0 011-1h2a1 1 0 011 1v6"/></svg>
+        </div>
+        <div style="flex:1">
+          <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px">Boutique page accueil</h2>
+          <div style="font-size:12px;color:#94a3b8">Choisissez les 3 produits mis en avant sur la page d'accueil du site</div>
+        </div>
+      </div>
+
+      <div class="card" style="max-width:640px">
+        <div class="card-header">
+          <div>
+            <h2>Produits à la une</h2>
+            <div class="subtitle">Ils apparaîtront dans la vitrine de la page d'accueil, dans cet ordre</div>
+          </div>
+        </div>
+        <div style="padding:22px 20px">
+          <div id="home-slots" style="display:flex;flex-direction:column;gap:16px">
+            <div class="field-group" style="margin:0">
+              <label class="field-label">Produit 1</label>
+              <select class="field-input home-slot" data-slot="0"></select>
+            </div>
+            <div class="field-group" style="margin:0">
+              <label class="field-label">Produit 2</label>
+              <select class="field-input home-slot" data-slot="1"></select>
+            </div>
+            <div class="field-group" style="margin:0">
+              <label class="field-label">Produit 3</label>
+              <select class="field-input home-slot" data-slot="2"></select>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:22px">
+            <button class="btn btn-primary" id="btn-save-home">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Enregistrer
+            </button>
+            <a href="../index.html#vitrine" target="_blank" class="btn btn-ghost">Voir sur le site</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ─── SECTION COMMANDES ─── -->
     <div id="section-commandes" class="section">
 
@@ -1088,6 +1242,7 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap">
         <div class="filter-tabs" id="order-filters">
           <button class="filter-tab active" data-filter="">Toutes</button>
+          <button class="filter-tab" data-filter="tovalidate">À valider</button>
           <button class="filter-tab" data-filter="paid">Confirmées</button>
           <button class="filter-tab" data-filter="pending">En attente</button>
           <button class="filter-tab" data-filter="cancelled">Annulées</button>
@@ -1112,12 +1267,13 @@
               <th>Mode</th>
               <th>Créneau</th>
               <th>Statut</th>
+              <th>Validation</th>
               <th>Date</th>
               <th></th>
             </tr>
           </thead>
           <tbody id="orders-tbody">
-            <tr><td colspan="8"><div class="empty-state"><p>Chargement…</p></div></td></tr>
+            <tr><td colspan="10"><div class="empty-state"><p>Chargement…</p></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -1190,9 +1346,82 @@
               <p style="font-size:11px;color:#94a3b8;margin-bottom:10px">Ajouter les créneaux par défaut (9h–12h, 14h–17h)</p>
               <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="addDefaultSlots()">Créneaux par défaut</button>
             </div>
+
+            <!-- Créneaux récurrents -->
+            <div style="border-top:1px solid #f1f5f9;padding-top:12px">
+              <p style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px">Créneaux récurrents</p>
+              <p style="font-size:11px;color:#94a3b8;margin-bottom:10px">Ex. : tous les mardis 9h–12h sur la période choisie</p>
+              <div id="rec-weekdays" style="display:flex;gap:4px;margin-bottom:10px">
+                <!-- data-day : 0 = dimanche … 6 = samedi -->
+                <button type="button" class="rec-day" data-day="1">L</button>
+                <button type="button" class="rec-day" data-day="2">M</button>
+                <button type="button" class="rec-day" data-day="3">M</button>
+                <button type="button" class="rec-day" data-day="4">J</button>
+                <button type="button" class="rec-day" data-day="5">V</button>
+                <button type="button" class="rec-day" data-day="6">S</button>
+                <button type="button" class="rec-day" data-day="0">D</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+                <div class="task-field">
+                  <label class="task-field label">Début</label>
+                  <input type="time" id="rec-start" class="task-input" value="09:00">
+                </div>
+                <div class="task-field">
+                  <label class="task-field label">Fin</label>
+                  <input type="time" id="rec-end" class="task-input" value="12:00">
+                </div>
+                <div class="task-field">
+                  <label class="task-field label">Du</label>
+                  <input type="date" id="rec-from" class="task-input">
+                </div>
+                <div class="task-field">
+                  <label class="task-field label">Au</label>
+                  <input type="date" id="rec-until" class="task-input">
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="addRecurringSlots()">Créer les créneaux récurrents</button>
+              <p id="rec-result" style="font-size:11px;color:#16a34a;margin-top:8px;display:none"></p>
+            </div>
           </div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- ─── SECTION TOURNÉE ─── -->
+    <div id="section-tournee" class="section">
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px" class="no-print">
+        <div style="width:40px;height:40px;border-radius:11px;background:#dcfce7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="20" height="20" fill="none" stroke="#15803d" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+        </div>
+        <div style="flex:1">
+          <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px">Tournée du jour</h2>
+          <div style="font-size:12px;color:#94a3b8">Commandes confirmées triées par créneau — préparez vos livraisons</div>
+        </div>
+      </div>
+
+      <div class="card no-print" style="margin-bottom:20px">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <label style="font-size:13px;font-weight:600;color:var(--text)">Date :</label>
+            <input type="date" id="tournee-date-input" class="task-input" style="width:180px;padding:7px 10px">
+            <button class="btn btn-primary btn-sm" onclick="loadTournee()">Afficher</button>
+            <button class="btn btn-ghost btn-sm" onclick="setTourneeDate(1)">Demain</button>
+            <button class="btn btn-ghost btn-sm" onclick="setTourneeDate(0)">Aujourd'hui</button>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="window.print()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            Imprimer
+          </button>
+        </div>
+      </div>
+
+      <div id="tournee-print-header" style="display:none"></div>
+      <div id="tournee-body">
+        <div class="empty-state" style="padding:40px">
+          <p>Sélectionnez une date</p>
+        </div>
       </div>
     </div>
 
@@ -1429,9 +1658,20 @@ async function apiFetch(url, opts = {}) {
   return res;
 }
 
+// ─── MENU MOBILE (tiroir) ───
+document.getElementById('menu-btn').addEventListener('click', () => {
+  document.body.classList.toggle('sb-open');
+});
+document.getElementById('sb-backdrop').addEventListener('click', () => {
+  document.body.classList.remove('sb-open');
+});
+
 // ─── NAVIGATION ───
 document.querySelectorAll('.nav-item[data-section]').forEach(btn => {
-  btn.addEventListener('click', () => navigate(btn.dataset.section));
+  btn.addEventListener('click', () => {
+    navigate(btn.dataset.section);
+    document.body.classList.remove('sb-open'); // referme le tiroir sur mobile
+  });
 });
 
 function navigate(section) {
@@ -1439,13 +1679,145 @@ function navigate(section) {
   document.querySelector(`.nav-item[data-section="${section}"]`)?.classList.add('active');
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(`section-${section}`)?.classList.add('active');
-  const titles = { dashboard: 'Tableau de bord', produits: 'Produits', commandes: 'Commandes', creneaux: 'Créneaux', agenda: 'Emploi du temps' };
+  const titles = { dashboard: 'Tableau de bord', produits: 'Produits', accueil: 'Boutique page accueil', commandes: 'Commandes', creneaux: 'Créneaux', tournee: 'Tournée', agenda: 'Emploi du temps' };
   document.getElementById('page-title').textContent = titles[section] || section;
   if (section === 'produits') loadProducts();
+  if (section === 'accueil') loadHomeProducts();
   if (section === 'commandes') loadOrders();
   if (section === 'creneaux') initCreneaux();
+  if (section === 'tournee') initTournee();
   if (section === 'agenda') { calCurrentDate = new Date(); renderCalendar(); }
 }
+
+// ═══════════════════════ TOURNÉE ═══════════════════════
+function setTourneeDate(offsetDays) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  document.getElementById('tournee-date-input').value = d.toISOString().split('T')[0];
+  loadTournee();
+}
+
+function initTournee() {
+  // Par défaut : la tournée du lendemain (préparation la veille)
+  if (!document.getElementById('tournee-date-input').value) setTourneeDate(1);
+  else loadTournee();
+}
+
+async function loadTournee() {
+  const date = document.getElementById('tournee-date-input').value;
+  const body = document.getElementById('tournee-body');
+  if (!date) return;
+  body.innerHTML = '<div class="empty-state" style="padding:40px"><p>Chargement…</p></div>';
+
+  try {
+    const res = await apiFetch(`/api/admin/tournee?date=${date}`);
+    if (!res.ok) throw new Error();
+    const orders = await res.json();
+    renderTournee(date, orders);
+  } catch {
+    body.innerHTML = '<div class="empty-state" style="padding:40px"><p>Erreur de chargement.</p></div>';
+  }
+}
+
+function renderTournee(date, orders) {
+  const body = document.getElementById('tournee-body');
+  const dateLabel = new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('tournee-print-header').textContent =
+    `Fleurs de Nila — Tournée du ${dateLabel} (${orders.length} commande${orders.length > 1 ? 's' : ''})`;
+
+  if (!orders.length) {
+    body.innerHTML = `<div class="empty-state" style="padding:40px"><p>Aucune commande confirmée pour le ${dateLabel}.</p></div>`;
+    return;
+  }
+
+  // Regroupe par créneau (les commandes arrivent déjà triées par heure de début)
+  const bySlot = {};
+  for (const o of orders) {
+    const key = `${o.start_time} – ${o.end_time}`;
+    (bySlot[key] = bySlot[key] || []).push(o);
+  }
+
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  body.innerHTML = Object.entries(bySlot).map(([slot, list]) => `
+    <div class="tournee-slot-title">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      ${esc(slot)} <span class="badge badge-navy">${list.length}</span>
+    </div>
+    ${list.map(o => {
+      let addr = null;
+      try { addr = o.customer_address ? JSON.parse(o.customer_address) : null; } catch { addr = null; }
+      const items = (o.items || []).map(i => {
+        const opts = i.options && Object.keys(i.options).length
+          ? ` <span class="to-muted">(${Object.entries(i.options).map(([k, v]) => `${esc(k)} : ${esc(v)}`).join(', ')})</span>` : '';
+        const msg = i.message ? `<div class="to-muted" style="padding-left:12px">✉ « ${esc(i.message)} »</div>` : '';
+        return `<div>• ${esc(i.name)} ×${i.qty}${opts}${msg}</div>`;
+      }).join('');
+      return `
+      <div class="tournee-order">
+        <div>
+          <div class="to-line" style="font-weight:700">#${o.id} — ${esc(o.customer_name)}
+            ${o.validated ? '' : ' <span class="badge badge-amber">À valider</span>'}</div>
+          <div class="to-line">${esc(o.customer_phone || '')}</div>
+          <div class="to-line" style="margin-top:4px">
+            ${o.delivery_type === 'delivery'
+              ? `<span class="badge" style="background:#dbeafe;color:#1e40af">Livraison</span>`
+              : `<span class="badge" style="background:#fef3c7;color:#b45309">Retrait boutique</span>`}
+          </div>
+          ${addr ? `<div class="to-line to-muted" style="margin-top:4px">${esc(addr.street)}${addr.extra ? ' — ' + esc(addr.extra) : ''}<br>${esc(addr.zip)} ${esc(addr.city)}</div>` : ''}
+        </div>
+        <div>
+          <div class="to-line to-muted" style="margin-bottom:2px">Produits</div>
+          <div class="to-line">${items}</div>
+          <div class="to-line" style="margin-top:4px;font-weight:600">${Number(o.total).toFixed(2)} €</div>
+        </div>
+      </div>`;
+    }).join('')}
+  `).join('');
+}
+
+// ═══════════════════════ CRÉNEAUX RÉCURRENTS ═══════════════════════
+document.querySelectorAll('.rec-day').forEach(btn => {
+  btn.addEventListener('click', () => btn.classList.toggle('active'));
+});
+
+async function addRecurringSlots() {
+  const weekdays = [...document.querySelectorAll('.rec-day.active')].map(b => parseInt(b.dataset.day));
+  const start_time = document.getElementById('rec-start').value;
+  const end_time = document.getElementById('rec-end').value;
+  const from = document.getElementById('rec-from').value;
+  const until = document.getElementById('rec-until').value;
+  const resultEl = document.getElementById('rec-result');
+  resultEl.style.display = 'none';
+
+  if (!weekdays.length) return alert('Sélectionnez au moins un jour de la semaine.');
+  if (!start_time || !end_time || start_time >= end_time) return alert('Horaires invalides.');
+  if (!from || !until || from > until) return alert('Période invalide.');
+
+  try {
+    const res = await apiFetch('/api/admin/slots/recurring', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ weekdays, start_time, end_time, from, until })
+    });
+    const data = await res.json();
+    if (!res.ok) return alert(data.error || 'Erreur lors de la création.');
+    resultEl.textContent = `${data.created} créneau${data.created > 1 ? 'x' : ''} créé${data.created > 1 ? 's' : ''}` +
+      (data.skipped ? ` (${data.skipped} déjà existant${data.skipped > 1 ? 's' : ''})` : '') + '.';
+    resultEl.style.display = 'block';
+    loadSlots();
+  } catch {
+    alert('Erreur réseau.');
+  }
+}
+
+// Période récurrente par défaut : d'aujourd'hui à +8 semaines
+(() => {
+  const t = new Date();
+  document.getElementById('rec-from').value = t.toISOString().split('T')[0];
+  t.setDate(t.getDate() + 56);
+  document.getElementById('rec-until').value = t.toISOString().split('T')[0];
+})();
 
 // ─── LOGOUT ───
 document.getElementById('logout-btn').addEventListener('click', async () => {
@@ -1821,6 +2193,47 @@ async function toggleActive(id, checked) {
   } catch { showToast('Erreur', true); }
 }
 
+// ═══════════════════════ BOUTIQUE PAGE ACCUEIL ═══════════════════════
+async function loadHomeProducts() {
+  try {
+    // Charge le catalogue si nécessaire, puis la sélection actuelle
+    if (!allProducts.length) {
+      const pr = await apiFetch('/api/admin/products');
+      allProducts = await pr.json();
+    }
+    const res = await apiFetch('/api/admin/home-products');
+    const { ids = [] } = await res.json();
+    renderHomeSlots(ids);
+  } catch { showToast('Erreur chargement', true); }
+}
+
+function renderHomeSlots(selectedIds) {
+  const options = allProducts.map(p =>
+    `<option value="${p.id}">${p.name}${p.active ? '' : ' (masqué)'}</option>`
+  ).join('');
+  document.querySelectorAll('.home-slot').forEach((sel, i) => {
+    sel.innerHTML = `<option value="">— Aucun —</option>${options}`;
+    sel.value = selectedIds[i] != null ? String(selectedIds[i]) : '';
+  });
+}
+
+document.getElementById('btn-save-home').addEventListener('click', async () => {
+  const ids = [...document.querySelectorAll('.home-slot')]
+    .map(sel => parseInt(sel.value))
+    .filter(n => Number.isInteger(n));
+  if (new Set(ids).size !== ids.length) {
+    return showToast('Choisissez 3 produits différents', true);
+  }
+  try {
+    await apiFetch('/api/admin/home-products', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids })
+    });
+    showToast('Vitrine mise à jour ✦');
+  } catch { showToast('Erreur enregistrement', true); }
+});
+
 // ═══════════════════════ COMMANDES ═══════════════════════
 let currentOrderFilter = '';
 
@@ -1835,18 +2248,20 @@ document.getElementById('order-filters').addEventListener('click', e => {
 
 async function loadOrders() {
   const tbody = document.getElementById('orders-tbody');
-  tbody.innerHTML = `<tr><td colspan="8"><div class="lottie-empty">
+  tbody.innerHTML = `<tr><td colspan="10"><div class="lottie-empty">
     <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#cbd5e1;animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
     <p>Chargement…</p>
   </div></td></tr>`;
   try {
-    const url = currentOrderFilter ? `/api/admin/orders?status=${currentOrderFilter}&limit=100` : '/api/admin/orders?limit=100';
+    const isToValidate = currentOrderFilter === 'tovalidate';
+    const url = (currentOrderFilter && !isToValidate) ? `/api/admin/orders?status=${currentOrderFilter}&limit=100` : '/api/admin/orders?limit=100';
     const res = await apiFetch(url);
-    const orders = await res.json();
+    let orders = await res.json();
+    if (isToValidate) orders = orders.filter(o => o.status === 'paid' && !o.validated);
     _csvOrders = orders;
     document.getElementById('orders-count').textContent = `${orders.length} commande${orders.length !== 1 ? 's' : ''}`;
     if (!orders.length) {
-      tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><p>Aucune commande</p></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><p>Aucune commande</p></div></td></tr>`;
       return;
     }
     tbody.innerHTML = orders.map(o => {
@@ -1865,6 +2280,7 @@ async function loadOrders() {
         <td><span class="badge ${o.delivery_type === 'delivery' ? 'badge-blue' : 'badge-gray'}">${modeLabel}</span></td>
         <td style="font-size:12px;color:#64748b;white-space:nowrap">${creneau}</td>
         <td>${statusBadge(o.status)}</td>
+        <td style="white-space:nowrap">${validationCell(o)}</td>
         <td style="font-size:12px;color:#94a3b8;white-space:nowrap">${dateStr}</td>
         <td style="white-space:nowrap">
           ${o.status !== 'cancelled'
@@ -1874,7 +2290,36 @@ async function loadOrders() {
         </td>
       </tr>`;
     }).join('');
-  } catch { tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><p style="color:#dc2626">Erreur de chargement</p></div></td></tr>`; }
+  } catch { tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><p style="color:#dc2626">Erreur de chargement</p></div></td></tr>`; }
+}
+
+// Cellule « Validation » : boutons Valider/Refuser pour les commandes payées non validées
+function validationCell(o) {
+  if (o.status !== 'paid') return '<span style="color:#cbd5e1">—</span>';
+  if (o.validated) return '<span class="badge badge-green">Validée</span>';
+  return `
+    <button onclick="validateOrder(${o.id},'accept')" title="Valider le créneau"
+      style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid #a7f3d0;background:#d1fae5;color:#065f46;cursor:pointer;font-weight:600">✓ Valider</button>
+    <button onclick="validateOrder(${o.id},'refuse')" title="Refuser : annule la commande et libère le créneau"
+      style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid #fecaca;background:#fee2e2;color:#dc2626;cursor:pointer;font-weight:600">✕ Refuser</button>`;
+}
+
+async function validateOrder(id, action) {
+  const msg = action === 'accept'
+    ? `Valider le créneau de la commande #${id} ?`
+    : `Refuser la commande #${id} ?\nElle sera annulée, le créneau libéré et les stocks restitués.\n(Le remboursement SumUp reste à faire manuellement.)`;
+  if (!confirm(msg)) return;
+  const res = await apiFetch(`/api/admin/orders/${id}/validate`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action })
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    alert(data.error || 'Erreur lors de la validation.');
+  }
+  loadOrders();
+  loadDashboard();
 }
 
 async function changeOrderStatus(id, status) {

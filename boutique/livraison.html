@@ -11,7 +11,7 @@
   <style>#nav { background: #ffffff; backdrop-filter: none; }</style>
 </head>
 
-<body class="font-sans text-primary bg-cream antialiased">
+<body class="font-sans text-primary bg-cream antialiased md:h-screen md:flex md:flex-col md:overflow-hidden">
 
   <!-- Navigation -->
   <nav id="nav" class="fixed w-full z-50 transition-all duration-500 border-b border-primary bg-white">
@@ -81,98 +81,199 @@
     </div>
   </div>
 
-  <main class="pt-24 min-h-screen">
+  <main class="pt-20 md:pt-24 md:flex-1 md:min-h-0 md:flex md:flex-col">
 
-    <!-- En-tête -->
-    <div class="border-b border-primary bg-white">
-      <div class="px-6 lg:px-16 py-12 max-w-6xl mx-auto">
-        <p class="text-sm tracking-widest uppercase text-gray-500 mb-3">Étape 2 sur 3</p>
-        <h1 class="font-display text-5xl lg:text-7xl text-primary">Livraison</h1>
-      </div>
-    </div>
+    <!-- Deux panneaux : formulaire (60 %) / récap commande (40 %), avec respiration autour -->
+    <div class="w-full max-w-screen-2xl mx-auto md:flex-1 md:min-h-0 md:grid md:grid-cols-[3fr_2fr] md:gap-8 lg:gap-12 md:px-10 lg:px-16 xl:px-24 md:py-6 lg:py-8">
 
-    <div class="px-6 lg:px-16 py-12 max-w-6xl mx-auto lg:grid lg:grid-cols-[1fr_360px] lg:gap-12">
+      <!-- Panneau gauche (60 %) — formulaire de livraison -->
+      <section class="md:min-h-0 md:flex md:flex-col">
 
-      <!-- Colonne gauche -->
-      <div>
-
-        <!-- Mode de livraison -->
-        <div class="mb-10">
-          <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-4">Mode de récupération</h2>
-          <div class="grid grid-cols-2 gap-3">
-            <button id="btn-delivery" data-mode="delivery"
-              class="mode-btn border border-primary bg-primary text-white py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200">
-              Livraison à domicile
-            </button>
-            <button id="btn-pickup" data-mode="pickup"
-              class="mode-btn border border-primary text-primary py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200 hover:bg-primary hover:text-white">
-              Retrait en boutique
-            </button>
-          </div>
+        <!-- En-tête du panneau : titre + parcours en 3 étapes -->
+        <div class="flex-shrink-0 px-6 md:px-0 pt-6 md:pt-0 pb-5 border-b border-primary/20 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+          <h1 class="font-display text-4xl lg:text-5xl leading-none text-primary">Livraison</h1>
+          <ol class="flex items-center gap-2 lg:gap-3 text-[11px] tracking-widest uppercase">
+            <li class="flex items-center gap-2 text-gray-400">
+              <span class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center text-[10px]">1</span>Panier
+            </li>
+            <li class="text-gray-300" aria-hidden="true">—</li>
+            <li class="flex items-center gap-2 text-primary font-medium">
+              <span class="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px]">2</span>Livraison
+            </li>
+            <li class="text-gray-300" aria-hidden="true">—</li>
+            <li class="flex items-center gap-2 text-gray-400">
+              <span class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center text-[10px]">3</span>Paiement
+            </li>
+          </ol>
         </div>
 
-        <!-- Adresse (livraison uniquement) -->
-        <div id="address-block" class="mb-10">
-          <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-4">Adresse de livraison</h2>
-          <div class="space-y-3">
-            <input id="address-street" type="text" placeholder="Adresse"
-              class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white">
-            <div class="grid grid-cols-2 gap-3">
-              <input id="address-zip" type="text" placeholder="Code postal"
-                class="border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white">
-              <input id="address-city" type="text" placeholder="Ville"
-                class="border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white">
+        <div class="px-6 md:px-0 py-6 lg:py-8 md:flex-1 md:min-h-0 md:overflow-y-auto">
+
+          <!-- Mode de livraison -->
+          <div class="mb-7 lg:mb-9">
+            <h2 class="text-xs tracking-widest uppercase text-gray-400 mb-3">Mode de récupération</h2>
+            <div class="grid grid-cols-2 gap-3 max-w-lg">
+              <button id="btn-delivery" data-mode="delivery"
+                class="mode-btn border border-primary bg-primary text-white py-3 px-4 text-sm tracking-widest uppercase transition-colors duration-200">
+                Livraison à domicile
+              </button>
+              <button id="btn-pickup" data-mode="pickup"
+                class="mode-btn border border-primary text-primary py-3 px-4 text-sm tracking-widest uppercase transition-colors duration-200 hover:bg-primary hover:text-white">
+                Retrait en boutique
+              </button>
             </div>
           </div>
-        </div>
 
-        <!-- Sélection de la date (livraison uniquement) -->
-        <div id="date-block" class="mb-8">
-          <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-4">Choisir une date</h2>
-          <div id="date-tabs" class="flex gap-2 flex-wrap"></div>
-        </div>
+          <!-- Deux sous-colonnes : zone + adresse | date + créneaux (pleine largeur en mode retrait) -->
+          <div id="form-columns" class="md:grid md:grid-cols-2 md:gap-10 lg:gap-14">
 
-        <!-- Créneaux horaires (livraison uniquement) -->
-        <div id="slots-block">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-sm tracking-widest uppercase text-gray-500">Créneau horaire</h2>
+            <!-- Sous-colonne 1 — zone + adresse -->
+            <div id="form-col-1">
+
+              <!-- Zone de livraison : liste déroulante avec recherche (livraison uniquement) -->
+              <div id="zone-block" class="mb-7">
+                <div class="flex items-baseline gap-3 mb-3">
+                  <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center">1</span>
+                  <h2 class="text-xs tracking-widest uppercase text-gray-400">Zone de livraison</h2>
+                </div>
+
+                <div class="pl-9">
+                  <div class="relative" id="zone-combo">
+                    <input id="zone-search" type="text" autocomplete="off" placeholder="Commune ou code postal…"
+                      class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 pr-16 text-sm transition-colors bg-white">
+                    <button id="zone-clear" type="button" aria-label="Effacer la zone de livraison"
+                      class="hidden absolute right-8 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-primary transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    <div id="zone-options" class="hidden absolute z-30 left-0 right-0 top-full mt-1 max-h-56 overflow-y-auto border border-gray-200 bg-white shadow-lg"></div>
+                  </div>
+
+                  <div id="zone-ok" class="hidden mt-3 border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800"></div>
+                  <p id="zone-help" class="mt-2 text-xs text-gray-400">Commune absente de la liste ? Appelez la boutique au
+                    <a href="tel:0434390429" class="underline hover:text-primary">04 34 39 04 29</a>.</p>
+                </div>
+              </div>
+
+              <!-- Reste de l'adresse (révélé après sélection de la commune) -->
+              <div id="address-rest" class="mb-7 hidden">
+                <div class="flex items-baseline gap-3 mb-3">
+                  <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center">2</span>
+                  <h2 class="text-xs tracking-widest uppercase text-gray-400">Adresse de livraison</h2>
+                </div>
+                <div class="pl-9">
+                  <div class="relative">
+                    <input id="address-street" type="text" placeholder="Numéro et rue" autocomplete="street-address"
+                      class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 pr-9 text-sm transition-colors bg-white">
+                    <button id="address-street-clear" type="button" aria-label="Effacer l'adresse"
+                      class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-primary transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </div>
+                  <div class="relative mt-3">
+                    <input id="address-extra" type="text" placeholder="Complément d'adresse (bâtiment, étage, digicode…)" autocomplete="address-line2"
+                      class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 pr-9 text-sm transition-colors bg-white">
+                    <button id="address-extra-clear" type="button" aria-label="Effacer le complément d'adresse"
+                      class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-primary transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </div>
+                  <p id="address-city-note" class="mt-2 text-xs text-gray-400"></p>
+                </div>
+              </div>
+
+            </div><!-- /Sous-colonne 1 -->
+
+            <!-- Sous-colonne 2 — date + créneaux -->
+            <div id="form-col-2" class="mt-2 md:mt-0 md:border-l md:border-primary/10 md:pl-10 lg:pl-14">
+
+              <!-- Sélection de la date (livraison uniquement) -->
+              <div id="date-block" class="mb-7">
+                <div class="flex items-baseline gap-3 mb-3">
+                  <span id="date-step-num" class="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center">3</span>
+                  <h2 class="text-xs tracking-widest uppercase text-gray-400">Choisir une date</h2>
+                </div>
+                <div id="date-tabs" class="flex gap-2 flex-wrap pl-9"></div>
+              </div>
+
+              <!-- Créneaux horaires (livraison uniquement) -->
+              <div id="slots-block">
+                <div class="flex items-baseline gap-3 mb-3">
+                  <span id="slots-step-num" class="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center">4</span>
+                  <h2 class="text-xs tracking-widest uppercase text-gray-400">Créneau horaire</h2>
+                </div>
+                <div class="pl-9">
+                  <div id="slots-loading" class="text-sm text-gray-400">Chargement des créneaux…</div>
+                  <div id="slots-grid" class="hidden grid grid-cols-2 gap-2"></div>
+                  <div id="slots-empty" class="hidden text-sm text-gray-400">Aucun créneau disponible pour cette date.</div>
+                  <div id="slots-error" class="hidden text-sm text-red-500">Erreur lors du chargement des créneaux.</div>
+                </div>
+              </div>
+
+              <!-- Retrait en boutique : info adresse (affiché sous les créneaux en mode pickup) -->
+              <div id="pickup-info" style="display:none" class="mt-4 ml-9 border border-gray-100 bg-gray-50 p-4">
+                <p class="text-xs text-gray-500">📍 Fleurs de Nila — venez récupérer votre commande à notre boutique au créneau choisi.</p>
+              </div>
+
+            </div><!-- /Sous-colonne 2 -->
           </div>
-          <div id="slots-loading" class="text-sm text-gray-400">Chargement des créneaux…</div>
-          <div id="slots-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
-          <div id="slots-empty" class="hidden text-sm text-gray-400">Aucun créneau disponible pour cette date.</div>
-          <div id="slots-error" class="hidden text-sm text-red-500">Erreur lors du chargement des créneaux.</div>
+
+        </div>
+      </section><!-- /Panneau gauche -->
+
+      <!-- Panneau droit (40 %) — récap panier + finaliser, pleine hauteur -->
+      <aside class="mt-8 md:mt-0 bg-white border-y md:border border-primary md:min-h-0 md:flex md:flex-col">
+
+        <div class="flex-shrink-0 px-6 lg:px-12 pt-6 lg:pt-8 pb-4 border-b border-primary/20">
+          <h2 class="text-xs tracking-widest uppercase text-gray-400">Votre commande</h2>
         </div>
 
-        <!-- Retrait en boutique : info adresse (affiché sous les créneaux en mode pickup) -->
-        <div id="pickup-info" style="display:none" class="mt-4 border border-gray-100 bg-gray-50 p-4">
-          <p class="text-xs text-gray-500">📍 Fleurs de Nila — venez récupérer votre commande à notre boutique au créneau choisi.</p>
+        <div class="px-6 lg:px-12 py-5 lg:py-6 md:flex-1 md:min-h-0 md:overflow-y-auto">
+          <div id="cart-summary" class="space-y-3 text-sm text-gray-600"></div>
         </div>
 
-      </div>
-
-      <!-- Colonne droite — récap commande -->
-      <div class="mt-10 lg:mt-0">
-        <div class="border border-primary bg-white p-6 sticky top-28">
-          <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-5">Votre commande</h2>
-          <div id="cart-summary" class="space-y-2 text-sm text-gray-600 mb-5"></div>
-          <div class="border-t border-gray-100 pt-4 flex justify-between font-medium">
-            <span>Total</span>
-            <span id="total-display">—</span>
+        <div class="flex-shrink-0 px-6 lg:px-12 pt-5 pb-6 lg:pb-8 border-t border-primary/20">
+          <div class="flex justify-between items-baseline mb-5">
+            <span class="text-xs tracking-widest uppercase text-gray-400">Total</span>
+            <span id="total-display" class="text-2xl font-medium text-primary">—</span>
           </div>
+
+          <p id="hold-timer" class="hidden mb-3 text-xs text-center text-primary border border-primary/20 bg-cream px-3 py-2">
+            Créneau réservé pour <span id="hold-countdown" class="font-medium tabular-nums">10:00</span>
+          </p>
 
           <button id="next-btn" disabled
-            class="mt-6 w-full bg-primary text-white py-4 text-sm tracking-widest uppercase transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:bg-secondary">
+            class="w-full bg-primary text-white py-4 text-sm tracking-widest uppercase transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:bg-secondary">
             Finaliser la commande →
           </button>
           <p id="next-hint" class="mt-3 text-xs text-gray-400 text-center">Sélectionnez un créneau pour continuer</p>
         </div>
-      </div>
+
+      </aside><!-- /Panneau droit -->
 
     </div>
   </main>
 
-  <footer class="border-t border-primary bg-white mt-16">
-    <div class="px-6 lg:px-16 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+  <!-- Modale de confirmation du créneau avant paiement -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-6">
+    <div id="confirm-backdrop" class="absolute inset-0 bg-primary/40"></div>
+    <div class="relative bg-white border border-primary max-w-md w-full p-8">
+      <h2 class="font-display text-3xl text-primary mb-1">Confirmez votre créneau</h2>
+      <p class="text-xs tracking-widest uppercase text-gray-400 mb-5">Vérifiez avant de passer au paiement</p>
+      <div id="confirm-recap" class="text-sm text-gray-600 space-y-1.5 border border-gray-100 bg-cream/60 p-4 mb-6"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <button id="confirm-cancel" class="border border-primary text-primary py-3 px-4 text-sm tracking-widest uppercase transition-colors duration-200 hover:bg-primary hover:text-white">
+          Modifier
+        </button>
+        <button id="confirm-ok" class="bg-primary text-white py-3 px-4 text-sm tracking-widest uppercase transition-colors duration-300 hover:bg-secondary">
+          Confirmer →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="border-t border-primary bg-white flex-shrink-0">
+    <div class="px-6 lg:px-14 xl:px-20 py-3 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
       <span>© 2026 Fleurs de Nila · Nîmes</span>
       <div class="flex gap-6">
         <a href="../mentions-legales.html" class="hover:text-primary transition-colors">Mentions légales</a>
@@ -181,22 +282,36 @@
     </div>
   </footer>
 
+  <script src="delivery-zones.js"></script>
   <script>
     const API = 'http://localhost:3000';
     const DELIVERY_THRESHOLD = 60;
-    const DELIVERY_PRICE = 5;
 
     let selectedMode = 'delivery';
     let selectedDate = null;
     let selectedSlotId = null;
     let selectedSlotLabel = null;
 
+    // --- Réservation temporaire de créneau (10 min, créneaux exclusifs) ---
+    let slotHold = null;        // { slotId, token, reservedUntil }
+    let holdInterval = null;
+    let skipRelease = false;    // vrai quand on part vers commande.html (la réservation doit survivre)
+
+    // --- Zone de livraison ---
+    let deliveryZoneValid = false;   // code postal desservi et validé
+    let deliveryFee = 0;             // tarif de la zone (avant seuil livraison offerte)
+    let deliveryZip = '';
+    let deliveryCommune = '';
+
     // --- Panier ---
     function getCart() { return JSON.parse(localStorage.getItem('cart') || '[]'); }
 
     function cartTotal() {
       const sub = getCart().reduce((s, i) => s + i.price * i.qty, 0);
-      const delivery = (selectedMode === 'delivery' && sub < DELIVERY_THRESHOLD) ? DELIVERY_PRICE : 0;
+      let delivery = 0;
+      if (selectedMode === 'delivery' && deliveryZoneValid) {
+        delivery = sub >= DELIVERY_THRESHOLD ? 0 : deliveryFee;
+      }
       return { sub, delivery, total: sub + delivery };
     }
 
@@ -213,9 +328,21 @@
     function renderCartSummary() {
       const cart = getCart();
       const { sub, delivery, total } = cartTotal();
+
+      let deliveryLine = '';
+      if (selectedMode === 'delivery') {
+        if (!deliveryZoneValid) {
+          deliveryLine = `<div class="flex justify-between text-gray-400"><span>Livraison</span><span>à définir</span></div>`;
+        } else if (delivery > 0) {
+          deliveryLine = `<div class="flex justify-between text-gray-400"><span>Livraison (${deliveryCommune})</span><span>${delivery.toFixed(2)} €</span></div>`;
+        } else {
+          deliveryLine = `<div class="text-green-700 text-xs">Livraison offerte (dès ${DELIVERY_THRESHOLD} €)</div>`;
+        }
+      }
+
       document.getElementById('cart-summary').innerHTML = [
         ...cart.map(i => `<div class="flex justify-between"><span>${i.name} ×${i.qty}</span><span>${(i.price * i.qty).toFixed(2)} €</span></div>`),
-        delivery > 0 ? `<div class="flex justify-between text-gray-400"><span>Livraison</span><span>${delivery.toFixed(2)} €</span></div>` : `<div class="text-green-700 text-xs">Livraison offerte</div>`
+        deliveryLine
       ].join('');
       document.getElementById('total-display').textContent = total.toFixed(2) + ' €';
     }
@@ -242,6 +369,7 @@
       selectedDate = date;
       selectedSlotId = null;
       selectedSlotLabel = null;
+      releaseHold();
       document.querySelectorAll('.date-tab').forEach(b => {
         b.className = b === btn
           ? 'date-tab border border-primary bg-primary text-white px-4 py-2 text-sm tracking-wide transition-colors duration-200'
@@ -272,13 +400,18 @@
 
         const grid = document.getElementById('slots-grid');
         grid.classList.remove('hidden');
-        grid.innerHTML = slots.map(s => `
-          <button class="slot-btn border border-gray-200 py-3 px-2 text-sm text-center transition-colors duration-200 hover:border-primary"
-            data-id="${s.id}" data-label="${s.start_time} – ${s.end_time}">
+        grid.innerHTML = slots.map(s => {
+          const mine = slotHold && slotHold.slotId === s.id;
+          const free = s.available || mine;
+          return `
+          <button class="slot-btn border py-3 px-2 text-sm text-center transition-colors duration-200
+              ${free ? 'border-gray-200 hover:border-primary' : 'border-gray-100 text-gray-300 line-through cursor-not-allowed'}"
+            data-id="${s.id}" data-label="${s.start_time} – ${s.end_time}" ${free ? '' : 'disabled'}>
             ${s.start_time} – ${s.end_time}
-          </button>`).join('');
+          </button>`;
+        }).join('');
 
-        grid.querySelectorAll('.slot-btn').forEach(btn => {
+        grid.querySelectorAll('.slot-btn:not([disabled])').forEach(btn => {
           btn.addEventListener('click', () => selectSlot(btn));
         });
       } catch {
@@ -287,15 +420,201 @@
       }
     }
 
-    function selectSlot(btn) {
-      selectedSlotId = parseInt(btn.dataset.id);
+    // Sélection d'un créneau = réservation temporaire côté serveur (10 min)
+    async function selectSlot(btn) {
+      const slotId = parseInt(btn.dataset.id);
+      try {
+        const res = await fetch(`${API}/api/cart/reserve-slot`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slotId,
+            previousSlotId: slotHold?.slotId,
+            previousToken: slotHold?.token
+          })
+        });
+        if (res.status === 409) {
+          // Pris entre-temps par un autre client : on rafraîchit la grille
+          alert('Ce créneau vient d\'être réservé par un autre client. Veuillez en choisir un autre.');
+          loadSlots(selectedDate);
+          return;
+        }
+        if (!res.ok) throw new Error();
+        const hold = await res.json();
+        slotHold = hold;
+        startHoldTimer();
+      } catch {
+        alert('Impossible de réserver ce créneau. Veuillez réessayer.');
+        return;
+      }
+
+      selectedSlotId = slotId;
       selectedSlotLabel = btn.dataset.label;
       document.querySelectorAll('.slot-btn').forEach(b => {
+        if (b.disabled) return;
         b.className = b === btn
           ? 'slot-btn border border-primary bg-primary text-white py-3 px-2 text-sm text-center transition-colors duration-200'
           : 'slot-btn border border-gray-200 py-3 px-2 text-sm text-center transition-colors duration-200 hover:border-primary';
       });
       updateNextBtn();
+    }
+
+    // Minuterie visible du temps de réservation restant
+    function startHoldTimer() {
+      const box = document.getElementById('hold-timer');
+      const countdown = document.getElementById('hold-countdown');
+      clearInterval(holdInterval);
+      box.classList.remove('hidden');
+
+      const tick = () => {
+        const remaining = Math.floor((new Date(slotHold.reservedUntil) - Date.now()) / 1000);
+        if (remaining <= 0) {
+          clearInterval(holdInterval);
+          box.classList.add('hidden');
+          slotHold = null;
+          selectedSlotId = null;
+          selectedSlotLabel = null;
+          if (selectedDate) loadSlots(selectedDate);
+          updateNextBtn();
+          document.getElementById('next-hint').textContent =
+            'Votre réservation de créneau a expiré — veuillez en choisir un autre.';
+          return;
+        }
+        const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const s = String(remaining % 60).padStart(2, '0');
+        countdown.textContent = `${m}:${s}`;
+      };
+      tick();
+      holdInterval = setInterval(tick, 1000);
+    }
+
+    // Libère la réservation en cours (changement de date/créneau, ou départ de la page)
+    function releaseHold(viaBeacon = false) {
+      if (!slotHold) return;
+      const payload = JSON.stringify({ slotId: slotHold.slotId, token: slotHold.token });
+      if (viaBeacon) {
+        navigator.sendBeacon(`${API}/api/cart/release-slot`, new Blob([payload], { type: 'text/plain' }));
+      } else {
+        fetch(`${API}/api/cart/release-slot`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload
+        }).catch(() => {});
+      }
+      slotHold = null;
+      clearInterval(holdInterval);
+      document.getElementById('hold-timer').classList.add('hidden');
+    }
+
+    // Libération automatique si le client quitte la page (sauf départ vers l'étape paiement)
+    window.addEventListener('pagehide', () => {
+      if (!skipRelease) releaseHold(true);
+    });
+
+    // --- Zone de livraison : liste déroulante avec recherche ---
+    const zoneSearch = document.getElementById('zone-search');
+    const zoneOptions = document.getElementById('zone-options');
+
+    function resetZone() {
+      deliveryZoneValid = false;
+      deliveryFee = 0;
+      deliveryZip = '';
+      deliveryCommune = '';
+      document.getElementById('zone-ok').classList.add('hidden');
+      document.getElementById('address-rest').classList.add('hidden');
+      document.getElementById('zone-clear').classList.toggle('hidden', !zoneSearch.value);
+    }
+
+    function renderZoneOptions(filter) {
+      const q = (filter || '').trim().toLowerCase();
+      const list = (window.DELIVERY_ZONES || []).filter(z =>
+        !q || z.commune.toLowerCase().includes(q) || z.zip.startsWith(q)
+      );
+      if (!list.length) {
+        zoneOptions.innerHTML = `<div class="px-4 py-3 text-sm text-gray-400">
+          Aucune commune — appelez le <a href="tel:0434390429" class="underline">04 34 39 04 29</a></div>`;
+      } else {
+        zoneOptions.innerHTML = list.map(z => `
+          <button type="button" class="zone-opt w-full text-left px-4 py-2.5 text-sm hover:bg-cream flex justify-between items-center gap-3"
+            data-zip="${z.zip}" data-fee="${z.fee}" data-commune="${z.commune}">
+            <span>${z.commune} <span class="text-gray-400">· ${z.zip}</span></span>
+            <span class="text-gray-500 whitespace-nowrap">${z.fee} €</span>
+          </button>`).join('');
+      }
+      zoneOptions.classList.remove('hidden');
+    }
+
+    function closeZoneOptions() { zoneOptions.classList.add('hidden'); }
+
+    function selectZone(zip, fee, commune) {
+      deliveryZoneValid = true;
+      deliveryZip = zip;
+      deliveryFee = fee;
+      deliveryCommune = commune;
+
+      zoneSearch.value = `${commune} (${zip})`;
+      document.getElementById('zone-clear').classList.remove('hidden');
+      closeZoneOptions();
+
+      const okEl = document.getElementById('zone-ok');
+      okEl.innerHTML = `Frais de livraison : <strong>${fee} €</strong> <span class="text-green-700/70">— offerts dès ${DELIVERY_THRESHOLD} €.</span>`;
+      okEl.classList.remove('hidden');
+
+      const addressRest = document.getElementById('address-rest');
+      addressRest.classList.remove('hidden');
+      addressRest.style.display = '';
+      document.getElementById('address-city-note').textContent = `Livraison à ${commune} (${zip})`;
+
+      updateFlowVisibility();
+      renderCartSummary();
+      updateNextBtn();
+    }
+
+    zoneSearch.addEventListener('focus', () => renderZoneOptions(zoneSearch.value));
+    zoneSearch.addEventListener('input', () => {
+      if (deliveryZoneValid) { resetZone(); renderCartSummary(); updateNextBtn(); }
+      document.getElementById('zone-clear').classList.toggle('hidden', !zoneSearch.value);
+      renderZoneOptions(zoneSearch.value);
+    });
+
+    // Croix « vider » sur le champ zone : réinitialise toute la sélection
+    document.getElementById('zone-clear').addEventListener('click', () => {
+      zoneSearch.value = '';
+      resetZone();
+      updateFlowVisibility();
+      renderCartSummary();
+      updateNextBtn();
+      zoneSearch.focus();
+    });
+
+    // Croix « vider » sur les champs adresse
+    [['address-street', 'address-street-clear'], ['address-extra', 'address-extra-clear']].forEach(([inputId, btnId]) => {
+      const input = document.getElementById(inputId);
+      const btn = document.getElementById(btnId);
+      input.addEventListener('input', () => btn.classList.toggle('hidden', !input.value));
+      btn.addEventListener('click', () => {
+        input.value = '';
+        btn.classList.add('hidden');
+        updateNextBtn();
+        input.focus();
+      });
+    });
+    zoneOptions.addEventListener('click', e => {
+      const opt = e.target.closest('.zone-opt');
+      if (!opt) return;
+      selectZone(opt.dataset.zip, parseFloat(opt.dataset.fee), opt.dataset.commune);
+    });
+    // Ferme la liste au clic extérieur
+    document.addEventListener('click', e => {
+      if (!document.getElementById('zone-combo').contains(e.target)) closeZoneOptions();
+    });
+    document.getElementById('address-street').addEventListener('input', updateNextBtn);
+
+    // Affiche/masque date + créneaux selon le mode et la validité de la zone
+    function updateFlowVisibility() {
+      const gate = (selectedMode === 'delivery') && !deliveryZoneValid;
+      document.getElementById('date-block').style.display = gate ? 'none' : '';
+      document.getElementById('slots-block').style.display = gate ? 'none' : '';
     }
 
     // --- Mode livraison / retrait ---
@@ -307,17 +626,25 @@
       const isDelivery = mode === 'delivery';
 
       document.getElementById('btn-delivery').className = isDelivery
-        ? 'mode-btn border border-primary bg-primary text-white py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200'
-        : 'mode-btn border border-primary text-primary py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200 hover:bg-primary hover:text-white';
+        ? 'mode-btn border border-primary bg-primary text-white py-3 px-4 text-sm tracking-widest uppercase transition-colors duration-200'
+        : 'mode-btn border border-primary text-primary py-3 px-4 text-sm tracking-widest uppercase transition-colors duration-200 hover:bg-primary hover:text-white';
       document.getElementById('btn-pickup').className = isDelivery
-        ? 'mode-btn border border-primary text-primary py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200 hover:bg-primary hover:text-white'
-        : 'mode-btn border border-primary bg-primary text-white py-4 px-4 text-sm tracking-widest uppercase transition-colors duration-200';
+        ? 'mode-btn border border-primary text-primary py-3 px-4 text-sm tracking-widest uppercase transition-colors duration-200 hover:bg-primary hover:text-white'
+        : 'mode-btn border border-primary bg-primary text-white py-3 px-4 text-sm tracking-widest uppercase transition-colors duration-200';
 
-      // L'adresse est uniquement pour la livraison
-      document.getElementById('address-block').style.display = isDelivery ? '' : 'none';
-      // La sélection date + créneaux s'affiche dans les deux modes
-      document.getElementById('date-block').style.display = '';
-      document.getElementById('slots-block').style.display = '';
+      // Bloc zone + adresse uniquement pour la livraison
+      document.getElementById('zone-block').style.display = isDelivery ? '' : 'none';
+      document.getElementById('address-rest').style.display =
+        (isDelivery && deliveryZoneValid) ? '' : 'none';
+
+      // En retrait : date + créneaux occupent toute la largeur (plus de sous-colonnes)
+      document.getElementById('form-col-1').style.display = isDelivery ? '' : 'none';
+      const col2 = document.getElementById('form-col-2');
+      ['md:border-l', 'md:border-primary/10', 'md:pl-10', 'lg:pl-14'].forEach(c =>
+        col2.classList.toggle(c, isDelivery));
+      col2.classList.toggle('md:col-span-2', !isDelivery);
+      // Créneaux sur 4 colonnes quand le bloc est en pleine largeur
+      document.getElementById('slots-grid').classList.toggle('md:grid-cols-4', !isDelivery);
       // Info boutique sous les créneaux en mode retrait
       document.getElementById('pickup-info').style.display = isDelivery ? 'none' : '';
 
@@ -325,8 +652,16 @@
       document.querySelector('#slots-block h2').textContent =
         isDelivery ? 'Créneau horaire' : 'Créneau de retrait';
 
+      // Numérotation des étapes : 3/4 en livraison (après zone + adresse), 1/2 en retrait
+      document.getElementById('date-step-num').textContent = isDelivery ? '3' : '1';
+      document.getElementById('slots-step-num').textContent = isDelivery ? '4' : '2';
+
+      // En livraison, date + créneaux restent masqués tant que la zone n'est pas validée
+      updateFlowVisibility();
+
       selectedSlotId = null;
       selectedSlotLabel = null;
+      releaseHold();
       renderCartSummary();
       updateNextBtn();
     }
@@ -335,33 +670,88 @@
     function updateNextBtn() {
       const btn = document.getElementById('next-btn');
       const hint = document.getElementById('next-hint');
-      const ok = selectedSlotId !== null;
+      let ok = true, msg = '';
+
+      if (selectedMode === 'delivery') {
+        if (!deliveryZoneValid) {
+          ok = false; msg = 'Choisissez d\'abord votre commune de livraison';
+        } else if (!document.getElementById('address-street').value.trim()) {
+          ok = false; msg = 'Renseignez votre numéro et rue';
+        }
+      }
+      if (ok && selectedSlotId === null) {
+        ok = false; msg = 'Sélectionnez une date et un créneau';
+      }
+
       btn.disabled = !ok;
-      hint.textContent = ok ? '' : 'Sélectionnez une date et un créneau pour continuer';
+      hint.textContent = ok ? '' : msg;
+    }
+
+    // Étape de validation : récap du créneau dans une modale avant de passer au paiement
+    function buildOrderAddress() {
+      if (selectedMode !== 'delivery') return null;
+      return {
+        street: document.getElementById('address-street').value.trim(),
+        extra: document.getElementById('address-extra').value.trim() || null,
+        zip: deliveryZip,
+        city: deliveryCommune,
+      };
     }
 
     document.getElementById('next-btn').addEventListener('click', () => {
-      if (!selectedSlotId) return;
+      const isDelivery = selectedMode === 'delivery';
 
-      const address = selectedMode === 'delivery' ? {
-        street: document.getElementById('address-street').value.trim(),
-        zip: document.getElementById('address-zip').value.trim(),
-        city: document.getElementById('address-city').value.trim(),
-      } : null;
-
-      if (selectedMode === 'delivery' && (!address.street || !address.zip || !address.city)) {
-        alert('Veuillez renseigner votre adresse de livraison.');
+      if (isDelivery && !deliveryZoneValid) {
+        alert('Veuillez choisir une commune desservie, ou contactez la boutique.');
         return;
       }
+      const address = buildOrderAddress();
+      if (isDelivery && !address.street) {
+        alert('Veuillez renseigner votre numéro et rue.');
+        return;
+      }
+      if (!selectedSlotId) return;
 
+      // Récapitulatif dans la modale
+      const dateLabel = new Date(selectedDate + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+      const { delivery } = cartTotal();
+      let recap = `
+        <div><strong>${isDelivery ? 'Livraison à domicile' : 'Retrait en boutique'}</strong></div>
+        <div>${dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)}</div>
+        <div>Créneau : <strong>${selectedSlotLabel}</strong></div>`;
+      if (isDelivery) {
+        recap += `<div class="text-gray-400">${address.street}${address.extra ? ' — ' + address.extra : ''}, ${address.zip} ${address.city}</div>`;
+        recap += delivery > 0
+          ? `<div class="text-gray-400">Frais de livraison : ${delivery.toFixed(2)} €</div>`
+          : `<div class="text-green-700 text-xs">Livraison offerte</div>`;
+      } else {
+        recap += `<div class="text-gray-400">📍 Fleurs de Nila, Nîmes</div>`;
+      }
+      document.getElementById('confirm-recap').innerHTML = recap;
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    });
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.add('hidden');
+    }
+    document.getElementById('confirm-cancel').addEventListener('click', closeConfirmModal);
+    document.getElementById('confirm-backdrop').addEventListener('click', closeConfirmModal);
+
+    document.getElementById('confirm-ok').addEventListener('click', () => {
+      const { delivery } = cartTotal();
       localStorage.setItem('order_slot', JSON.stringify({
         slotId: selectedSlotId,
         slotLabel: selectedSlotLabel,
+        slotToken: slotHold?.token || null,
+        reservedUntil: slotHold?.reservedUntil || null,
         date: selectedDate,
         mode: selectedMode,
-        address
+        address: buildOrderAddress(),
+        deliveryFee: delivery
       }));
 
+      // La réservation doit survivre à la navigation vers l'étape paiement
+      skipRelease = true;
       window.location.href = 'commande.html';
     });
 
@@ -376,11 +766,10 @@
 
     // --- Init ---
     updateCartBadge();
-    renderCartSummary();
     buildDateTabs();
-    updateNextBtn();
+    setMode('delivery');   // établit la visibilité initiale (zone à choisir, créneaux masqués)
   </script>
   <script src="../script.js"></script>
-  <script src="cart-drawer.js"></script>
+  <script src="cart-drawer.js?v=2"></script>
 </body>
 </html>

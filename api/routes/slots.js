@@ -7,8 +7,9 @@ const DEFAULT_TIMES = [
   ['14:00', '15:00'], ['15:00', '16:00'], ['16:00', '17:00']
 ];
 
-// GET /api/slots?date=YYYY-MM-DD — créneaux pour une date (non exclusifs)
-// Crée automatiquement les créneaux si la date n'en a pas encore
+// GET /api/slots?date=YYYY-MM-DD — créneaux pour une date (exclusifs : un créneau = une commande)
+// Crée automatiquement les créneaux si la date n'en a pas encore.
+// Chaque créneau indique sa disponibilité (pris définitivement ou réservé temporairement).
 router.get('/', (req, res) => {
   const { date } = req.query;
   if (!date) return res.status(400).json({ error: 'Paramètre date requis' });
@@ -21,11 +22,18 @@ router.get('/', (req, res) => {
     }
   }
 
+  const now = new Date().toISOString();
   const slots = db.prepare(
-    'SELECT id, date, start_time, end_time FROM slots WHERE date = ? ORDER BY start_time ASC'
+    'SELECT id, date, start_time, end_time, order_id, reserved_until FROM slots WHERE date = ? ORDER BY start_time ASC'
   ).all(date);
 
-  res.json(slots);
+  res.json(slots.map(s => ({
+    id: s.id,
+    date: s.date,
+    start_time: s.start_time,
+    end_time: s.end_time,
+    available: !s.order_id && (!s.reserved_until || s.reserved_until <= now)
+  })));
 });
 
 module.exports = router;

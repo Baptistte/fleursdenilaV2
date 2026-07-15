@@ -147,6 +147,9 @@
             Ajouter au panier
           </button>
 
+          <!-- Choix d'option manquant -->
+          <div id="option-error" class="hidden mt-4 text-center text-sm text-red-700 border border-red-200 bg-red-50 py-3"></div>
+
           <!-- Confirmation -->
           <div id="added-confirm" class="hidden mt-4 text-center text-sm text-green-700 border border-green-200 bg-green-50 py-3">
             Ajouté au panier —
@@ -215,19 +218,27 @@
       return price;
     }
 
+    // Groupes de boutons par type d'option (le type peut contenir espaces/accents,
+    // donc pas utilisable comme id CSS)
+    let optionGroups = {};
+
     function renderOptions(options) {
       const container = document.getElementById('options-container');
       container.innerHTML = '';
+      optionGroups = {};
       if (!options || options.length === 0) return;
 
       for (const opt of options) {
         const wrapper = document.createElement('div');
-        wrapper.innerHTML = `
-          <p class="text-sm tracking-widest uppercase text-gray-500 mb-3">${opt.label}</p>
-          <div class="flex flex-wrap gap-2" id="opt-${opt.type}"></div>`;
+        const title = document.createElement('p');
+        title.className = 'text-sm tracking-widest uppercase text-gray-500 mb-3';
+        title.textContent = opt.label;
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'flex flex-wrap gap-2';
+        wrapper.appendChild(title);
+        wrapper.appendChild(btnGroup);
         container.appendChild(wrapper);
-
-        const btnGroup = wrapper.querySelector(`#opt-${opt.type}`);
+        optionGroups[opt.type] = btnGroup;
         for (const choice of opt.choices) {
           const btn = document.createElement('button');
           const label = choice.priceDelta > 0
@@ -243,15 +254,15 @@
           btn.addEventListener('click', () => {
             selectedOptions[opt.type] = choice.value;
             btnGroup.querySelectorAll('button').forEach(b => {
-              b.classList.toggle('bg-primary', b.dataset.value === choice.value);
-              b.classList.toggle('text-white', b.dataset.value === choice.value);
-              b.classList.toggle('border-primary', b.dataset.value === choice.value);
+              const active = b.dataset.value === choice.value;
+              b.classList.toggle('bg-primary', active);
+              b.classList.toggle('text-white', active);
+              b.classList.toggle('border-primary', active);
+              b.classList.remove('border-red-400');
             });
             document.getElementById('product-price').textContent = computePrice();
+            document.getElementById('option-error').classList.add('hidden');
           });
-
-          // Sélectionner le premier choix par défaut
-          if (opt.choices.indexOf(choice) === 0) btn.click();
 
           btnGroup.appendChild(btn);
         }
@@ -301,6 +312,22 @@
     });
 
     document.getElementById('add-to-cart').addEventListener('click', () => {
+      // Toutes les options doivent être choisies (aucune sélection par défaut)
+      const missing = (currentProduct.options || []).filter(opt => !selectedOptions[opt.type]);
+      if (missing.length) {
+        const errEl = document.getElementById('option-error');
+        const labels = missing.map(o => o.label).join(', ');
+        errEl.textContent = `Veuillez choisir : ${labels}`;
+        errEl.classList.remove('hidden');
+        missing.forEach(o => {
+          const g = optionGroups[o.type];
+          if (g) g.querySelectorAll('button').forEach(b => b.classList.add('border-red-400'));
+        });
+        document.getElementById('options-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      document.getElementById('option-error').classList.add('hidden');
+
       const cart = getCart();
       const price = computePrice();
       const message = document.getElementById('custom-message').value.trim();
@@ -344,6 +371,6 @@
     loadProduct();
   </script>
   <script src="../script.js"></script>
-  <script src="cart-drawer.js"></script>
+  <script src="cart-drawer.js?v=2"></script>
 </body>
 </html>

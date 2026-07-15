@@ -297,9 +297,17 @@
   document.getElementById('cart-close-btn').addEventListener('click', closeCart);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
 
+  // Navigation explicite vers le panier détaillé (jamais interceptée par openCart)
+  document.getElementById('btn-view-cart').addEventListener('click', e => {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    closeCart();
+    window.location.href = 'panier.html';
+  });
+
   /* ── Intercepter les liens panier ── */
   function interceptCartLinks() {
-    document.querySelectorAll('a[href="panier.html"], a[aria-label="Panier"]').forEach(a => {
+    document.querySelectorAll('a[href="panier.html"]:not(#btn-view-cart), a[aria-label="Panier"]').forEach(a => {
       // Ne pas intercepter sur panier.html lui-même
       if (window.location.pathname.includes('panier.html')) return;
       a.addEventListener('click', e => {

@@ -11,7 +11,7 @@
   <style>#nav { background: #ffffff; backdrop-filter: none; }</style>
 </head>
 
-<body class="font-sans text-primary bg-cream antialiased">
+<body class="font-sans text-primary bg-cream antialiased md:h-screen md:flex md:flex-col md:overflow-hidden">
 
   <!-- Navigation -->
   <nav id="nav" class="fixed w-full z-50 transition-all duration-500 border-b border-primary bg-white">
@@ -81,44 +81,74 @@
     </div>
   </div>
 
-  <main class="pt-24 min-h-screen">
+  <main class="pt-20 md:pt-24 md:flex-1 md:min-h-0 md:flex md:flex-col">
 
-    <!-- En-tête -->
-    <div class="border-b border-primary bg-white">
-      <div class="px-6 lg:px-16 py-12 max-w-6xl mx-auto">
-        <p class="text-sm tracking-widest uppercase text-gray-500 mb-3">Étape 3 sur 3</p>
-        <h1 class="font-display text-5xl lg:text-7xl text-primary">Paiement</h1>
-      </div>
-    </div>
+    <!-- Deux panneaux : coordonnées + récap (60 %) / commande (40 %) -->
+    <div class="w-full max-w-screen-2xl mx-auto md:flex-1 md:min-h-0 md:grid md:grid-cols-[3fr_2fr] md:gap-8 lg:gap-12 md:px-10 lg:px-16 xl:px-24 md:py-6 lg:py-8">
 
-    <div class="px-6 lg:px-16 py-12 max-w-6xl mx-auto lg:grid lg:grid-cols-[1fr_360px] lg:gap-12">
+      <!-- Panneau gauche (60 %) — coordonnées + récapitulatif -->
+      <section class="md:min-h-0 md:flex md:flex-col">
 
-      <!-- Formulaire coordonnées -->
-      <div>
-        <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-6">Vos coordonnées</h2>
+        <!-- En-tête du panneau : titre + parcours en 3 étapes -->
+        <div class="flex-shrink-0 px-6 md:px-0 pt-6 md:pt-0 pb-5 border-b border-primary/20 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+          <h1 class="font-display text-4xl lg:text-5xl leading-none text-primary">Paiement</h1>
+          <ol class="flex items-center gap-2 lg:gap-3 text-[11px] tracking-widest uppercase">
+            <li class="flex items-center gap-2 text-gray-400">
+              <span class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center text-[10px]">1</span>Panier
+            </li>
+            <li class="text-gray-300" aria-hidden="true">—</li>
+            <li class="flex items-center gap-2 text-gray-400">
+              <span class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center text-[10px]">2</span>Livraison
+            </li>
+            <li class="text-gray-300" aria-hidden="true">—</li>
+            <li class="flex items-center gap-2 text-primary font-medium">
+              <span class="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px]">3</span>Paiement
+            </li>
+          </ol>
+        </div>
+
+        <div class="px-6 md:px-0 py-6 lg:py-8 md:flex-1 md:min-h-0 md:overflow-y-auto">
+          <div class="md:grid md:grid-cols-2 md:gap-10 lg:gap-14">
+
+          <!-- Sous-colonne 1 — coordonnées -->
+          <div>
+        <h2 class="text-xs tracking-widest uppercase text-gray-400 mb-4">Vos coordonnées</h2>
         <div class="space-y-4">
-          <div>
-            <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Nom complet *</label>
-            <input id="customer-name" type="text" autocomplete="name" required
-              class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-              placeholder="Marie Dupont">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Prénom *</label>
+              <input id="customer-firstname" type="text" autocomplete="given-name" required
+                class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
+                placeholder="Marie">
+            </div>
+            <div>
+              <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Nom *</label>
+              <input id="customer-lastname" type="text" autocomplete="family-name" required
+                class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
+                placeholder="Dupont">
+            </div>
           </div>
           <div>
-            <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Email *</label>
-            <input id="customer-email" type="email" autocomplete="email" required
-              class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-              placeholder="marie@exemple.fr">
-          </div>
-          <div>
-            <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Téléphone</label>
-            <input id="customer-phone" type="tel" autocomplete="tel"
+            <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Téléphone *</label>
+            <input id="customer-phone" type="tel" autocomplete="tel" required
               class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
               placeholder="06 12 34 56 78">
           </div>
+          <div>
+            <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Email <span class="normal-case tracking-normal text-gray-400">(optionnel — pour recevoir la confirmation)</span></label>
+            <input id="customer-email" type="email" autocomplete="email"
+              class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
+              placeholder="marie@exemple.fr">
+          </div>
         </div>
 
+          </div><!-- /Sous-colonne 1 -->
+
+          <!-- Sous-colonne 2 — récapitulatif créneau + messages -->
+          <div class="mt-8 md:mt-0 md:border-l md:border-primary/10 md:pl-10 lg:pl-14">
+
         <!-- Récap créneau -->
-        <div id="slot-recap" class="mt-8 border border-gray-100 bg-white p-5">
+        <div id="slot-recap" class="border border-gray-100 bg-white p-5">
           <h3 class="text-xs tracking-widest uppercase text-gray-400 mb-3">Récapitulatif</h3>
           <div id="slot-recap-content" class="text-sm text-gray-600 space-y-1"></div>
         </div>
@@ -131,20 +161,31 @@
           Votre créneau a expiré.
           <a href="livraison.html" class="underline">Retourner au choix du créneau</a>
         </div>
-      </div>
 
-      <!-- Récap commande + bouton paiement -->
-      <div class="mt-10 lg:mt-0">
-        <div class="border border-primary bg-white p-6 sticky top-28">
-          <h2 class="text-sm tracking-widest uppercase text-gray-500 mb-5">Votre commande</h2>
-          <div id="cart-summary" class="space-y-2 text-sm text-gray-600 mb-5"></div>
-          <div class="border-t border-gray-100 pt-4 flex justify-between font-medium">
-            <span>Total</span>
-            <span id="total-display">—</span>
+          </div><!-- /Sous-colonne 2 -->
+          </div>
+        </div>
+      </section><!-- /Panneau gauche -->
+
+      <!-- Panneau droit (40 %) — récap panier + paiement, pleine hauteur -->
+      <aside class="mt-8 md:mt-0 bg-white border-y md:border border-primary md:min-h-0 md:flex md:flex-col">
+
+        <div class="flex-shrink-0 px-6 lg:px-12 pt-6 lg:pt-8 pb-4 border-b border-primary/20">
+          <h2 class="text-xs tracking-widest uppercase text-gray-400">Votre commande</h2>
+        </div>
+
+        <div class="px-6 lg:px-12 py-5 lg:py-6 md:flex-1 md:min-h-0 md:overflow-y-auto">
+          <div id="cart-summary" class="space-y-3 text-sm text-gray-600"></div>
+        </div>
+
+        <div class="flex-shrink-0 px-6 lg:px-12 pt-5 pb-6 lg:pb-8 border-t border-primary/20">
+          <div class="flex justify-between items-baseline mb-5">
+            <span class="text-xs tracking-widest uppercase text-gray-400">Total</span>
+            <span id="total-display" class="text-2xl font-medium text-primary">—</span>
           </div>
 
           <button id="pay-btn"
-            class="mt-6 w-full bg-primary text-white py-4 text-sm tracking-widest uppercase transition-colors duration-300 hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+            class="w-full bg-primary text-white py-4 text-sm tracking-widest uppercase transition-colors duration-300 hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3">
             <span id="pay-label">Procéder au paiement</span>
             <svg id="pay-spinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -153,7 +194,8 @@
           </button>
           <p class="mt-3 text-xs text-gray-400 text-center">Paiement sécurisé via SumUp</p>
         </div>
-      </div>
+
+      </aside><!-- /Panneau droit -->
 
     </div>
   </main>
@@ -184,7 +226,8 @@
 
     function cartTotal() {
       const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
-      const delivery = (orderSlot?.mode === 'delivery' && sub < DELIVERY_THRESHOLD) ? DELIVERY_PRICE : 0;
+      // Tarif de livraison déjà résolu (zone + seuil livraison offerte) à l'étape précédente
+      const delivery = orderSlot?.mode === 'delivery' ? (orderSlot.deliveryFee || 0) : 0;
       return { sub, delivery, total: sub + delivery };
     }
 
@@ -200,11 +243,15 @@
 
     function renderSummary() {
       const { sub, delivery, total } = cartTotal();
+      let deliveryLine = '';
+      if (orderSlot?.mode === 'delivery') {
+        deliveryLine = delivery > 0
+          ? `<div class="flex justify-between text-gray-400"><span>Livraison</span><span>${delivery.toFixed(2)} €</span></div>`
+          : `<div class="text-green-700 text-xs">Livraison offerte</div>`;
+      }
       document.getElementById('cart-summary').innerHTML = [
         ...cart.map(i => `<div class="flex justify-between"><span>${i.name} ×${i.qty}</span><span>${(i.price * i.qty).toFixed(2)} €</span></div>`),
-        delivery > 0
-          ? `<div class="flex justify-between text-gray-400"><span>Livraison</span><span>${delivery.toFixed(2)} €</span></div>`
-          : `<div class="text-green-700 text-xs">Livraison offerte</div>`
+        deliveryLine
       ].join('');
       document.getElementById('total-display').textContent = total.toFixed(2) + ' €';
     }
@@ -223,28 +270,67 @@
       }
       if (orderSlot.address) {
         const a = orderSlot.address;
-        html += `<div class="mt-1 text-gray-400">${a.street}, ${a.zip} ${a.city}</div>`;
+        html += `<div class="mt-1 text-gray-400">${a.street}${a.extra ? ' — ' + a.extra : ''}, ${a.zip} ${a.city}</div>`;
+      }
+      if (orderSlot.reservedUntil) {
+        html += `<div class="mt-2 text-xs text-primary">Créneau réservé pour <strong id="hold-countdown" class="tabular-nums">—</strong></div>`;
       }
       document.getElementById('slot-recap-content').innerHTML = html;
+      startHoldCountdown();
+    }
+
+    // Compte à rebours de la réservation temporaire du créneau (démarrée à l'étape précédente)
+    let holdInterval = null;
+    function startHoldCountdown() {
+      if (!orderSlot?.reservedUntil) return;
+      const el = document.getElementById('hold-countdown');
+      if (!el) return;
+      clearInterval(holdInterval);
+      const tick = () => {
+        const remaining = Math.floor((new Date(orderSlot.reservedUntil) - Date.now()) / 1000);
+        if (remaining <= 0) {
+          clearInterval(holdInterval);
+          document.getElementById('slot-expired').classList.remove('hidden');
+          document.getElementById('pay-btn').disabled = true;
+          return;
+        }
+        const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const s = String(remaining % 60).padStart(2, '0');
+        el.textContent = `${m}:${s}`;
+      };
+      tick();
+      holdInterval = setInterval(tick, 1000);
     }
 
     document.getElementById('pay-btn').addEventListener('click', async () => {
-      const name = document.getElementById('customer-name').value.trim();
+      const firstname = document.getElementById('customer-firstname').value.trim();
+      const lastname = document.getElementById('customer-lastname').value.trim();
       const email = document.getElementById('customer-email').value.trim();
       const phone = document.getElementById('customer-phone').value.trim();
       const errEl = document.getElementById('error-msg');
       errEl.classList.add('hidden');
 
-      if (!name || !email) {
-        errEl.textContent = 'Veuillez renseigner votre nom et votre email.';
+      if (!firstname || !lastname) {
+        errEl.textContent = 'Veuillez renseigner votre prénom et votre nom.';
         errEl.classList.remove('hidden');
         return;
       }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (!phone) {
+        errEl.textContent = 'Veuillez renseigner votre numéro de téléphone.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      if (!/^(\+33\s?|0)[1-9]([\s.\-]?\d{2}){4}$/.test(phone)) {
+        errEl.textContent = 'Numéro de téléphone invalide (ex. 06 12 34 56 78).';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         errEl.textContent = 'Adresse email invalide.';
         errEl.classList.remove('hidden');
         return;
       }
+      const name = `${firstname} ${lastname}`;
 
       const btn = document.getElementById('pay-btn');
       btn.disabled = true;
@@ -258,10 +344,11 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             customer_name: name,
-            customer_email: email,
-            customer_phone: phone || null,
+            customer_email: email || null,
+            customer_phone: phone,
             cart,
             slot_id: orderSlot.slotId,
+            slot_token: orderSlot.slotToken || null,
             delivery_type: orderSlot.mode,
             delivery_address: orderSlot.address || null
           })
@@ -286,7 +373,8 @@
           return;
         }
 
-        localStorage.setItem('order_email', email);
+        if (email) localStorage.setItem('order_email', email);
+        else localStorage.removeItem('order_email');
         if (data.simulation) {
           // Mode test sans SumUp : redirection relative (fonctionne depuis file://)
           window.location.href = `confirmation.html?sim=1&orderId=${data.orderId}`;
@@ -317,6 +405,6 @@
     renderSlotRecap();
   </script>
   <script src="../script.js"></script>
-  <script src="cart-drawer.js"></script>
+  <script src="cart-drawer.js?v=2"></script>
 </body>
 </html>

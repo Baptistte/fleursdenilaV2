@@ -51,6 +51,11 @@ db.exec(`
     password_hash TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT
+  );
+
   CREATE TABLE IF NOT EXISTS calendar_tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
@@ -62,5 +67,13 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now'))
   );
 `);
+
+// Migrations légères (colonnes ajoutées après la création initiale)
+try { db.exec('ALTER TABLE slots ADD COLUMN reservation_token TEXT DEFAULT NULL'); } catch { /* déjà appliquée */ }
+try {
+  db.exec('ALTER TABLE orders ADD COLUMN validated INTEGER NOT NULL DEFAULT 0');
+  // Backfill unique : les commandes payées d'avant la mise en place du workflow sont considérées validées
+  db.prepare("UPDATE orders SET validated = 1 WHERE status = 'paid'").run();
+} catch { /* déjà appliquée */ }
 
 module.exports = db;

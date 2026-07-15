@@ -16,6 +16,7 @@ router.get('/stats', (req, res) => {
   const outOfStock      = db.prepare("SELECT COUNT(*) as n FROM products WHERE stock = 0").get().n;
 
   const ordersTotal     = db.prepare("SELECT COUNT(*) as n FROM orders WHERE status = 'paid'").get().n;
+  const ordersToValidate = db.prepare("SELECT COUNT(*) as n FROM orders WHERE status = 'paid' AND validated = 0").get().n;
   const ordersToday     = db.prepare("SELECT COUNT(*) as n FROM orders WHERE status = 'paid' AND date(created_at) = ?").get(today).n;
   const ordersMonth     = db.prepare("SELECT COUNT(*) as n FROM orders WHERE status = 'paid' AND created_at >= ?").get(firstDayOfMonth).n;
 
@@ -25,7 +26,7 @@ router.get('/stats', (req, res) => {
 
   res.json({
     products: { total: totalProducts, active: activeProducts, lowStock, outOfStock },
-    orders:   { total: ordersTotal, today: ordersToday, month: ordersMonth },
+    orders:   { total: ordersTotal, today: ordersToday, month: ordersMonth, toValidate: ordersToValidate },
     revenue:  { total: revenueTotal, month: revenueMonth, today: revenueToday }
   });
 });
@@ -99,6 +100,30 @@ router.delete('/products/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+// GET /api/admin/home-products — IDs des produits mis en avant sur l'accueil
+router.get('/home-products', (req, res) => {
+  const row = db.prepare("SELECT value FROM settings WHERE key = 'home_products'").get();
+  let ids = [];
+  try { ids = JSON.parse(row?.value || '[]'); } catch { ids = []; }
+  res.json({ ids });
+});
+
+// PUT /api/admin/home-products — définir les produits mis en avant (max 3)
+router.put('/home-products', (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids)) return res.status(400).json({ error: 'ids doit être un tableau' });
+
+  // Nettoyage : entiers valides, uniques, max 3
+  const clean = [...new Set(ids.map(Number).filter(n => Number.isInteger(n) && n > 0))].slice(0, 3);
+
+  db.prepare(`
+    INSERT INTO settings (key, value) VALUES ('home_products', ?)
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value
+  `).run(JSON.stringify(clean));
+
+  res.json({ ok: true, ids: clean });
+});
+
 // PATCH /api/admin/orders/:id/status — changer le statut d'une commande
 router.patch('/orders/:id/status', (req, res) => {
   const { status } = req.body;
@@ -109,6 +134,40 @@ router.patch('/orders/:id/status', (req, res) => {
   if (!order) return res.status(404).json({ error: 'Commande introuvable' });
   db.prepare('UPDATE orders SET status = ? WHERE id = ?').run(status, req.params.id);
   res.json({ ok: true, status });
+});
+
+// PATCH /api/admin/orders/:id/validate — valider ou refuser le créneau d'une commande payée
+// Body : { action: 'accept' | 'refuse' }
+// Refus : commande annulée, créneau libéré, stocks restitués (le remboursement SumUp reste manuel).
+router.patch('/orders/:id/validate', (req, res) => {
+  const { action } = req.body;
+  if (!['accept', 'refuse'].includes(action)) {
+    return res.status(400).json({ error: "action invalide ('accept' | 'refuse')" });
+  }
+  const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(req.params.id);
+  if (!order) return res.status(404).json({ error: 'Commande introuvable' });
+  if (order.status !== 'paid') return res.status(400).json({ error: 'Seule une commande payée peut être validée ou refusée' });
+
+  if (action === 'accept') {
+    db.prepare('UPDATE orders SET validated = 1 WHERE id = ?').run(order.id);
+    return res.json({ ok: true, validated: true });
+  }
+
+  // Refus : tout se fait en une transaction
+  const refuse = db.transaction(() => {
+    db.prepare("UPDATE orders SET status = 'cancelled', validated = 0 WHERE id = ?").run(order.id);
+    if (order.slot_id) {
+      db.prepare('UPDATE slots SET order_id = NULL, reserved_until = NULL, reservation_token = NULL WHERE id = ? AND order_id = ?')
+        .run(order.slot_id, order.id);
+    }
+    let items = [];
+    try { items = JSON.parse(order.items); } catch { items = []; }
+    const restock = db.prepare('UPDATE products SET stock = stock + ? WHERE id = ?');
+    for (const item of items) restock.run(item.qty, item.id);
+  });
+  refuse();
+
+  res.json({ ok: true, refused: true });
 });
 
 // GET /api/admin/tournee?date=YYYY-MM-DD — commandes du jour triées par créneau
@@ -150,6 +209,44 @@ router.post('/slots', (req, res) => {
   ).run(date, start_time, end_time);
 
   res.status(201).json({ id: result.lastInsertRowid });
+});
+
+// POST /api/admin/slots/recurring — créer des créneaux récurrents
+// Body : { weekdays: [0-6, dimanche=0], start_time, end_time, from: 'YYYY-MM-DD', until: 'YYYY-MM-DD' }
+// Crée un créneau start_time–end_time pour chaque jour de la période dont le jour de semaine correspond.
+// Les doublons exacts (même date + mêmes horaires) sont ignorés.
+router.post('/slots/recurring', (req, res) => {
+  const { weekdays, start_time, end_time, from, until } = req.body;
+  if (!Array.isArray(weekdays) || !weekdays.length || !start_time || !end_time || !from || !until) {
+    return res.status(400).json({ error: 'weekdays, start_time, end_time, from et until requis' });
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(until) || from > until) {
+    return res.status(400).json({ error: 'Période invalide' });
+  }
+  // Garde-fou : 1 an maximum
+  const MAX_DAYS = 366;
+  const days = Math.round((new Date(until) - new Date(from)) / 86400000) + 1;
+  if (days > MAX_DAYS) return res.status(400).json({ error: 'Période limitée à 1 an' });
+
+  const wanted = new Set(weekdays.map(Number));
+  const exists = db.prepare('SELECT 1 FROM slots WHERE date = ? AND start_time = ? AND end_time = ?');
+  const insert = db.prepare('INSERT INTO slots (date, start_time, end_time) VALUES (?, ?, ?)');
+
+  let created = 0, skipped = 0;
+  const run = db.transaction(() => {
+    const d = new Date(from + 'T00:00:00Z');
+    for (let i = 0; i < days; i++) {
+      if (wanted.has(d.getUTCDay())) {
+        const iso = d.toISOString().split('T')[0];
+        if (exists.get(iso, start_time, end_time)) skipped++;
+        else { insert.run(iso, start_time, end_time); created++; }
+      }
+      d.setUTCDate(d.getUTCDate() + 1);
+    }
+  });
+  run();
+
+  res.status(201).json({ ok: true, created, skipped });
 });
 
 // DELETE /api/admin/slots/:id
