@@ -1000,7 +1000,7 @@
             </svg>
           </div>
           <div>
-            <span class="welcome-title">Bonjour, Manon</span>
+            <span class="welcome-title">Bonjour</span>
             <span class="welcome-sub"><span class="live-dot"></span>Activité en direct · Fleurs de Nila, Nîmes</span>
           </div>
         </div>
@@ -3337,7 +3337,19 @@ async function renderCalendar() {
   placeEvents(monday);
   updateNowLine();
   startNowLine();
+  syncCalHeaderScrollbar();
 }
+
+// La barre de défilement verticale du corps mange ~15 px : sans compensation,
+// les colonnes du corps sont plus étroites que celles de l'en-tête et la grille
+// se décale progressivement vers la droite. On réserve la même largeur en en-tête.
+function syncCalHeaderScrollbar() {
+  const body = document.querySelector('.cal-body');
+  const head = document.getElementById('cal-head-row');
+  if (!body || !head) return;
+  head.style.paddingRight = (body.offsetWidth - body.clientWidth) + 'px';
+}
+window.addEventListener('resize', syncCalHeaderScrollbar);
 
 /* ── Charger events (commandes pickup + tâches) ── */
 async function loadCalEvents(monday, sunday) {
