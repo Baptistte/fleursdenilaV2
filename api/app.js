@@ -27,6 +27,12 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Images uploadées depuis l'admin (sur le volume persistant en prod : UPLOADS_DIR=/data/uploads)
+const fs = require('fs');
+const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(__dirname, 'uploads');
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+app.use('/uploads', express.static(UPLOADS_DIR, { maxAge: '7d', immutable: true }));
+
 app.use(session({
   store: new SQLiteStore({ db: 'sessions.sqlite', dir: path.join(__dirname, 'db') }),
   secret: process.env.SESSION_SECRET || 'dev-secret-change-in-prod',

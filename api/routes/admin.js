@@ -1,9 +1,50 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 const db = require('../db/database');
 const requireAdmin = require('../middleware/requireAdmin');
 
 router.use(requireAdmin);
+
+// ── Upload d'images produits ───────────────────────────────────────────
+const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(__dirname, '..', 'uploads');
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, UPLOADS_DIR),
+    filename: (req, file, cb) => {
+      // Nom sûr : timestamp + nom d'origine slugifié (pas d'accents ni caractères spéciaux)
+      const ext = { 'image/webp': '.webp', 'image/jpeg': '.jpg', 'image/png': '.png' }[file.mimetype];
+      const base = path.basename(file.originalname, path.extname(file.originalname))
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+        .toLowerCase().slice(0, 40) || 'image';
+      cb(null, `${Date.now()}-${base}${ext}`);
+    }
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },   // 5 Mo
+  fileFilter: (req, file, cb) => {
+    if (['image/webp', 'image/jpeg', 'image/png'].includes(file.mimetype)) cb(null, true);
+    else cb(new Error('Format non accepté (webp, jpeg ou png uniquement)'));
+  }
+});
+
+// POST /api/admin/upload — reçoit un fichier image, retourne son URL publique
+router.post('/upload', (req, res) => {
+  upload.single('image')(req, res, err => {
+    if (err) {
+      const msg = err.code === 'LIMIT_FILE_SIZE' ? 'Image trop lourde (5 Mo maximum)' : err.message;
+      return res.status(400).json({ error: msg });
+    }
+    if (!req.file) return res.status(400).json({ error: 'Aucun fichier reçu' });
+    // URL absolue : fonctionne depuis le front Netlify comme depuis l'admin en local
+    const url = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    res.status(201).json({ url });
+  });
+});
 
 // POST /api/admin/seed-demo — insère les données de démo sur une base VIDE
 // (refusé si des produits existent déjà : aucun risque d'écraser du vrai contenu)

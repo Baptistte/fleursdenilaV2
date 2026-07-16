@@ -1699,9 +1699,17 @@
         </div>
       </div>
       <div class="field-group">
-        <label class="field-label">URL image</label>
-        <input id="f-image" class="field-input" type="text" placeholder="../images/mon-bouquet.webp">
-        <p style="font-size:11px;color:#94a3b8;margin-top:5px">Chemin relatif depuis la boutique</p>
+        <label class="field-label">Image du produit</label>
+        <input type="file" id="f-image-file" accept="image/webp,image/jpeg,image/png" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('f-image-file').click()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            Choisir une image…
+          </button>
+          <span id="f-image-status" style="font-size:11px;color:#94a3b8"></span>
+        </div>
+        <input id="f-image" class="field-input" type="text" placeholder="ou URL manuelle (../images/mon-bouquet.webp)">
+        <p style="font-size:11px;color:#94a3b8;margin-top:5px">webp, jpeg ou png — 5 Mo maximum</p>
       </div>
 
       <div id="img-preview" style="display:none;margin-bottom:18px">
@@ -2917,6 +2925,40 @@ document.getElementById('f-image').addEventListener('input', e => {
   const img = document.getElementById('img-preview-el');
   if (val) { img.src = val; preview.style.display = 'block'; }
   else { preview.style.display = 'none'; }
+});
+
+// Upload d'une image produit vers l'API
+document.getElementById('f-image-file').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  const status = document.getElementById('f-image-status');
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Image trop lourde (5 Mo maximum).');
+    e.target.value = '';
+    return;
+  }
+  status.textContent = 'Envoi en cours…';
+  try {
+    const fd = new FormData();
+    fd.append('image', file);
+    const res = await apiFetch('/api/admin/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) {
+      status.textContent = '';
+      alert(data.error || 'Erreur lors de l\'envoi de l\'image.');
+      return;
+    }
+    document.getElementById('f-image').value = data.url;
+    document.getElementById('img-preview-el').src = data.url;
+    document.getElementById('img-preview').style.display = 'block';
+    status.textContent = '✓ Image envoyée';
+    setTimeout(() => { status.textContent = ''; }, 3000);
+  } catch {
+    status.textContent = '';
+    alert('Erreur réseau pendant l\'envoi.');
+  } finally {
+    e.target.value = '';   // permet de re-choisir le même fichier
+  }
 });
 
 document.getElementById('f-active').addEventListener('change', e => {

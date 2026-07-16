@@ -36,29 +36,22 @@ table `products`.
 > Choix technique : stocker le **fichier sur disque** (dossier `api/uploads/`) et **l'URL en
 > base** — pas le binaire en BLOB SQLite, qui gonfle la base et complique les sauvegardes.
 
-### Backend
-- [ ] `npm install multer` dans `api/`
-- [ ] Route `POST /api/admin/upload` (protégée par `requireAdmin`) :
-  - accepte un fichier image (`multipart/form-data`)
-  - restrictions : types `image/webp|jpeg|png`, taille max 5 Mo
-  - nom de fichier généré (timestamp + slug) pour éviter collisions et caractères exotiques
-  - réponse : `{ url: "/uploads/1721145600-bouquet.webp" }`
-- [ ] Servir le dossier : `app.use('/uploads', express.static(path.join(__dirname, 'uploads')))`
-- [ ] Ajouter `api/uploads/` au `.gitignore` (fichiers clients ≠ dépôt git)
-- [ ] Optionnel : redimensionnement/compression à l'upload avec `sharp` (max 1200 px, webp)
+### Backend ✓ fait le 16/07
+- [x] multer installé, route `POST /api/admin/upload` protégée (webp/jpeg/png, 5 Mo max,
+      noms slugifiés + timestamp), dossier servi sur `/uploads` (UPLOADS_DIR sur le volume
+      en prod), `uploads/` ignoré par git
+- [ ] Optionnel plus tard : redimensionnement/compression à l'upload avec `sharp`
 
-### Frontend admin (`admin/produits.html`)
-- [ ] Remplacer le champ texte `#f-image` par un `<input type="file" accept="image/*">`
-      (+ garder un champ texte « ou URL manuelle » en secours)
-- [ ] Upload via `apiFetch('/api/admin/upload', { method:'POST', body: formData })`
-      puis renseigner l'URL retournée dans le produit
-- [ ] Aperçu de l'image après upload (le bloc `#img-preview` existe déjà)
+### Frontend admin ✓ fait le 16/07
+- [x] Bouton « Choisir une image… » + champ URL manuelle en secours, aperçu immédiat,
+      statut d'envoi ; l'URL absolue retournée est enregistrée dans le produit
 
-### Frontend boutique
-- [ ] Les URLs stockées deviennent absolues vers l'API (`https://api.../uploads/...`) :
-      vérifier que `boutique/index.html`, `produit.html`, `cart-drawer.js` et la vitrine
-      de `index.html` (fonction `toRootPath`) affichent correctement les deux formats
-      (anciens chemins `../images/...` ET nouvelles URLs `/uploads/...`)
+### Frontend boutique ✓
+- [x] L'API retourne une **URL absolue** (`https://api…/uploads/…`) : aucune adaptation
+      nécessaire côté boutique, les deux formats cohabitent (testé de bout en bout)
+
+> ⚠️ Sur Railway : ajouter la variable `UPLOADS_DIR=/data/uploads` pour que les images
+> soient stockées sur le volume persistant (sinon elles disparaissent au redéploiement).
 
 ---
 
