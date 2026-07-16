@@ -5,6 +5,16 @@ const requireAdmin = require('../middleware/requireAdmin');
 
 router.use(requireAdmin);
 
+// POST /api/admin/seed-demo — insère les données de démo sur une base VIDE
+// (refusé si des produits existent déjà : aucun risque d'écraser du vrai contenu)
+router.post('/seed-demo', (req, res) => {
+  const n = db.prepare('SELECT COUNT(*) AS n FROM products').get().n;
+  if (n > 0) return res.status(409).json({ error: 'Des produits existent déjà — seed refusé.' });
+  const { seedDemo } = require('../db/seed');
+  const result = seedDemo();
+  res.status(201).json({ ok: true, ...result });
+});
+
 // GET /api/admin/stats — KPIs du tableau de bord
 router.get('/stats', (req, res) => {
   const today = new Date().toISOString().split('T')[0];
