@@ -72,21 +72,18 @@ volume persistant pour SQLite — pas besoin de migrer vers PostgreSQL pour la p
 La prod finale sur VPS LWS + PostgreSQL reste le plan du CDC (Phase 7).
 
 ### Étape A — Préparer le code (prérequis)
-- [ ] **Centraliser l'URL de l'API côté front** : `const API = 'http://localhost:3000'` est
-      dupliqué dans ~6 fichiers (`boutique/*.html`, `cart-drawer.js`, `admin/produits.html`,
-      `admin/login.html`, vitrine `index.html`). Créer un fichier `boutique/config.js`
-      (et l'équivalent admin) du type :
-      `window.API_URL = location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://fleurs-de-nila-api.up.railway.app';`
-- [ ] **CORS** : dans `api/app.js`, ajouter l'URL du front de test dans `allowedOrigins`
-      (via la variable d'env `FRONTEND_URL`)
-- [ ] **Chemin de la BDD configurable** : dans `api/db/database.js`, remplacer le chemin en dur
-      par `process.env.DB_PATH || path.join(__dirname, 'fleurs-de-nila.sqlite')`
-      (nécessaire pour pointer vers le volume Railway)
+- [x] **Centraliser l'URL de l'API côté front** ✓ 16/07 : fichier `config.js` à la racine,
+      inclus dans les 9 pages + `cart-drawer.js`. Bascule automatique localhost ↔ en ligne.
+      ⚠️ Après « Generate Domain » sur Railway, remplacer le placeholder dans `config.js`
+- [x] **CORS** ✓ 16/07 : `https://fleursdeniladeveloppement.netlify.app` autorisée en dur
+      + `FRONTEND_URL` via env ; `trust proxy` + cookie `secure` en production
+- [x] **Chemin de la BDD configurable** ✓ 16/07 : `DB_PATH` via env, fallback local
 - [x] Vérifier que `api/package.json` a un script `start` (`node app.js`) — Railway l'utilise ✓ (déjà présent)
 - [ ] **Sécurité avant exposition publique** (obligatoire, l'API sera sur internet) :
-  - [ ] changer le mot de passe admin (`admin/admin` actuellement !) — script ou route de setup
-  - [ ] `SESSION_SECRET` fort dans les variables d'env (pas le fallback `dev-secret…`)
-  - [ ] cookie de session `secure: true` derrière HTTPS
+  - [x] mot de passe admin changé en local ✓ 16/07 (10 caractères, transmis en privé) ;
+        sur Railway : bootstrap automatique via `ADMIN_USER` / `ADMIN_PASSWORD` si la base est vide
+  - [x] `SESSION_SECRET` lu depuis l'env (reste à renseigner une valeur forte sur Railway)
+  - [x] cookie de session `secure` quand `NODE_ENV=production` ✓ 16/07
 
 ### Étape B — Déployer l'API sur Railway
 - [ ] Créer un compte sur https://railway.app (login GitHub)
@@ -99,7 +96,10 @@ La prod finale sur VPS LWS + PostgreSQL reste le plan du CDC (Phase 7).
   |---|---|
   | `DB_PATH` | `/data/fleurs-de-nila.sqlite` |
   | `SESSION_SECRET` | chaîne aléatoire longue |
-  | `FRONTEND_URL` | URL du front de test (étape C) |
+  | `FRONTEND_URL` | `https://fleursdeniladeveloppement.netlify.app` |
+  | `ADMIN_USER` | `admin` (ou autre) |
+  | `ADMIN_PASSWORD` | le mot de passe transmis en privé — crée le compte au 1er démarrage |
+  | `NODE_ENV` | `production` |
   | `SUMUP_CLIENT_ID` / `SECRET` / `MERCHANT_CODE` | **laisser vides pour le test** → mode simulation, paiement fictif sans CB |
 - [ ] Settings → Networking → « Generate Domain » → noter l'URL (ex. `fleurs-de-nila-api.up.railway.app`)
 - [ ] Vérifier `https://<url-railway>/api/health` → `{"status":"ok"}`
@@ -107,8 +107,7 @@ La prod finale sur VPS LWS + PostgreSQL reste le plan du CDC (Phase 7).
       ou route de setup temporaire
 
 ### Étape C — Héberger le front de test
-- [ ] Le site est statique → **Netlify** (gratuit) : « Add new site » → importer le repo,
-      pas de build, publish directory = racine
+- [x] Déjà fait : `https://fleursdeniladeveloppement.netlify.app` (branche `main`)
 - [ ] Reporter l'URL Netlify dans `FRONTEND_URL` sur Railway (CORS)
 - [ ] Vérifier que `config.js` (étape A) pointe bien vers l'URL Railway
 - [ ] Option : protéger le site de test par mot de passe (Netlify « Password protection »,

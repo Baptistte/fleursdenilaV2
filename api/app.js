@@ -9,9 +9,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:5500',
+  process.env.FRONTEND_URL,
+  'https://fleursdeniladeveloppement.netlify.app',   // front de test (Netlify)
+  'http://localhost:5500',
   'http://127.0.0.1:5500'
-];
+].filter(Boolean);
+
+// Derrière le proxy Railway/Nginx : nécessaire pour les cookies "secure"
+app.set('trust proxy', 1);
 app.use(cors({
   origin: (origin, cb) => {
     // Accepter file:// (origin vaut la chaîne "null" ou undefined) et les origines autorisées
@@ -27,7 +32,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-secret-change-in-prod',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, httpOnly: true, maxAge: 8 * 60 * 60 * 1000 }
+  cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, maxAge: 8 * 60 * 60 * 1000 }
 }));
 
 // Cron — libère les créneaux expirés toutes les minutes

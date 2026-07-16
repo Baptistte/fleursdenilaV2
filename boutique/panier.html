@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="../tailwind.css">
   <style>#nav { background: #ffffff; backdrop-filter: none; }</style>
+  <script src="../config.js"></script>
 </head>
 
 <body class="font-sans text-primary bg-cream antialiased">
@@ -169,7 +170,7 @@
 
   <script>
     let DELIVERY_THRESHOLD = 60;   // valeur par défaut, remplacée par le réglage admin via /api/config
-    fetch('http://localhost:3000/api/config').then(r => r.json()).then(c => {
+    fetch(`${window.API_URL}/api/config`).then(r => r.json()).then(c => {
       if (Number.isFinite(c.freeDeliveryThreshold)) {
         DELIVERY_THRESHOLD = c.freeDeliveryThreshold;
         render();

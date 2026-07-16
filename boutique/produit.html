@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="../tailwind.css">
   <style>#nav { background: #ffffff; backdrop-filter: none; }</style>
+  <script src="../config.js"></script>
 </head>
 
 <body class="font-sans text-primary bg-cream antialiased">
@@ -177,7 +178,7 @@
   </footer>
 
   <script>
-    const API = 'http://localhost:3000';
+    const API = window.API_URL;
     let currentProduct = null;
     let selectedOptions = {};
 

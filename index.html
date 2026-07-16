@@ -229,6 +229,7 @@
         "url": "https://www.fleursdenila.fr/"
     }
     </script>
+  <script src="config.js"></script>
 </head>
 
 <body class="font-sans text-primary bg-cream antialiased selection:bg-primary selection:text-white">
@@ -1199,7 +1200,7 @@
     <!-- Vitrine : chargement des produits mis en avant depuis l'API -->
     <script>
       (function () {
-        const API = 'http://localhost:3000';
+        const API = window.API_URL;
 
         // Convertit un chemin image stocké côté boutique (../images/) vers la racine (images/)
         function toRootPath(src) {

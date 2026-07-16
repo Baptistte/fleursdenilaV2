@@ -888,6 +888,7 @@
       .tournee-order { border-color: #cbd5e1; }
     }
   </style>
+  <script src="../config.js"></script>
 </head>
 <body>
 
@@ -1746,7 +1747,7 @@
 <div id="toast"><div class="toast-inner" id="toast-inner"></div></div>
 
 <script>
-const API = 'http://localhost:3000';
+const API = window.API_URL;
 let editingId = null;
 let allProducts = [];
 let currentFilter = 'all';

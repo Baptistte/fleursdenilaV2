@@ -265,6 +265,7 @@
       white-space: nowrap;
     }
   </style>
+  <script src="../config.js"></script>
 </head>
 <body>
 
@@ -330,7 +331,7 @@
   <div class="page-badge">Fleurs de Nila · Nîmes</div>
 
   <script>
-    const API = 'http://localhost:3000';
+    const API = window.API_URL;
 
     async function login() {
       const username = document.getElementById('username').value.trim();

@@ -2,7 +2,7 @@
 (function () {
   let DELIVERY_THRESHOLD = 60;   // valeur par défaut, remplacée par le réglage admin via /api/config
 
-  fetch('http://localhost:3000/api/config').then(r => r.json()).then(c => {
+  fetch(`${window.API_URL}/api/config`).then(r => r.json()).then(c => {
     if (Number.isFinite(c.freeDeliveryThreshold)) {
       DELIVERY_THRESHOLD = c.freeDeliveryThreshold;
       if (typeof renderDrawer === 'function') renderDrawer();

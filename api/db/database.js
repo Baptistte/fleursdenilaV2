@@ -1,7 +1,9 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const crypto = require('crypto');
 
-const db = new Database(path.join(__dirname, 'fleurs-de-nila.sqlite'));
+// En prod/test (Railway), DB_PATH pointe vers le volume persistant (ex. /data/fleurs-de-nila.sqlite)
+const db = new Database(process.env.DB_PATH || path.join(__dirname, 'fleurs-de-nila.sqlite'));
 
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
@@ -79,5 +81,16 @@ try {
   // Backfill unique : les commandes payées d'avant la mise en place du workflow sont considérées validées
   db.prepare("UPDATE orders SET validated = 1 WHERE status = 'paid'").run();
 } catch { /* déjà appliquée */ }
+
+// Compte admin initial : créé depuis les variables d'env si la table est vide
+// (nécessaire au premier démarrage sur une base neuve, ex. volume Railway).
+if (process.env.ADMIN_USER && process.env.ADMIN_PASSWORD) {
+  const n = db.prepare('SELECT COUNT(*) AS n FROM admins').get().n;
+  if (n === 0) {
+    const hash = crypto.createHash('sha256').update(process.env.ADMIN_PASSWORD).digest('hex');
+    db.prepare('INSERT INTO admins (username, password_hash) VALUES (?, ?)').run(process.env.ADMIN_USER, hash);
+    console.log(`Compte admin « ${process.env.ADMIN_USER} » créé (bootstrap).`);
+  }
+}
 
 module.exports = db;
