@@ -46,7 +46,7 @@ function seedDemo() {
       name: 'Arrangement Végétal',
       description: 'Composition de plantes vertes et de feuillages exotiques dans un vase en verre. Parfait pour un bureau ou une table de salon.',
       price: 50,
-      images: ['../images/vase-arrangement-floral-nimes.webp'],
+      images: ['../images/arrangement-vegetal-vert-nimes.webp'],
       options: [],
       stock: 4
     },

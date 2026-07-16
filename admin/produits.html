@@ -2981,21 +2981,47 @@ document.getElementById('f-image').addEventListener('input', e => {
   else { preview.style.display = 'none'; }
 });
 
+// Compression côté navigateur : redimensionne à 1600 px max et convertit en webp.
+// Une photo de téléphone de 4 Mo devient ~150 Ko → envoi quasi instantané.
+async function compressImage(file) {
+  try {
+    const bmp = await createImageBitmap(file);
+    const MAX = 1600;
+    const scale = Math.min(1, MAX / Math.max(bmp.width, bmp.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/webp', 0.85));
+    if (blob && blob.size < file.size) {
+      return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.webp', { type: 'image/webp' });
+    }
+  } catch { /* format non décodable : on tente l'original */ }
+  return file;
+}
+
 // Upload d'une image produit vers l'API
 document.getElementById('f-image-file').addEventListener('change', async e => {
-  const file = e.target.files[0];
+  const original = e.target.files[0];
   const status = document.getElementById('f-image-status');
-  if (!file) return;
+  if (!original) return;
+
+  status.textContent = 'Préparation de l\'image…';
+  const file = await compressImage(original);
   if (file.size > 5 * 1024 * 1024) {
-    alert('Image trop lourde (5 Mo maximum).');
+    status.textContent = '';
+    alert('Image trop lourde (5 Mo maximum après compression).');
     e.target.value = '';
     return;
   }
+
   status.textContent = 'Envoi en cours…';
+  const abort = new AbortController();
+  const timeout = setTimeout(() => abort.abort(), 30000);   // 30 s max
   try {
     const fd = new FormData();
     fd.append('image', file);
-    const res = await apiFetch('/api/admin/upload', { method: 'POST', body: fd });
+    const res = await apiFetch('/api/admin/upload', { method: 'POST', body: fd, signal: abort.signal });
     const data = await res.json();
     if (!res.ok) {
       status.textContent = '';
@@ -3007,10 +3033,13 @@ document.getElementById('f-image-file').addEventListener('change', async e => {
     document.getElementById('img-preview').style.display = 'block';
     status.textContent = '✓ Image envoyée';
     setTimeout(() => { status.textContent = ''; }, 3000);
-  } catch {
+  } catch (err) {
     status.textContent = '';
-    alert('Erreur réseau pendant l\'envoi.');
+    alert(err.name === 'AbortError'
+      ? 'L\'envoi a pris trop de temps (30 s). Vérifiez votre connexion et réessayez.'
+      : 'Erreur réseau pendant l\'envoi.');
   } finally {
+    clearTimeout(timeout);
     e.target.value = '';   // permet de re-choisir le même fichier
   }
 });
