@@ -46,15 +46,10 @@ router.post('/sumup', express.raw({ type: 'application/json' }), (req, res) => {
     return res.json({ received: true });
   }
 
-  // Transaction atomique : confirmer commande + verrouiller le créneau + décrémenter stocks
+  // Transaction atomique : confirmer commande + décrémenter stocks
+  // (la commande paid occupe sa place sur le créneau via le comptage de slotAvailability)
   const confirm = db.transaction(() => {
     db.prepare("UPDATE orders SET status = 'paid' WHERE id = ?").run(order.id);
-
-    // Verrouillage définitif du créneau (fin de la réservation temporaire)
-    if (order.slot_id) {
-      db.prepare('UPDATE slots SET order_id = ?, reserved_until = NULL, reservation_token = NULL WHERE id = ?')
-        .run(order.id, order.slot_id);
-    }
 
     const items = JSON.parse(order.items);
     const updateStock = db.prepare('UPDATE products SET stock = MAX(0, stock - ?) WHERE id = ?');

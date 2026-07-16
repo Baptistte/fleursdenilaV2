@@ -106,10 +106,11 @@ La prod finale sur VPS LWS + PostgreSQL reste le plan du CDC (Phase 7).
 - [ ] Option : protéger le site de test par mot de passe (Netlify « Password protection »,
       payant) ou simplement ne pas diffuser l'URL
 
-### Question métier à trancher avec Manon avant la recette
-- [ ] **Capacité des créneaux** : le système est exclusif — 1 commande par créneau,
-      soit 6 commandes max par jour avec les créneaux par défaut. Si Manon peut livrer
-      plusieurs clients sur un même créneau, prévoir une capacité par créneau (ex. 3).
+### Capacité des créneaux ✅ fait le 16/07
+- [x] Chaque créneau a une **capacité paramétrable** (défaut : 3, réglable globalement dans
+      « Réglages boutique » et individuellement sur chaque créneau). Un créneau reste
+      réservable tant que (commandes payées/en cours + réservations 10 min) < capacité.
+      Doublons d'horaires refusés — on ajuste la capacité au lieu de dupliquer le créneau.
 
 ### Étape D — Recette avec la cliente
 - [ ] Parcours complet : boutique → panier → livraison (zone, créneau, minuterie) →
@@ -144,6 +145,5 @@ La prod finale sur VPS LWS + PostgreSQL reste le plan du CDC (Phase 7).
 | Mot de passe admin + `SESSION_SECRET` | api + admin | 🔴 oui |
 | `DB_PATH` configurable | `api/db/database.js` | 🔴 oui |
 | Upload d'images produits | admin + api | 🟠 fortement conseillé |
-| Capacité des créneaux (si multi-commandes) | api + admin | 🟠 selon réponse de Manon |
 | Test mobile du tunnel boutique | — | 🟠 avant recette |
 | Dates admin en UTC (décale entre 0 h et 2 h) | admin | 🟢 mineur |

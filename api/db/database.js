@@ -62,6 +62,16 @@ db.exec(`
     date TEXT PRIMARY KEY
   );
 
+  -- Réservations temporaires de créneau (10 min) : plusieurs clients peuvent
+  -- retenir le même créneau tant que sa capacité n'est pas atteinte.
+  CREATE TABLE IF NOT EXISTS slot_holds (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slot_id INTEGER NOT NULL,
+    token TEXT NOT NULL UNIQUE,
+    expires_at TEXT NOT NULL,
+    FOREIGN KEY (slot_id) REFERENCES slots(id) ON DELETE CASCADE
+  );
+
   CREATE TABLE IF NOT EXISTS calendar_tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
@@ -81,6 +91,10 @@ try {
   // Backfill unique : les commandes payées d'avant la mise en place du workflow sont considérées validées
   db.prepare("UPDATE orders SET validated = 1 WHERE status = 'paid'").run();
 } catch { /* déjà appliquée */ }
+// Capacité par créneau (nb de commandes acceptées sur le même créneau).
+// Les colonnes slots.reserved_until / reservation_token / order_id de l'ancien
+// modèle exclusif ne sont plus utilisées (remplacées par slot_holds + comptage des commandes).
+try { db.exec('ALTER TABLE slots ADD COLUMN capacity INTEGER NOT NULL DEFAULT 3'); } catch { /* déjà appliquée */ }
 
 // Compte admin initial : créé depuis les variables d'env si la table est vide
 // (nécessaire au premier démarrage sur une base neuve, ex. volume Railway).

@@ -5,6 +5,7 @@ const fs = require('fs');
 const multer = require('multer');
 const db = require('../db/database');
 const requireAdmin = require('../middleware/requireAdmin');
+const { purgeExpiredHolds, takenCount, defaultCapacity } = require('../services/slotAvailability');
 
 router.use(requireAdmin);
 
@@ -267,11 +268,8 @@ router.patch('/orders/:id/validate', (req, res) => {
 
   // Refus : tout se fait en une transaction
   const refuse = db.transaction(() => {
+    // L'annulation libère automatiquement la place (comptage des commandes actives)
     db.prepare("UPDATE orders SET status = 'cancelled', validated = 0 WHERE id = ?").run(order.id);
-    if (order.slot_id) {
-      db.prepare('UPDATE slots SET order_id = NULL, reserved_until = NULL, reservation_token = NULL WHERE id = ? AND order_id = ?')
-        .run(order.slot_id, order.id);
-    }
     let items = [];
     try { items = JSON.parse(order.items); } catch { items = []; }
     const restock = db.prepare('UPDATE products SET stock = stock + ? WHERE id = ?');
@@ -300,28 +298,51 @@ router.get('/tournee', (req, res) => {
 });
 
 // GET /api/admin/slots — tous les créneaux
-// Avec ?date= : { blocked, slots } pour que l'admin voie l'état « jour bloqué »
+// Avec ?date= : { blocked, slots } — chaque créneau expose sa capacité et son remplissage
 router.get('/slots', (req, res) => {
   const { date } = req.query;
   if (date) {
     const blocked = !!db.prepare('SELECT 1 FROM blocked_dates WHERE date = ?').get(date);
-    const slots = db.prepare('SELECT * FROM slots WHERE date = ? ORDER BY start_time ASC').all(date);
+    purgeExpiredHolds();
+    const slots = db.prepare('SELECT * FROM slots WHERE date = ? ORDER BY start_time ASC').all(date)
+      .map(s => ({ ...s, booked: takenCount(s.id) }));
     return res.json({ blocked, slots });
   }
   res.json(db.prepare('SELECT * FROM slots ORDER BY date ASC, start_time ASC').all());
 });
 
 // POST /api/admin/slots — créer un créneau (débloque le jour : action explicite de l'admin)
+// Unicité garantie : impossible de créer deux fois le même horaire le même jour.
 router.post('/slots', (req, res) => {
-  const { date, start_time, end_time } = req.body;
+  const { date, start_time, end_time, capacity } = req.body;
   if (!date || !start_time || !end_time) return res.status(400).json({ error: 'date, start_time et end_time requis' });
+  const cap = parseInt(capacity);
+  if (capacity != null && (!Number.isInteger(cap) || cap < 1 || cap > 100)) {
+    return res.status(400).json({ error: 'Capacité invalide (entre 1 et 100)' });
+  }
+
+  const exists = db.prepare('SELECT 1 FROM slots WHERE date = ? AND start_time = ? AND end_time = ?')
+    .get(date, start_time, end_time);
+  if (exists) return res.status(409).json({ error: `Le créneau ${start_time}–${end_time} existe déjà ce jour-là. Modifiez plutôt sa capacité.` });
 
   db.prepare('DELETE FROM blocked_dates WHERE date = ?').run(date);
   const result = db.prepare(
-    'INSERT INTO slots (date, start_time, end_time) VALUES (?, ?, ?)'
-  ).run(date, start_time, end_time);
+    'INSERT INTO slots (date, start_time, end_time, capacity) VALUES (?, ?, ?, ?)'
+  ).run(date, start_time, end_time, Number.isInteger(cap) ? cap : defaultCapacity());
 
   res.status(201).json({ id: result.lastInsertRowid });
+});
+
+// PATCH /api/admin/slots/:id — modifier la capacité d'un créneau
+router.patch('/slots/:id', (req, res) => {
+  const cap = parseInt(req.body.capacity);
+  if (!Number.isInteger(cap) || cap < 1 || cap > 100) {
+    return res.status(400).json({ error: 'Capacité invalide (entre 1 et 100)' });
+  }
+  const slot = db.prepare('SELECT * FROM slots WHERE id = ?').get(req.params.id);
+  if (!slot) return res.status(404).json({ error: 'Créneau introuvable' });
+  db.prepare('UPDATE slots SET capacity = ? WHERE id = ?').run(cap, req.params.id);
+  res.json({ ok: true, capacity: cap, booked: takenCount(slot.id) });
 });
 
 // POST /api/admin/slots/recurring — créer des créneaux récurrents
@@ -341,10 +362,16 @@ router.post('/slots/recurring', (req, res) => {
   const days = Math.round((new Date(until) - new Date(from)) / 86400000) + 1;
   if (days > MAX_DAYS) return res.status(400).json({ error: 'Période limitée à 1 an' });
 
+  const cap = parseInt(req.body.capacity);
+  if (req.body.capacity != null && (!Number.isInteger(cap) || cap < 1 || cap > 100)) {
+    return res.status(400).json({ error: 'Capacité invalide (entre 1 et 100)' });
+  }
+  const slotCapacity = Number.isInteger(cap) ? cap : defaultCapacity();
+
   const wanted = new Set(weekdays.map(Number));
   const exists = db.prepare('SELECT 1 FROM slots WHERE date = ? AND start_time = ? AND end_time = ?');
   const isBlocked = db.prepare('SELECT 1 FROM blocked_dates WHERE date = ?');
-  const insert = db.prepare('INSERT INTO slots (date, start_time, end_time) VALUES (?, ?, ?)');
+  const insert = db.prepare('INSERT INTO slots (date, start_time, end_time, capacity) VALUES (?, ?, ?, ?)');
 
   let created = 0, skipped = 0;
   const run = db.transaction(() => {
@@ -354,7 +381,7 @@ router.post('/slots/recurring', (req, res) => {
         const iso = d.toISOString().split('T')[0];
         // Les jours bloqués par l'admin sont ignorés (comme les doublons)
         if (exists.get(iso, start_time, end_time) || isBlocked.get(iso)) skipped++;
-        else { insert.run(iso, start_time, end_time); created++; }
+        else { insert.run(iso, start_time, end_time, slotCapacity); created++; }
       }
       d.setUTCDate(d.getUTCDate() + 1);
     }
@@ -397,21 +424,35 @@ router.delete('/blocked-days/:date', (req, res) => {
 router.get('/settings', (req, res) => {
   const row = db.prepare("SELECT value FROM settings WHERE key = 'free_delivery_threshold'").get();
   const v = parseFloat(row?.value);
-  res.json({ freeDeliveryThreshold: Number.isFinite(v) && v >= 0 ? v : 60 });
+  res.json({
+    freeDeliveryThreshold: Number.isFinite(v) && v >= 0 ? v : 60,
+    defaultSlotCapacity: defaultCapacity()
+  });
 });
 
 // PUT /api/admin/settings — mettre à jour les réglages
 router.put('/settings', (req, res) => {
-  const { freeDeliveryThreshold } = req.body;
-  const v = parseFloat(freeDeliveryThreshold);
-  if (!Number.isFinite(v) || v < 0 || v > 10000) {
-    return res.status(400).json({ error: 'Seuil invalide (entre 0 et 10 000 €)' });
-  }
-  db.prepare(`
-    INSERT INTO settings (key, value) VALUES ('free_delivery_threshold', ?)
+  const { freeDeliveryThreshold, defaultSlotCapacity } = req.body;
+  const upsert = db.prepare(`
+    INSERT INTO settings (key, value) VALUES (?, ?)
     ON CONFLICT(key) DO UPDATE SET value = excluded.value
-  `).run(String(v));
-  res.json({ ok: true, freeDeliveryThreshold: v });
+  `);
+
+  if (freeDeliveryThreshold != null) {
+    const v = parseFloat(freeDeliveryThreshold);
+    if (!Number.isFinite(v) || v < 0 || v > 10000) {
+      return res.status(400).json({ error: 'Seuil invalide (entre 0 et 10 000 €)' });
+    }
+    upsert.run('free_delivery_threshold', String(v));
+  }
+  if (defaultSlotCapacity != null) {
+    const c = parseInt(defaultSlotCapacity);
+    if (!Number.isInteger(c) || c < 1 || c > 100) {
+      return res.status(400).json({ error: 'Capacité par défaut invalide (entre 1 et 100)' });
+    }
+    upsert.run('default_slot_capacity', String(c));
+  }
+  res.json({ ok: true });
 });
 
 module.exports = router;

@@ -41,12 +41,10 @@ app.use(session({
   cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, maxAge: 8 * 60 * 60 * 1000 }
 }));
 
-// Cron — libère les créneaux expirés toutes les minutes
+// Cron — purge les réservations temporaires expirées toutes les minutes
 const db = require('./db/database');
-setInterval(() => {
-  const now = new Date().toISOString();
-  db.prepare('UPDATE slots SET reserved_until = NULL, reservation_token = NULL WHERE reserved_until < ? AND order_id IS NULL').run(now);
-}, 60 * 1000);
+const { purgeExpiredHolds } = require('./services/slotAvailability');
+setInterval(purgeExpiredHolds, 60 * 1000);
 
 // Routes
 app.use('/api/products', require('./routes/products'));

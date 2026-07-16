@@ -41,18 +41,18 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Adresse email invalide.' });
   }
 
-  // Créneaux exclusifs : la réservation temporaire (10 min) du client doit être encore valide
+  // Créneaux à capacité : la réservation temporaire (10 min) du client doit être encore valide.
+  // Le hold garantit la place ; il est consommé à la création de la commande
+  // (la commande paid/pending occupe alors la place à sa place).
   const slot = db.prepare('SELECT * FROM slots WHERE id = ?').get(slot_id);
   if (!slot) {
     return res.status(409).json({ error: 'Créneau introuvable. Veuillez en choisir un autre.' });
   }
-  if (slot.order_id) {
-    return res.status(409).json({ error: 'Ce créneau vient d\'être pris. Veuillez en choisir un autre.' });
-  }
   const nowIso = new Date().toISOString();
-  const holdValid = slot_token && slot.reservation_token === slot_token
-    && slot.reserved_until && slot.reserved_until > nowIso;
-  if (!holdValid) {
+  const hold = slot_token
+    ? db.prepare('SELECT * FROM slot_holds WHERE slot_id = ? AND token = ?').get(slot_id, slot_token)
+    : null;
+  if (!hold || hold.expires_at <= nowIso) {
     return res.status(409).json({ error: 'Votre réservation de créneau a expiré. Veuillez en choisir un autre.' });
   }
 
@@ -145,9 +145,8 @@ router.post('/', async (req, res) => {
         total,
         delivery_type
       );
-      // Verrouillage définitif du créneau + décrément des stocks (pas de webhook en simulation)
-      db.prepare('UPDATE slots SET order_id = ?, reserved_until = NULL, reservation_token = NULL WHERE id = ?')
-        .run(result.lastInsertRowid, slot_id);
+      // La commande occupe la place : le hold est consommé. Décrément des stocks (pas de webhook en simulation)
+      db.prepare('DELETE FROM slot_holds WHERE token = ?').run(slot_token);
       const updateStock = db.prepare('UPDATE products SET stock = MAX(0, stock - ?) WHERE id = ?');
       for (const item of pricedCart) updateStock.run(item.qty, item.id);
       return result.lastInsertRowid;
@@ -203,9 +202,8 @@ router.post('/', async (req, res) => {
       delivery_type
     );
 
-    // Prolonge la réservation le temps du paiement SumUp (15 min de plus)
-    const extendedHold = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-    db.prepare('UPDATE slots SET reserved_until = ? WHERE id = ?').run(extendedHold, slot_id);
+    // La commande pending occupe la place pendant 30 min (cf. slotAvailability) : hold consommé
+    db.prepare('DELETE FROM slot_holds WHERE token = ?').run(slot_token);
 
     res.json({ checkoutUrl: `https://pay.sumup.com/b2c/${checkout.id}` });
 
