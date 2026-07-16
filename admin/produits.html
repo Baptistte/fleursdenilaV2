@@ -3356,6 +3356,7 @@ async function loadCalEvents(monday, sunday) {
     orders.forEach(o => {
       if (!o.date || !o.start_time) return;
       if (o.date < from || o.date > to) return;
+      if (o.status === 'cancelled') return;   // les commandes annulées ne sont plus à livrer
       // L'API renvoie o.items déjà parsé en tableau
       const items = Array.isArray(o.items) ? o.items
         : (() => { try { return JSON.parse(o.items || '[]'); } catch { return []; } })();
@@ -3402,39 +3403,73 @@ function addOneHour(time) {
   return `${String(h+1).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 }
 
-/* ── Placer les événements dans la grille ── */
+/* ── Placer les événements dans la grille ──
+   Les événements qui se chevauchent (ex. deux livraisons sur le même créneau)
+   sont répartis côte à côte au lieu de se recouvrir. */
 function placeEvents(monday) {
   document.querySelectorAll('.cal-event').forEach(e => e.remove());
 
+  // Regroupe les événements visibles par jour de la semaine
+  const byDay = new Map();
   calEvents.forEach(ev => {
-    // Appliquer les filtres
     if (ev.filterKey && !calFilters[ev.filterKey]) return;
     const dayDiff = (new Date(ev.date + 'T12:00:00') - new Date(isoDate(monday) + 'T12:00:00')) / 86400000;
     if (dayDiff < 0 || dayDiff > 6) return;
+    (byDay.get(dayDiff) || byDay.set(dayDiff, []).get(dayDiff)).push(ev);
+  });
 
-    const cols = document.getElementById('cal-days-grid').children;
+  const cols = document.getElementById('cal-days-grid').children;
+
+  byDay.forEach((events, dayDiff) => {
     const col = cols[dayDiff];
     if (!col) return;
 
-    const top    = timeToPx(ev.start_time);
-    const bottom = timeToPx(ev.end_time);
-    const height = Math.max(bottom - top, 24);
+    // Géométrie + tri par heure de début
+    const items = events.map(ev => {
+      const top = timeToPx(ev.start_time);
+      const height = Math.max(timeToPx(ev.end_time) - top, 24);
+      return { ev, top, bottom: top + height, height, lane: 0, lanes: 1 };
+    }).sort((a, b) => a.top - b.top || a.bottom - b.bottom);
 
-    const el = document.createElement('div');
-    el.className = 'cal-event';
-    el.style.cssText = `
-      top: ${top}px;
-      height: ${height}px;
-      background: ${ev.color};
-      color: #fff;
-    `;
-    el.innerHTML = `
-      <div class="cal-event-title">${ev.title}</div>
-      ${height > 36 ? `<div class="cal-event-time">${ev.start_time} – ${ev.end_time}</div>` : ''}
-      ${height > 56 && ev.subtitle ? `<div class="cal-event-type">${ev.subtitle}</div>` : ''}
-    `;
-    el.addEventListener('click', e => { e.stopPropagation(); showEventPopup(e, ev); });
-    col.appendChild(el);
+    // Attribution des colonnes : les événements simultanés se partagent la largeur
+    let cluster = [];      // événements du groupe de chevauchement courant
+    let laneEnds = [];     // bas de la dernière carte de chaque colonne du groupe
+    const closeCluster = () => {
+      cluster.forEach(it => { it.lanes = laneEnds.length; });
+      cluster = []; laneEnds = [];
+    };
+    for (const it of items) {
+      if (cluster.length && Math.max(...laneEnds) <= it.top) closeCluster();
+      let lane = laneEnds.findIndex(end => end <= it.top);
+      if (lane === -1) { lane = laneEnds.length; laneEnds.push(0); }
+      laneEnds[lane] = it.bottom;
+      it.lane = lane;
+      cluster.push(it);
+    }
+    closeCluster();
+
+    // Rendu
+    for (const it of items) {
+      const { ev, top, height, lane, lanes } = it;
+      const el = document.createElement('div');
+      el.className = 'cal-event';
+      el.style.cssText = `
+        top: ${top}px;
+        height: ${height}px;
+        left: calc(${(lane / lanes) * 100}% + 3px);
+        width: calc(${100 / lanes}% - 6px);
+        right: auto;
+        background: ${ev.color};
+        color: #fff;
+      `;
+      el.innerHTML = `
+        <div class="cal-event-title">${ev.title}</div>
+        ${height > 36 && lanes < 3 ? `<div class="cal-event-time">${ev.start_time} – ${ev.end_time}</div>` : ''}
+        ${height > 56 && ev.subtitle && lanes === 1 ? `<div class="cal-event-type">${ev.subtitle}</div>` : ''}
+      `;
+      el.addEventListener('click', e => { e.stopPropagation(); showEventPopup(e, ev); });
+      col.appendChild(el);
+    }
   });
 }
 
