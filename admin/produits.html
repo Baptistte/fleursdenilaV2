@@ -855,6 +855,32 @@
       #modal-panel, #task-modal-panel { width: 100vw; }
     }
 
+    /* ──────────────────── DASHBOARD PLEIN ÉCRAN ────────────────────
+       La page d'accueil tient dans la fenêtre sans scroll : les 4 cartes du
+       bas forment une grille 2×2 alignée en X et Y, leurs corps défilent
+       en interne si besoin. */
+    @media (min-width: 769px) {
+      #section-dashboard.active {
+        display: flex; flex-direction: column;
+        height: calc(100vh - 62px - 56px);   /* topbar + padding de #content */
+        overflow: hidden;
+      }
+      #section-dashboard .welcome-bar,
+      #section-dashboard .kpi-grid { flex-shrink: 0; }
+      #dash-columns { flex: 1; min-height: 0; }
+      #dash-col-left, #dash-col-right {
+        display: grid !important;
+        grid-template-rows: 1fr 1fr;   /* cartes haut/bas alignées entre colonnes */
+        gap: 20px; min-height: 0;
+      }
+      #dash-columns .card {
+        min-height: 0; display: flex; flex-direction: column;
+        overflow: hidden; margin: 0;
+      }
+      #dash-columns .card-header { flex-shrink: 0; }
+      #dash-columns .dash-fill { flex: 1; min-height: 0; overflow-y: auto; }
+    }
+
     /* ──────────────────── CRÉNEAUX RÉCURRENTS ──────────────────── */
     .rec-day {
       width: 30px; height: 30px; border-radius: 8px;
@@ -1033,10 +1059,10 @@
       </div>
 
       <!-- 2 colonnes -->
-      <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start">
+      <div id="dash-columns" style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
 
         <!-- Colonne gauche : Livraisons du jour + Commandes récentes -->
-        <div style="display:flex;flex-direction:column;gap:20px">
+        <div id="dash-col-left" style="display:flex;flex-direction:column;gap:20px">
 
         <!-- Livraisons & Retraits du jour -->
         <div class="card">
@@ -1058,7 +1084,7 @@
               <button class="btn btn-ghost btn-sm" style="padding:5px 9px;font-size:15px;line-height:1;border-radius:8px" onclick="shiftOrdersDay(1)">›</button>
             </div>
           </div>
-          <div id="dash-orders-body" style="min-height:60px">
+          <div id="dash-orders-body" class="dash-fill" style="min-height:60px">
             <div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">Chargement…</div>
           </div>
         </div>
@@ -1077,6 +1103,7 @@
             </div>
             <button class="btn btn-ghost btn-sm" onclick="navigate('commandes')">Tout voir →</button>
           </div>
+          <div class="dash-fill">
           <table class="data-table">
             <thead>
               <tr>
@@ -1091,12 +1118,13 @@
               <tr><td colspan="5"><div class="empty-state"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><p>Chargement…</p></div></td></tr>
             </tbody>
           </table>
+          </div>
         </div>
 
         </div><!-- /colonne gauche -->
 
         <!-- Colonne droite : Alertes stock + Tâches à venir -->
-        <div style="display:flex;flex-direction:column;gap:20px">
+        <div id="dash-col-right" style="display:flex;flex-direction:column;gap:20px">
 
           <!-- Alertes stock -->
           <div class="card">
@@ -1107,7 +1135,7 @@
               </div>
               <button class="btn btn-ghost btn-sm" onclick="navigate('produits')">Gérer</button>
             </div>
-            <div id="stock-alerts-body">
+            <div id="stock-alerts-body" class="dash-fill">
               <div class="empty-state" style="padding:32px"><svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg><p>Chargement…</p></div>
             </div>
           </div>
@@ -1127,7 +1155,7 @@
                 <button class="btn btn-ghost btn-sm" style="padding:5px 9px;font-size:15px;line-height:1;border-radius:8px" onclick="shiftTaskDay(1)">›</button>
               </div>
             </div>
-            <div id="dash-tasks-body" style="min-height:60px">
+            <div id="dash-tasks-body" class="dash-fill" style="min-height:60px">
               <div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">Chargement…</div>
             </div>
             <div style="padding:10px 16px;border-top:1px solid #f1f5f9">
