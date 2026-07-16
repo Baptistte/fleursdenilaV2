@@ -85,7 +85,14 @@ function seedDemo() {
     insertSlot.run(dateStr(dayAfter), start, end);
   }
 
-  return { products: products.length, slots: times.length * 2 };
+  // Vitrine de la page d'accueil : les 3 premiers produits par défaut
+  const ids = db.prepare('SELECT id FROM products ORDER BY id ASC LIMIT 3').all().map(r => r.id);
+  db.prepare(`
+    INSERT INTO settings (key, value) VALUES ('home_products', ?)
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value
+  `).run(JSON.stringify(ids));
+
+  return { products: products.length, slots: times.length * 2, featured: ids.length };
 }
 
 module.exports = { seedDemo };
