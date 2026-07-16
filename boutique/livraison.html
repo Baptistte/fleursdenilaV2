@@ -285,7 +285,13 @@
   <script src="delivery-zones.js"></script>
   <script>
     const API = 'http://localhost:3000';
-    const DELIVERY_THRESHOLD = 60;
+    let DELIVERY_THRESHOLD = 60;   // valeur par défaut, remplacée par le réglage admin via /api/config
+    fetch(`${API}/api/config`).then(r => r.json()).then(c => {
+      if (Number.isFinite(c.freeDeliveryThreshold)) {
+        DELIVERY_THRESHOLD = c.freeDeliveryThreshold;
+        renderCartSummary();
+      }
+    }).catch(() => {});
 
     let selectedMode = 'delivery';
     let selectedDate = null;

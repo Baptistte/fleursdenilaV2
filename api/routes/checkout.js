@@ -3,7 +3,12 @@ const router = express.Router();
 const db = require('../db/database');
 const { feeForZip } = require('../deliveryZones');
 
-const FREE_DELIVERY_THRESHOLD = 60;
+// Seuil de livraison offerte : réglable depuis l'admin (settings), 60 € par défaut
+function freeDeliveryThreshold() {
+  const row = db.prepare("SELECT value FROM settings WHERE key = 'free_delivery_threshold'").get();
+  const v = parseFloat(row?.value);
+  return Number.isFinite(v) && v >= 0 ? v : 60;
+}
 
 async function getSumUpToken() {
   const res = await fetch('https://api.sumup.com/token', {
@@ -51,7 +56,60 @@ router.post('/', async (req, res) => {
     return res.status(409).json({ error: 'Votre réservation de créneau a expiré. Veuillez en choisir un autre.' });
   }
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  // ── Re-tarification autoritaire côté serveur ─────────────────────────
+  // Les prix envoyés par le navigateur sont IGNORÉS : chaque article est
+  // re-tarifé depuis la table products (prix de base + suppléments d'options),
+  // et le stock est vérifié. Le panier stocké en commande reflète ces prix.
+  const qtyByProduct = new Map();   // contrôle du stock, toutes lignes confondues
+  const pricedCart = [];
+
+  for (const item of cart) {
+    const qty = parseInt(item.qty);
+    if (!Number.isInteger(qty) || qty < 1 || qty > 50) {
+      return res.status(400).json({ error: 'Quantité invalide.' });
+    }
+
+    const product = db.prepare('SELECT * FROM products WHERE id = ?').get(item.id);
+    if (!product || !product.active) {
+      return res.status(409).json({ error: `« ${item.name || 'Un article'} » n'est plus disponible. Retirez-le de votre panier.` });
+    }
+
+    let options = [];
+    try { options = JSON.parse(product.options); } catch { options = []; }
+
+    // Toutes les options du produit doivent être choisies, et chaque choix doit exister
+    let unitPrice = product.price;
+    const chosen = item.options || {};
+    for (const opt of options) {
+      const value = chosen[opt.type];
+      const choice = value != null ? (opt.choices || []).find(c => String(c.value) === String(value)) : null;
+      if (!choice) {
+        return res.status(400).json({ error: `Option manquante ou invalide pour « ${product.name} » (${opt.label}).` });
+      }
+      unitPrice += choice.priceDelta || 0;
+    }
+    unitPrice = Math.round(unitPrice * 100) / 100;
+
+    qtyByProduct.set(product.id, (qtyByProduct.get(product.id) || 0) + qty);
+    if (qtyByProduct.get(product.id) > product.stock) {
+      return res.status(409).json({
+        error: product.stock > 0
+          ? `Stock insuffisant pour « ${product.name} » : ${product.stock} disponible${product.stock > 1 ? 's' : ''}.`
+          : `« ${product.name} » est épuisé.`
+      });
+    }
+
+    pricedCart.push({
+      id: product.id,
+      name: product.name,
+      price: unitPrice,
+      qty,
+      options: chosen,
+      message: typeof item.message === 'string' ? item.message.slice(0, 500) : ''
+    });
+  }
+
+  const subtotal = pricedCart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   // Tarif de livraison basé sur le code postal (zone). Livraison offerte dès 60 €.
   let deliveryCost = 0;
@@ -61,7 +119,7 @@ router.post('/', async (req, res) => {
     if (zoneFee === null) {
       return res.status(400).json({ error: 'Nous ne livrons pas à ce code postal. Merci de contacter la boutique.' });
     }
-    deliveryCost = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : zoneFee;
+    deliveryCost = subtotal >= freeDeliveryThreshold() ? 0 : zoneFee;
   }
   const total = Math.round((subtotal + deliveryCost) * 100) / 100;
 
@@ -83,7 +141,7 @@ router.post('/', async (req, res) => {
         customer_phone,
         delivery_address ? JSON.stringify(delivery_address) : null,
         slot_id,
-        JSON.stringify(cart),
+        JSON.stringify(pricedCart),
         total,
         delivery_type
       );
@@ -91,7 +149,7 @@ router.post('/', async (req, res) => {
       db.prepare('UPDATE slots SET order_id = ?, reserved_until = NULL, reservation_token = NULL WHERE id = ?')
         .run(result.lastInsertRowid, slot_id);
       const updateStock = db.prepare('UPDATE products SET stock = MAX(0, stock - ?) WHERE id = ?');
-      for (const item of cart) updateStock.run(item.qty, item.id);
+      for (const item of pricedCart) updateStock.run(item.qty, item.id);
       return result.lastInsertRowid;
     });
     return res.json({
@@ -115,7 +173,7 @@ router.post('/', async (req, res) => {
         amount: total,
         currency: 'EUR',
         merchant_code: process.env.SUMUP_MERCHANT_CODE,
-        description: `Commande Fleurs de Nila — ${cart.map(i => i.name).join(', ')}`,
+        description: `Commande Fleurs de Nila — ${pricedCart.map(i => i.name).join(', ')}`,
         redirect_url: `${process.env.FRONTEND_URL}/boutique/confirmation.html`
       })
     });
@@ -140,7 +198,7 @@ router.post('/', async (req, res) => {
       customer_phone,
       delivery_address ? JSON.stringify(delivery_address) : null,
       slot_id,
-      JSON.stringify(cart),
+      JSON.stringify(pricedCart),
       total,
       delivery_type
     );

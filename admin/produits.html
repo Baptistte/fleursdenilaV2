@@ -66,8 +66,10 @@
       display: flex; flex-direction: column; align-items: center; gap: 10px;
     }
     .sb-logo img {
-      height: 44px; width: auto;
-      filter: brightness(0) invert(1); opacity: .9;
+      /* Le webp a un fond blanc opaque : le filtre invert donnait un carré blanc.
+         On l'affiche tel quel dans une pastille blanche arrondie. */
+      height: 52px; width: auto;
+      background: #fff; border-radius: 10px; padding: 4px 14px;
     }
     .sb-logo-tag {
       display: flex; align-items: center; gap: 7px;
@@ -915,6 +917,14 @@
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
       <span>Commandes</span>
     </button>
+    <button class="nav-item" data-section="clients">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6-4a3 3 0 11-3-3"/></svg>
+      <span>Clients</span>
+    </button>
+    <button class="nav-item" data-section="factures">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <span>Factures</span>
+    </button>
     <div class="sb-section">Planning</div>
     <button class="nav-item" data-section="creneaux">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -1224,6 +1234,29 @@
           </div>
         </div>
       </div>
+
+      <!-- Réglages boutique -->
+      <div class="card" style="max-width:640px;margin-top:20px">
+        <div class="card-header">
+          <div>
+            <h2>Réglages boutique</h2>
+            <div class="subtitle">Appliqués immédiatement sur le site et au paiement</div>
+          </div>
+        </div>
+        <div style="padding:22px 20px">
+          <div class="field-group" style="margin:0;max-width:280px">
+            <label class="field-label">Livraison offerte à partir de (€)</label>
+            <input type="number" id="setting-threshold" class="field-input" min="0" max="10000" step="1" value="60">
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:18px">
+            <button class="btn btn-primary" onclick="saveSettings()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Enregistrer
+            </button>
+            <span id="setting-saved" style="display:none;font-size:12px;color:#16a34a">Enregistré ✓</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ─── SECTION COMMANDES ─── -->
@@ -1279,6 +1312,88 @@
       </div>
     </div>
 
+    <!-- ─── SECTION CLIENTS ─── -->
+    <div id="section-clients" class="section">
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:40px;height:40px;border-radius:11px;background:#fce7f3;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="20" height="20" fill="none" stroke="#be185d" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4z"/></svg>
+        </div>
+        <div style="flex:1">
+          <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px">Fichier clients</h2>
+          <div style="font-size:12px;color:#94a3b8">Un client = un numéro de téléphone — cliquez sur une ligne pour voir l'historique</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap">
+        <input type="text" id="client-search" class="task-input" placeholder="Rechercher nom, téléphone ou email…" style="width:320px;max-width:100%;padding:8px 12px">
+        <span id="clients-count" class="badge badge-navy"></span>
+      </div>
+
+      <div class="card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Téléphone</th>
+              <th>Email</th>
+              <th>Commandes</th>
+              <th>Total dépensé</th>
+              <th>Dernière commande</th>
+            </tr>
+          </thead>
+          <tbody id="clients-tbody">
+            <tr><td colspan="6"><div class="empty-state"><p>Chargement…</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─── SECTION FACTURES ─── -->
+    <div id="section-factures" class="section">
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:40px;height:40px;border-radius:11px;background:#fef3c7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="20" height="20" fill="none" stroke="#b45309" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <div style="flex:1">
+          <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px">Générer une facture</h2>
+          <div style="font-size:12px;color:#94a3b8">Cochez une ou plusieurs ventes payées d'un même client — recherchez par nom ou téléphone pour retrouver toutes celles d'un client</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap">
+        <input type="text" id="facture-search" class="task-input" placeholder="Rechercher nom, téléphone ou n° de commande…" style="width:320px;max-width:100%;padding:8px 12px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span id="factures-count" class="badge badge-navy"></span>
+          <button class="btn btn-primary btn-sm" id="btn-generate-invoice" onclick="generateSelectedInvoice()" disabled>
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span id="btn-generate-label">Générer la facture</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:36px"></th>
+              <th>#</th>
+              <th>Client</th>
+              <th>Téléphone</th>
+              <th>Produits</th>
+              <th>Total</th>
+              <th>Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="factures-tbody">
+            <tr><td colspan="8"><div class="empty-state"><p>Chargement…</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- ─── SECTION CRÉNEAUX ─── -->
     <div id="section-creneaux" class="section">
 
@@ -1295,11 +1410,12 @@
       <!-- Sélecteur de date -->
       <div class="card" style="margin-bottom:20px">
         <div class="card-header">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <label style="font-size:13px;font-weight:600;color:var(--text)">Date :</label>
+            <button class="btn btn-ghost btn-sm" style="padding:6px 10px" onclick="shiftSlotDate(-1)" aria-label="Jour précédent">‹</button>
             <input type="date" id="slot-date-input" class="task-input" style="width:180px;padding:7px 10px"
               value="">
-            <button class="btn btn-primary btn-sm" onclick="loadSlots()">Afficher</button>
+            <button class="btn btn-ghost btn-sm" style="padding:6px 10px" onclick="shiftSlotDate(1)" aria-label="Jour suivant">›</button>
           </div>
           <button class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:none;padding:6px 14px;border-radius:8px;font-weight:600;cursor:pointer" onclick="blockDay()">
             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
@@ -1405,8 +1521,9 @@
         <div class="card-header">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             <label style="font-size:13px;font-weight:600;color:var(--text)">Date :</label>
+            <button class="btn btn-ghost btn-sm" style="padding:6px 10px" onclick="shiftTourneeDate(-1)" aria-label="Jour précédent">‹</button>
             <input type="date" id="tournee-date-input" class="task-input" style="width:180px;padding:7px 10px">
-            <button class="btn btn-primary btn-sm" onclick="loadTournee()">Afficher</button>
+            <button class="btn btn-ghost btn-sm" style="padding:6px 10px" onclick="shiftTourneeDate(1)" aria-label="Jour suivant">›</button>
             <button class="btn btn-ghost btn-sm" onclick="setTourneeDate(1)">Demain</button>
             <button class="btn btn-ghost btn-sm" onclick="setTourneeDate(0)">Aujourd'hui</button>
           </div>
@@ -1679,11 +1796,13 @@ function navigate(section) {
   document.querySelector(`.nav-item[data-section="${section}"]`)?.classList.add('active');
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(`section-${section}`)?.classList.add('active');
-  const titles = { dashboard: 'Tableau de bord', produits: 'Produits', accueil: 'Boutique page accueil', commandes: 'Commandes', creneaux: 'Créneaux', tournee: 'Tournée', agenda: 'Emploi du temps' };
+  const titles = { dashboard: 'Tableau de bord', produits: 'Produits', accueil: 'Boutique page accueil', commandes: 'Commandes', clients: 'Clients', factures: 'Factures', creneaux: 'Créneaux', tournee: 'Tournée', agenda: 'Emploi du temps' };
   document.getElementById('page-title').textContent = titles[section] || section;
   if (section === 'produits') loadProducts();
-  if (section === 'accueil') loadHomeProducts();
+  if (section === 'accueil') { loadHomeProducts(); loadSettings(); }
   if (section === 'commandes') loadOrders();
+  if (section === 'clients') loadClients();
+  if (section === 'factures') loadFactures();
   if (section === 'creneaux') initCreneaux();
   if (section === 'tournee') initTournee();
   if (section === 'agenda') { calCurrentDate = new Date(); renderCalendar(); }
@@ -1701,6 +1820,17 @@ function initTournee() {
   // Par défaut : la tournée du lendemain (préparation la veille)
   if (!document.getElementById('tournee-date-input').value) setTourneeDate(1);
   else loadTournee();
+}
+
+// Actualisation automatique dès que la date change (picker ou flèches)
+document.getElementById('tournee-date-input').addEventListener('change', loadTournee);
+
+function shiftTourneeDate(delta) {
+  const input = document.getElementById('tournee-date-input');
+  const d = new Date((input.value || new Date().toISOString().split('T')[0]) + 'T12:00:00');
+  d.setDate(d.getDate() + delta);
+  input.value = d.toISOString().split('T')[0];
+  loadTournee();
 }
 
 async function loadTournee() {
@@ -1774,6 +1904,273 @@ function renderTournee(date, orders) {
       </div>`;
     }).join('')}
   `).join('');
+}
+
+// ═══════════════════════ CLIENTS ═══════════════════════
+let _allClients = [];
+let _clientSearch = '';
+
+async function loadClients() {
+  const tbody = document.getElementById('clients-tbody');
+  tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><p>Chargement…</p></div></td></tr>`;
+  try {
+    const res = await apiFetch('/api/admin/customers');
+    _allClients = await res.json();
+    renderClients();
+  } catch {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><p style="color:#dc2626">Erreur de chargement</p></div></td></tr>`;
+  }
+}
+
+document.getElementById('client-search').addEventListener('input', e => {
+  _clientSearch = e.target.value.toLowerCase().trim();
+  renderClients();
+});
+
+function formatPhone(p) {
+  return p.length === 10 ? p.replace(/(\d{2})(?=\d)/g, '$1 ') : p;
+}
+
+function renderClients() {
+  const tbody = document.getElementById('clients-tbody');
+  const q = _clientSearch;
+  const list = _allClients.filter(c =>
+    !q || c.name.toLowerCase().includes(q) || c.phone.includes(q.replace(/\D/g, '') || q) || (c.email || '').toLowerCase().includes(q)
+  );
+  document.getElementById('clients-count').textContent = `${list.length} client${list.length !== 1 ? 's' : ''}`;
+
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><p>Aucun client${q ? ' pour cette recherche' : ' pour l\'instant'}</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map((c, i) => {
+    const last = new Date(c.lastOrderAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    return `
+    <tr onclick="toggleClientOrders(${i})" style="cursor:pointer" data-idx="${i}">
+      <td style="font-weight:600">${c.name}</td>
+      <td style="white-space:nowrap"><a href="tel:${c.phone}" onclick="event.stopPropagation()" style="color:var(--navy2)">${formatPhone(c.phone)}</a></td>
+      <td style="font-size:12px;color:#64748b">${c.email || '<span style="color:#cbd5e1">—</span>'}</td>
+      <td>${c.ordersCount}${c.paidCount !== c.ordersCount ? ` <span style="color:#94a3b8;font-size:11px">(${c.paidCount} payée${c.paidCount > 1 ? 's' : ''})</span>` : ''}</td>
+      <td style="font-weight:700" class="tabular">${c.totalSpent.toFixed(2)} €</td>
+      <td style="font-size:12px;color:#94a3b8">${last}</td>
+    </tr>
+    <tr class="client-orders-row" data-detail="${i}" style="display:none">
+      <td colspan="6" style="background:#f8fafc;padding:14px 18px">
+        ${c.orders.map(o => `
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px">
+            <span style="color:#94a3b8;font-weight:700">#${o.id}</span>
+            <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.items.map(it => `${it.name} ×${it.qty}`).join(', ')}</span>
+            <span class="badge ${o.delivery_type === 'delivery' ? 'badge-blue' : 'badge-gray'}">${o.delivery_type === 'delivery' ? 'Livraison' : 'Retrait'}</span>
+            ${statusBadge(o.status)}
+            <span style="font-weight:700;white-space:nowrap" class="tabular">${o.total.toFixed(2)} €</span>
+            <span style="color:#94a3b8;white-space:nowrap">${new Date(o.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' })}</span>
+          </div>`).join('')}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleClientOrders(i) {
+  const row = document.querySelector(`.client-orders-row[data-detail="${i}"]`);
+  if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
+}
+
+// ═══════════════════════ FACTURES ═══════════════════════
+let _invOrders = [];
+let _invSearch = '';
+const _invSelection = new Set();
+
+function normPhone(p) {
+  let d = String(p || '').replace(/\D/g, '');
+  if (d.startsWith('33') && d.length === 11) d = '0' + d.slice(2);
+  return d;
+}
+
+async function loadFactures() {
+  const tbody = document.getElementById('factures-tbody');
+  tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><p>Chargement…</p></div></td></tr>`;
+  try {
+    const res = await apiFetch('/api/admin/orders?status=paid&limit=500');
+    _invOrders = await res.json();
+    _invSelection.clear();
+    renderFactures();
+  } catch {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><p style="color:#dc2626">Erreur de chargement</p></div></td></tr>`;
+  }
+}
+
+document.getElementById('facture-search').addEventListener('input', e => {
+  _invSearch = e.target.value.toLowerCase().trim();
+  renderFactures();
+});
+
+function renderFactures() {
+  const tbody = document.getElementById('factures-tbody');
+  const q = _invSearch;
+  const qDigits = q.replace(/\D/g, '');
+  const list = _invOrders.filter(o =>
+    !q ||
+    o.customer_name.toLowerCase().includes(q) ||
+    (qDigits && normPhone(o.customer_phone).includes(qDigits)) ||
+    String(o.id) === q.replace('#', '')
+  );
+  document.getElementById('factures-count').textContent = `${list.length} vente${list.length !== 1 ? 's' : ''}`;
+
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><p>Aucune vente payée${q ? ' pour cette recherche' : ''}</p></div></td></tr>`;
+    updateInvoiceBtn();
+    return;
+  }
+
+  tbody.innerHTML = list.map(o => {
+    const items = (o.items || []).map(i => `${i.name} ×${i.qty}`).join(', ');
+    const d = o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '—';
+    return `<tr>
+      <td><input type="checkbox" class="inv-check" data-id="${o.id}" ${_invSelection.has(o.id) ? 'checked' : ''} style="width:15px;height:15px;cursor:pointer"></td>
+      <td style="font-size:11px;color:#94a3b8;font-weight:700">#${o.id}</td>
+      <td style="font-weight:600">${o.customer_name}</td>
+      <td style="white-space:nowrap;font-size:12px">${o.customer_phone || '—'}</td>
+      <td style="font-size:12px;color:#64748b;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${items}</td>
+      <td style="font-weight:700" class="tabular">${o.total.toFixed(2)} €</td>
+      <td style="font-size:12px;color:#94a3b8;white-space:nowrap">${d}</td>
+      <td><button onclick="openInvoice([${o.id}])" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid #fde68a;background:#fef3c7;color:#b45309;cursor:pointer;font-weight:600">Facture</button></td>
+    </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('.inv-check').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const id = parseInt(cb.dataset.id);
+      cb.checked ? _invSelection.add(id) : _invSelection.delete(id);
+      updateInvoiceBtn();
+    });
+  });
+  updateInvoiceBtn();
+}
+
+function updateInvoiceBtn() {
+  const n = _invSelection.size;
+  document.getElementById('btn-generate-invoice').disabled = n === 0;
+  document.getElementById('btn-generate-label').textContent =
+    n > 1 ? `Générer la facture (${n} ventes)` : 'Générer la facture';
+}
+
+function generateSelectedInvoice() {
+  openInvoice([..._invSelection]);
+}
+
+function openInvoice(ids) {
+  const orders = _invOrders.filter(o => ids.includes(o.id));
+  if (!orders.length) return;
+
+  // Une facture = un seul client (regroupement par téléphone normalisé)
+  const phones = new Set(orders.map(o => normPhone(o.customer_phone)));
+  if (phones.size > 1) {
+    alert('Les ventes sélectionnées appartiennent à plusieurs clients.\nUne facture ne peut concerner qu\'un seul client : affinez la sélection (astuce : recherchez le client par téléphone).');
+    return;
+  }
+
+  orders.sort((a, b) => a.id - b.id);
+  const c = orders[orders.length - 1]; // coordonnées de la commande la plus récente
+  const today = new Date();
+  const num = `FDN-${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}-${orders.map(o => o.id).join('.')}`;
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+
+  let grandTotal = 0;
+  const blocks = orders.map(o => {
+    const itemsSum = (o.items || []).reduce((s, i) => s + i.price * i.qty, 0);
+    const deliveryFee = Math.max(0, Math.round((o.total - itemsSum) * 100) / 100);
+    grandTotal += o.total;
+    const dateCmd = o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR') : '';
+    const creneau = o.date ? ` — ${o.delivery_type === 'delivery' ? 'livraison' : 'retrait'} le ${new Date(o.date + 'T12:00:00').toLocaleDateString('fr-FR')}${o.start_time ? ' (' + o.start_time + '–' + o.end_time + ')' : ''}` : '';
+    return `
+      <tr class="order-head"><td colspan="4">Commande n°${o.id} du ${dateCmd}${esc(creneau)}</td></tr>
+      ${(o.items || []).map(i => {
+        const opts = i.options && Object.keys(i.options).length
+          ? `<div class="opts">${Object.entries(i.options).map(([k, v]) => `${esc(k)} : ${esc(v)}`).join(' · ')}</div>` : '';
+        return `<tr>
+          <td>${esc(i.name)}${opts}</td>
+          <td class="num">${i.qty}</td>
+          <td class="num">${i.price.toFixed(2)} €</td>
+          <td class="num">${(i.price * i.qty).toFixed(2)} €</td>
+        </tr>`;
+      }).join('')}
+      ${deliveryFee > 0 ? `<tr><td>Frais de livraison</td><td class="num">1</td><td class="num">${deliveryFee.toFixed(2)} €</td><td class="num">${deliveryFee.toFixed(2)} €</td></tr>` : ''}
+    `;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<title>Facture ${num}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, 'Times New Roman', serif; color: #1a365d; padding: 48px 56px; font-size: 13px; line-height: 1.5; }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+  h1 { font-size: 30px; font-weight: normal; letter-spacing: .02em; }
+  .brand small { display:block; letter-spacing: .25em; text-transform: uppercase; font-size: 9px; color: #64748b; margin-top: 2px; }
+  .doc { text-align: right; }
+  .doc .title { font-size: 20px; text-transform: uppercase; letter-spacing: .18em; }
+  .doc div { font-size: 12px; color: #475569; }
+  .parties { display: flex; justify-content: space-between; gap: 40px; margin-bottom: 36px; }
+  .partie h3 { font-size: 10px; text-transform: uppercase; letter-spacing: .18em; color: #94a3b8; margin-bottom: 6px; font-weight: normal; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .14em; color: #64748b; border-bottom: 2px solid #1a365d; padding: 8px 10px; font-weight: normal; }
+  td { padding: 8px 10px; border-bottom: 1px solid #e8edf3; vertical-align: top; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  .order-head td { background: #f4f7fa; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #475569; border-bottom: none; }
+  .opts { font-size: 11px; color: #94a3b8; }
+  .totals { margin-left: auto; width: 260px; }
+  .totals .row { display: flex; justify-content: space-between; padding: 6px 10px; }
+  .totals .grand { border-top: 2px solid #1a365d; font-size: 17px; font-weight: bold; padding-top: 10px; }
+  .paid { margin-top: 28px; display: inline-block; border: 1.5px solid #15803d; color: #15803d; text-transform: uppercase; letter-spacing: .18em; font-size: 11px; padding: 6px 16px; }
+  footer { margin-top: 56px; padding-top: 14px; border-top: 1px solid #e8edf3; font-size: 10.5px; color: #94a3b8; }
+  .actions { position: fixed; top: 14px; right: 14px; }
+  .actions button { font-family: inherit; background: #1a365d; color: #fff; border: none; padding: 10px 22px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
+  @media print { .actions { display: none; } body { padding: 24px 8px; } }
+</style></head><body>
+  <div class="actions"><button onclick="window.print()">Imprimer / PDF</button></div>
+  <div class="top">
+    <div class="brand">
+      <h1>Fleurs de Nila</h1>
+      <small>Fleuriste artisan — Nîmes</small>
+    </div>
+    <div class="doc">
+      <div class="title">Facture</div>
+      <div>N° ${num}</div>
+      <div>Date : ${today.toLocaleDateString('fr-FR')}</div>
+    </div>
+  </div>
+  <div class="parties">
+    <div class="partie">
+      <h3>Émetteur</h3>
+      <div><strong>Fleurs de Nila</strong></div>
+      <div>Nîmes, France</div>
+      <div>Tél : 04 34 39 04 29</div>
+      <div>SIRET : [à compléter]</div>
+    </div>
+    <div class="partie" style="text-align:right">
+      <h3>Client</h3>
+      <div><strong>${esc(c.customer_name)}</strong></div>
+      <div>${esc(c.customer_phone || '')}</div>
+      ${c.customer_email ? `<div>${esc(c.customer_email)}</div>` : ''}
+    </div>
+  </div>
+  <table>
+    <thead><tr><th>Désignation</th><th class="num">Qté</th><th class="num">Prix unitaire</th><th class="num">Montant</th></tr></thead>
+    <tbody>${blocks}</tbody>
+  </table>
+  <div class="totals">
+    <div class="row grand"><span>Total TTC</span><span>${grandTotal.toFixed(2)} €</span></div>
+  </div>
+  <div class="paid">Facture acquittée — paiement en ligne</div>
+  <footer>
+    Fleurs de Nila — Nîmes · Tél : 04 34 39 04 29 · Prix exprimés en euros, toutes taxes comprises.
+  </footer>
+</body></html>`;
+
+  const w = window.open('', '_blank');
+  if (!w) { alert('Autorisez les popups pour afficher la facture.'); return; }
+  w.document.write(html);
+  w.document.close();
 }
 
 // ═══════════════════════ CRÉNEAUX RÉCURRENTS ═══════════════════════
@@ -2194,6 +2591,33 @@ async function toggleActive(id, checked) {
 }
 
 // ═══════════════════════ BOUTIQUE PAGE ACCUEIL ═══════════════════════
+// ─── RÉGLAGES BOUTIQUE ───
+async function loadSettings() {
+  try {
+    const res = await apiFetch('/api/admin/settings');
+    const s = await res.json();
+    document.getElementById('setting-threshold').value = s.freeDeliveryThreshold;
+  } catch { /* valeur par défaut du champ conservée */ }
+}
+
+async function saveSettings() {
+  const v = parseFloat(document.getElementById('setting-threshold').value);
+  if (!Number.isFinite(v) || v < 0) { alert('Seuil invalide.'); return; }
+  const res = await apiFetch('/api/admin/settings', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ freeDeliveryThreshold: v })
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    alert(data.error || 'Erreur lors de l\'enregistrement.');
+    return;
+  }
+  const el = document.getElementById('setting-saved');
+  el.style.display = 'inline';
+  setTimeout(() => { el.style.display = 'none'; }, 2500);
+}
+
 async function loadHomeProducts() {
   try {
     // Charge le catalogue si nécessaire, puis la sélection actuelle
@@ -2365,16 +2789,39 @@ function initCreneaux() {
   loadSlots();
 }
 
+// Actualisation automatique dès que la date change (picker ou flèches)
+document.getElementById('slot-date-input').addEventListener('change', loadSlots);
+
+function shiftSlotDate(delta) {
+  const input = document.getElementById('slot-date-input');
+  const d = new Date((input.value || new Date().toISOString().split('T')[0]) + 'T12:00:00');
+  d.setDate(d.getDate() + delta);
+  input.value = d.toISOString().split('T')[0];
+  loadSlots();
+}
+
 async function loadSlots() {
   const date = document.getElementById('slot-date-input').value;
   if (!date) return;
   const body = document.getElementById('slots-body');
   body.innerHTML = `<div class="empty-state" style="padding:30px"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#cbd5e1;animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></div>`;
   const res = await apiFetch(`/api/admin/slots?date=${date}`);
-  const slots = await res.json();
-  document.getElementById('slot-count').textContent = `${slots.length} créneau${slots.length !== 1 ? 'x' : ''}`;
+  const { blocked, slots } = await res.json();
+  document.getElementById('slot-count').textContent = blocked
+    ? 'Jour bloqué'
+    : `${slots.length} créneau${slots.length !== 1 ? 'x' : ''}`;
+
+  if (blocked) {
+    body.innerHTML = `<div class="empty-state" style="padding:40px">
+      <svg width="32" height="32" fill="none" stroke="#dc2626" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+      <p style="color:#dc2626;font-weight:600">Jour bloqué — aucun créneau proposé aux clients</p>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="unblockDay()">Débloquer ce jour</button>
+    </div>`;
+    return;
+  }
+
   if (!slots.length) {
-    body.innerHTML = `<div class="empty-state" style="padding:40px"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#cbd5e1"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p>Aucun créneau ce jour</p></div>`;
+    body.innerHTML = `<div class="empty-state" style="padding:40px"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#cbd5e1"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p>Aucun créneau ce jour — les créneaux par défaut seront créés à la première visite d'un client</p></div>`;
     return;
   }
   body.innerHTML = slots.map(s => `
@@ -2421,8 +2868,15 @@ async function deleteSlot(id) {
 async function blockDay() {
   const date = document.getElementById('slot-date-input').value;
   if (!date) { alert('Sélectionnez d\'abord une date.'); return; }
-  if (!confirm(`Supprimer tous les créneaux du ${date} ? Les commandes existantes ne seront pas affectées.`)) return;
+  if (!confirm(`Bloquer le ${date} ?\nSes créneaux seront supprimés et aucun ne sera proposé aux clients ce jour-là (l'auto-création est désactivée).\nLes commandes existantes ne seront pas affectées.`)) return;
   await apiFetch(`/api/admin/slots?date=${date}`, { method: 'DELETE' });
+  loadSlots();
+}
+
+async function unblockDay() {
+  const date = document.getElementById('slot-date-input').value;
+  if (!date) return;
+  await apiFetch(`/api/admin/blocked-days/${date}`, { method: 'DELETE' });
   loadSlots();
 }
 

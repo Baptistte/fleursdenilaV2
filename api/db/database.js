@@ -56,6 +56,10 @@ db.exec(`
     value TEXT
   );
 
+  CREATE TABLE IF NOT EXISTS blocked_dates (
+    date TEXT PRIMARY KEY
+  );
+
   CREATE TABLE IF NOT EXISTS calendar_tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,

@@ -14,6 +14,10 @@ router.get('/', (req, res) => {
   const { date } = req.query;
   if (!date) return res.status(400).json({ error: 'Paramètre date requis' });
 
+  // Jour bloqué par l'admin : aucun créneau, et surtout pas d'auto-création
+  const blocked = db.prepare('SELECT 1 FROM blocked_dates WHERE date = ?').get(date);
+  if (blocked) return res.json([]);
+
   const existing = db.prepare('SELECT COUNT(*) as n FROM slots WHERE date = ?').get(date);
   if (existing.n === 0) {
     const insert = db.prepare('INSERT INTO slots (date, start_time, end_time) VALUES (?, ?, ?)');

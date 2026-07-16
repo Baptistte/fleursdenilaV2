@@ -49,6 +49,13 @@ app.use('/api/tasks', require('./routes/tasks'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
+// Configuration publique de la boutique (lue par le front à chaque page)
+app.get('/api/config', (req, res) => {
+  const row = db.prepare("SELECT value FROM settings WHERE key = 'free_delivery_threshold'").get();
+  const threshold = parseFloat(row?.value);
+  res.json({ freeDeliveryThreshold: Number.isFinite(threshold) && threshold >= 0 ? threshold : 60 });
+});
+
 app.listen(PORT, () => {
   console.log(`API Fleurs de Nila démarrée sur http://localhost:${PORT}`);
 });

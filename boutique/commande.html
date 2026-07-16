@@ -212,7 +212,13 @@
 
   <script>
     const API = 'http://localhost:3000';
-    const DELIVERY_THRESHOLD = 60;
+    let DELIVERY_THRESHOLD = 60;   // valeur par défaut, remplacée par le réglage admin via /api/config
+    fetch(`${API}/api/config`).then(r => r.json()).then(c => {
+      if (Number.isFinite(c.freeDeliveryThreshold)) {
+        DELIVERY_THRESHOLD = c.freeDeliveryThreshold;
+        renderSummary();
+      }
+    }).catch(() => {});
     const DELIVERY_PRICE = 5;
 
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');

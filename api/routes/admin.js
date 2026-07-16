@@ -136,6 +136,67 @@ router.patch('/orders/:id/status', (req, res) => {
   res.json({ ok: true, status });
 });
 
+// Normalise un numéro FR pour regrouper les commandes d'un même client :
+// « +33 6 12 34 56 78 », « 06.12.34.56.78 » et « 0612345678 » → « 0612345678 »
+function normalizePhone(phone) {
+  if (!phone) return null;
+  let digits = String(phone).replace(/\D/g, '');
+  if (digits.startsWith('33') && digits.length === 11) digits = '0' + digits.slice(2);
+  return digits.length === 10 ? digits : (digits || null);
+}
+
+// GET /api/admin/customers — fiche client par numéro de téléphone
+// Agrège toutes les commandes ; chaque client embarque son historique.
+router.get('/customers', (req, res) => {
+  const orders = db.prepare(`
+    SELECT o.*, s.date AS slot_date, s.start_time, s.end_time
+    FROM orders o LEFT JOIN slots s ON o.slot_id = s.id
+    WHERE o.customer_phone IS NOT NULL AND o.customer_phone != ''
+    ORDER BY o.created_at DESC
+  `).all();
+
+  const map = new Map();
+  for (const o of orders) {
+    const key = normalizePhone(o.customer_phone);
+    if (!key) continue;
+    let c = map.get(key);
+    if (!c) {
+      c = {
+        phone: key,
+        phoneDisplay: o.customer_phone,
+        name: o.customer_name,          // nom de la commande la plus récente
+        email: o.customer_email || '',
+        ordersCount: 0,
+        paidCount: 0,
+        totalSpent: 0,                  // somme des commandes payées uniquement
+        lastOrderAt: o.created_at,
+        orders: []
+      };
+      map.set(key, c);
+    }
+    if (!c.email && o.customer_email) c.email = o.customer_email;
+    c.ordersCount++;
+    if (o.status === 'paid') { c.paidCount++; c.totalSpent += o.total; }
+    let items = [];
+    try { items = JSON.parse(o.items); } catch { items = []; }
+    c.orders.push({
+      id: o.id,
+      total: o.total,
+      status: o.status,
+      validated: o.validated,
+      delivery_type: o.delivery_type,
+      created_at: o.created_at,
+      slot: o.slot_date ? `${o.slot_date} ${o.start_time || ''}` : null,
+      items
+    });
+  }
+
+  const customers = [...map.values()];
+  customers.forEach(c => { c.totalSpent = Math.round(c.totalSpent * 100) / 100; });
+  customers.sort((a, b) => b.lastOrderAt.localeCompare(a.lastOrderAt));
+  res.json(customers);
+});
+
 // PATCH /api/admin/orders/:id/validate — valider ou refuser le créneau d'une commande payée
 // Body : { action: 'accept' | 'refuse' }
 // Refus : commande annulée, créneau libéré, stocks restitués (le remboursement SumUp reste manuel).
@@ -188,22 +249,23 @@ router.get('/tournee', (req, res) => {
 });
 
 // GET /api/admin/slots — tous les créneaux
+// Avec ?date= : { blocked, slots } pour que l'admin voie l'état « jour bloqué »
 router.get('/slots', (req, res) => {
   const { date } = req.query;
-  const query = date
-    ? 'SELECT * FROM slots WHERE date = ? ORDER BY start_time ASC'
-    : 'SELECT * FROM slots ORDER BY date ASC, start_time ASC';
-  const slots = date
-    ? db.prepare(query).all(date)
-    : db.prepare(query).all();
-  res.json(slots);
+  if (date) {
+    const blocked = !!db.prepare('SELECT 1 FROM blocked_dates WHERE date = ?').get(date);
+    const slots = db.prepare('SELECT * FROM slots WHERE date = ? ORDER BY start_time ASC').all(date);
+    return res.json({ blocked, slots });
+  }
+  res.json(db.prepare('SELECT * FROM slots ORDER BY date ASC, start_time ASC').all());
 });
 
-// POST /api/admin/slots — créer un créneau
+// POST /api/admin/slots — créer un créneau (débloque le jour : action explicite de l'admin)
 router.post('/slots', (req, res) => {
   const { date, start_time, end_time } = req.body;
   if (!date || !start_time || !end_time) return res.status(400).json({ error: 'date, start_time et end_time requis' });
 
+  db.prepare('DELETE FROM blocked_dates WHERE date = ?').run(date);
   const result = db.prepare(
     'INSERT INTO slots (date, start_time, end_time) VALUES (?, ?, ?)'
   ).run(date, start_time, end_time);
@@ -230,6 +292,7 @@ router.post('/slots/recurring', (req, res) => {
 
   const wanted = new Set(weekdays.map(Number));
   const exists = db.prepare('SELECT 1 FROM slots WHERE date = ? AND start_time = ? AND end_time = ?');
+  const isBlocked = db.prepare('SELECT 1 FROM blocked_dates WHERE date = ?');
   const insert = db.prepare('INSERT INTO slots (date, start_time, end_time) VALUES (?, ?, ?)');
 
   let created = 0, skipped = 0;
@@ -238,7 +301,8 @@ router.post('/slots/recurring', (req, res) => {
     for (let i = 0; i < days; i++) {
       if (wanted.has(d.getUTCDay())) {
         const iso = d.toISOString().split('T')[0];
-        if (exists.get(iso, start_time, end_time)) skipped++;
+        // Les jours bloqués par l'admin sont ignorés (comme les doublons)
+        if (exists.get(iso, start_time, end_time) || isBlocked.get(iso)) skipped++;
         else { insert.run(iso, start_time, end_time); created++; }
       }
       d.setUTCDate(d.getUTCDate() + 1);
@@ -257,12 +321,46 @@ router.delete('/slots/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-// DELETE /api/admin/slots?date=YYYY-MM-DD — bloquer un jour entier (supprimer tous ses créneaux)
+// DELETE /api/admin/slots?date=YYYY-MM-DD — bloquer un jour entier :
+// supprime ses créneaux ET marque la date bloquée (sinon l'auto-création les recrée)
 router.delete('/slots', (req, res) => {
   const { date } = req.query;
   if (!date) return res.status(400).json({ error: 'Paramètre date requis' });
-  const info = db.prepare('DELETE FROM slots WHERE date = ?').run(date);
-  res.json({ ok: true, deleted: info.changes });
+  const block = db.transaction(() => {
+    const info = db.prepare('DELETE FROM slots WHERE date = ?').run(date);
+    db.prepare('INSERT OR IGNORE INTO blocked_dates (date) VALUES (?)').run(date);
+    return info.changes;
+  });
+  res.json({ ok: true, deleted: block() });
+});
+
+// DELETE /api/admin/blocked-days/:date — débloquer un jour
+// (les créneaux par défaut seront recréés à la prochaine consultation client,
+//  ou l'admin peut en créer manuellement)
+router.delete('/blocked-days/:date', (req, res) => {
+  db.prepare('DELETE FROM blocked_dates WHERE date = ?').run(req.params.date);
+  res.json({ ok: true });
+});
+
+// GET /api/admin/settings — réglages de la boutique
+router.get('/settings', (req, res) => {
+  const row = db.prepare("SELECT value FROM settings WHERE key = 'free_delivery_threshold'").get();
+  const v = parseFloat(row?.value);
+  res.json({ freeDeliveryThreshold: Number.isFinite(v) && v >= 0 ? v : 60 });
+});
+
+// PUT /api/admin/settings — mettre à jour les réglages
+router.put('/settings', (req, res) => {
+  const { freeDeliveryThreshold } = req.body;
+  const v = parseFloat(freeDeliveryThreshold);
+  if (!Number.isFinite(v) || v < 0 || v > 10000) {
+    return res.status(400).json({ error: 'Seuil invalide (entre 0 et 10 000 €)' });
+  }
+  db.prepare(`
+    INSERT INTO settings (key, value) VALUES ('free_delivery_threshold', ?)
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value
+  `).run(String(v));
+  res.json({ ok: true, freeDeliveryThreshold: v });
 });
 
 module.exports = router;

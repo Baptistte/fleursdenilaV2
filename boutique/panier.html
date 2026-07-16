@@ -168,8 +168,13 @@
   </footer>
 
   <script>
-    const DELIVERY_THRESHOLD = 60;   // livraison offerte au-dessus de ce montant
-    const DELIVERY_PRICE     = 5;    // frais de livraison en dessous du seuil
+    let DELIVERY_THRESHOLD = 60;   // valeur par défaut, remplacée par le réglage admin via /api/config
+    fetch('http://localhost:3000/api/config').then(r => r.json()).then(c => {
+      if (Number.isFinite(c.freeDeliveryThreshold)) {
+        DELIVERY_THRESHOLD = c.freeDeliveryThreshold;
+        render();
+      }
+    }).catch(() => {});
 
     function getCart() {
       return JSON.parse(localStorage.getItem('cart') || '[]');
@@ -190,7 +195,7 @@
     }
 
     function optionsLabel(options) {
-      return Object.entries(options)
+      return Object.entries(options || {})
         .map(([k, v]) => `${k} : ${v}`)
         .join(' · ');
     }
@@ -227,19 +232,19 @@
     function renderSummary(cart) {
       const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
       const freeDelivery = subtotal >= DELIVERY_THRESHOLD;
-      const deliveryCost = freeDelivery ? 0 : DELIVERY_PRICE;
-      const total = subtotal + deliveryCost;
 
+      // Les frais réels dépendent de la commune (10–15 €) et sont calculés à
+      // l'étape livraison — on n'affiche pas de montant arbitraire ici.
       document.getElementById('subtotal').textContent = subtotal.toFixed(2) + ' €';
-      document.getElementById('total').textContent = total.toFixed(2) + ' €';
+      document.getElementById('total').textContent = subtotal.toFixed(2) + ' €' + (freeDelivery ? '' : ' *');
 
       const deliveryEl = document.getElementById('delivery-cost');
       if (freeDelivery) {
         deliveryEl.textContent = 'Offerte';
         deliveryEl.className = 'text-green-700 text-sm';
       } else {
-        deliveryEl.textContent = deliveryCost.toFixed(2) + ' €';
-        deliveryEl.className = 'text-sm';
+        deliveryEl.textContent = '* selon la commune, à l\'étape suivante';
+        deliveryEl.className = 'text-xs text-gray-400';
       }
 
       // Barre de progression

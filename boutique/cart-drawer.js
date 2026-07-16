@@ -1,7 +1,13 @@
 /* Volet panier — chargé dans toutes les pages boutique */
 (function () {
-  const DELIVERY_THRESHOLD = 60;
-  const DELIVERY_PRICE = 5;
+  let DELIVERY_THRESHOLD = 60;   // valeur par défaut, remplacée par le réglage admin via /api/config
+
+  fetch('http://localhost:3000/api/config').then(r => r.json()).then(c => {
+    if (Number.isFinite(c.freeDeliveryThreshold)) {
+      DELIVERY_THRESHOLD = c.freeDeliveryThreshold;
+      if (typeof renderDrawer === 'function') renderDrawer();
+    }
+  }).catch(() => {});
 
   /* ── Injection HTML ── */
   const style = document.createElement('style');
@@ -242,10 +248,9 @@
         </div>`;
     }).join('');
 
-    // Totaux
+    // Totaux — les frais réels dépendent de la commune (calculés à l'étape livraison)
     const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
     const remaining = Math.max(0, DELIVERY_THRESHOLD - sub);
-    const delivery = remaining > 0 ? DELIVERY_PRICE : 0;
     const pct = Math.min(100, (sub / DELIVERY_THRESHOLD) * 100);
 
     document.getElementById('delivery-bar-fill').style.width = pct + '%';
@@ -255,8 +260,8 @@
 
     document.getElementById('cart-totals').innerHTML = `
       <div class="cart-total-row"><span>Sous-total</span><span>${sub.toFixed(2)} €</span></div>
-      ${delivery > 0 ? `<div class="cart-total-row"><span>Livraison</span><span>${delivery.toFixed(2)} €</span></div>` : ''}
-      <div class="cart-total-row main"><span>Total</span><span>${(sub + delivery).toFixed(2)} €</span></div>`;
+      ${remaining > 0 ? `<div class="cart-total-row" style="font-size:11px;color:#9b8f80"><span>Livraison selon la commune</span><span>à l'étape suivante</span></div>` : ''}
+      <div class="cart-total-row main"><span>Total${remaining > 0 ? ' (hors livraison)' : ''}</span><span>${sub.toFixed(2)} €</span></div>`;
 
     footerEl.style.display = 'block';
 
