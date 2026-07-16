@@ -141,7 +141,10 @@
 
     /* ──────────────────── TOPBAR ──────────────────── */
     #topbar {
-      height: 62px; background: var(--white);
+      /* flex-shrink: 0 est indispensable : #main est un conteneur flex contraint
+         à la hauteur de la fenêtre, sans quoi le bandeau se fait comprimer
+         proportionnellement à la longueur du contenu (hauteur variable). */
+      height: 62px; flex-shrink: 0; background: var(--white);
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center;
       padding: 0 32px; gap: 14px;
@@ -183,7 +186,7 @@
     /* ──────────────────── KPI GRID ──────────────────── */
     .kpi-grid {
       display: grid;
-      grid-template-columns: 1.15fr 1fr 1fr 1fr;
+      grid-template-columns: repeat(4, 1fr);   /* 4 cartes strictement identiques */
       gap: 16px;
       margin-bottom: 24px;
     }
