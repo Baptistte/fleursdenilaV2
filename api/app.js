@@ -55,6 +55,7 @@ app.use('/api/webhook', require('./routes/webhook'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tasks', require('./routes/tasks'));
+app.use('/api/track', require('./routes/track'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

@@ -410,6 +410,28 @@
     updateCartBadge();
     renderSummary();
     renderSlotRecap();
+
+    // Amélioration continue : enregistre l'arrivée sur la page paiement
+    // (créneau validé à l'étape 2). Anonyme, dédupliqué par réservation
+    // pour ne pas compter les rechargements de page.
+    (function trackPaymentPageReached() {
+      if (!orderSlot) return;
+      const key = orderSlot.slotToken || `${orderSlot.slotId}-${orderSlot.date}`;
+      if (sessionStorage.getItem('tracked_payment_page') === key) return;
+      sessionStorage.setItem('tracked_payment_page', key);
+      const { total } = cartTotal();
+      fetch(`${API}/api/track`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event: 'payment_page_reached',
+          slotId: orderSlot.slotId,
+          mode: orderSlot.mode,
+          cartTotal: total,
+          itemsCount: cart.reduce((s, i) => s + i.qty, 0)
+        })
+      }).catch(() => {});
+    })();
   </script>
   <script src="../script.js"></script>
   <script src="cart-drawer.js?v=2"></script>

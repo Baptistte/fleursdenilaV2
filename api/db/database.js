@@ -62,6 +62,18 @@ db.exec(`
     date TEXT PRIMARY KEY
   );
 
+  -- Événements du tunnel de commande (amélioration continue, non affiché en admin).
+  -- Ex. : 'payment_page_reached' = le client a validé son créneau et atteint l'étape paiement.
+  CREATE TABLE IF NOT EXISTS checkout_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event TEXT NOT NULL,
+    slot_id INTEGER,
+    mode TEXT,
+    cart_total REAL,
+    items_count INTEGER,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
   -- Réservations temporaires de créneau (10 min) : plusieurs clients peuvent
   -- retenir le même créneau tant que sa capacité n'est pas atteinte.
   CREATE TABLE IF NOT EXISTS slot_holds (
