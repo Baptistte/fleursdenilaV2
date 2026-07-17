@@ -772,6 +772,22 @@
     });
 
     // --- Init ---
+    // Retour depuis l'étape paiement : libère l'ancienne réservation de créneau
+    // pour ne pas laisser une place occupée pendant 10 min.
+    (function releaseStaleHold() {
+      try {
+        const prev = JSON.parse(localStorage.getItem('order_slot') || 'null');
+        if (prev?.slotToken) {
+          fetch(`${API}/api/cart/release-slot`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slotId: prev.slotId, token: prev.slotToken })
+          }).catch(() => {});
+          localStorage.removeItem('order_slot');
+        }
+      } catch { /* données corrompues : ignorées */ }
+    })();
+
     updateCartBadge();
     buildDateTabs();
     setMode('delivery');   // établit la visibilité initiale (zone à choisir, créneaux masqués)
