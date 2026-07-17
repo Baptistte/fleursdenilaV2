@@ -62,6 +62,20 @@ db.exec(`
     date TEXT PRIMARY KEY
   );
 
+  -- Journal des messages sortants (emails, et SMS à l'avenir).
+  -- status : 'sent' (parti via Resend) | 'simulated' (pas de clé configurée) | 'failed'
+  CREATE TABLE IF NOT EXISTS messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    channel TEXT NOT NULL DEFAULT 'email' CHECK(channel IN ('email', 'sms')),
+    template TEXT NOT NULL,
+    recipient TEXT NOT NULL,
+    subject TEXT,
+    order_id INTEGER,
+    status TEXT NOT NULL CHECK(status IN ('sent', 'simulated', 'failed')),
+    error TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
   -- Événements du tunnel de commande (amélioration continue, non affiché en admin).
   -- Ex. : 'payment_page_reached' = le client a validé son créneau et atteint l'étape paiement.
   CREATE TABLE IF NOT EXISTS checkout_events (

@@ -955,6 +955,10 @@
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
       <span>Factures</span>
     </button>
+    <button class="nav-item" data-section="messages">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      <span>Messages</span>
+    </button>
     <div class="sb-section">Planning</div>
     <button class="nav-item" data-section="creneaux">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -1431,6 +1435,74 @@
       </div>
     </div>
 
+    <!-- ─── SECTION MESSAGES ─── -->
+    <div id="section-messages" class="section">
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:40px;height:40px;border-radius:11px;background:#e0e7ff;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="20" height="20" fill="none" stroke="#4338ca" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <div style="flex:1">
+          <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px">Emails &amp; SMS</h2>
+          <div style="font-size:12px;color:#94a3b8">Templates, envois manuels et historique de tout ce qui part vers vos clients</div>
+        </div>
+        <span id="mailer-mode" class="badge badge-amber">…</span>
+      </div>
+
+      <!-- Statistiques -->
+      <div id="msg-stats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
+
+        <!-- Historique -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Historique des envois</h2>
+            <span id="msg-count" class="badge badge-navy"></span>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr><th>Date</th><th>Canal</th><th>Template</th><th>Destinataire</th><th>Commande</th><th>Statut</th></tr>
+            </thead>
+            <tbody id="msg-tbody">
+              <tr><td colspan="6"><div class="empty-state"><p>Chargement…</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:20px">
+
+          <!-- Envoi manuel -->
+          <div class="card">
+            <div class="card-header"><h2>Envoyer un message</h2></div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div class="task-field">
+                <label class="task-field label">Template</label>
+                <select id="send-template" class="task-input"></select>
+              </div>
+              <div class="task-field">
+                <label class="task-field label">Email du destinataire</label>
+                <input type="email" id="send-to" class="task-input" placeholder="client@exemple.fr">
+              </div>
+              <div id="send-params" style="display:flex;flex-direction:column;gap:12px"></div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="sendManualMessage()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                Envoyer
+              </button>
+              <p id="send-result" style="display:none;font-size:11px;color:#16a34a"></p>
+            </div>
+          </div>
+
+          <!-- Catalogue des templates -->
+          <div class="card">
+            <div class="card-header"><h2>Templates du workflow</h2></div>
+            <div id="tpl-list" style="padding:6px 0"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <!-- ─── SECTION CRÉNEAUX ─── -->
     <div id="section-creneaux" class="section">
 
@@ -1849,13 +1921,14 @@ function navigate(section) {
   document.querySelector(`.nav-item[data-section="${section}"]`)?.classList.add('active');
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(`section-${section}`)?.classList.add('active');
-  const titles = { dashboard: 'Tableau de bord', produits: 'Produits', accueil: 'Boutique page accueil', commandes: 'Commandes', clients: 'Clients', factures: 'Factures', creneaux: 'Créneaux', tournee: 'Tournée', agenda: 'Emploi du temps' };
+  const titles = { dashboard: 'Tableau de bord', produits: 'Produits', accueil: 'Boutique page accueil', commandes: 'Commandes', clients: 'Clients', factures: 'Factures', messages: 'Emails & SMS', creneaux: 'Créneaux', tournee: 'Tournée', agenda: 'Emploi du temps' };
   document.getElementById('page-title').textContent = titles[section] || section;
   if (section === 'produits') loadProducts();
   if (section === 'accueil') { loadHomeProducts(); loadSettings(); }
   if (section === 'commandes') loadOrders();
   if (section === 'clients') loadClients();
   if (section === 'factures') loadFactures();
+  if (section === 'messages') loadMessagesPanel();
   if (section === 'creneaux') initCreneaux();
   if (section === 'tournee') initTournee();
   if (section === 'agenda') { calCurrentDate = new Date(); renderCalendar(); }
@@ -2224,6 +2297,140 @@ function openInvoice(ids) {
   if (!w) { alert('Autorisez les popups pour afficher la facture.'); return; }
   w.document.write(html);
   w.document.close();
+}
+
+// ═══════════════════════ MESSAGES (EMAILS / SMS) ═══════════════════════
+let _msgTemplates = [];
+
+async function loadMessagesPanel() {
+  try {
+    const [msgRes, tplRes] = await Promise.all([
+      apiFetch('/api/admin/messages?limit=100'),
+      apiFetch('/api/admin/messages/templates')
+    ]);
+    const { stats, messages, mailerConfigured } = await msgRes.json();
+    _msgTemplates = await tplRes.json();
+
+    // Mode d'envoi
+    const mode = document.getElementById('mailer-mode');
+    mode.textContent = mailerConfigured ? 'Envois réels activés' : 'Mode simulation (aucun email ne part)';
+    mode.className = 'badge ' + (mailerConfigured ? 'badge-green' : 'badge-amber');
+
+    // Statistiques
+    const stat = (label, val, color) => `
+      <div style="flex:1;min-width:120px;background:#fff;border:1px solid var(--border);border-radius:11px;padding:12px 16px">
+        <div style="font-size:20px;font-weight:700;color:${color}">${val}</div>
+        <div style="font-size:11px;color:#94a3b8">${label}</div>
+      </div>`;
+    document.getElementById('msg-stats').innerHTML =
+      stat('Messages au total', stats.total, 'var(--text)') +
+      stat('Envoyés', stats.sent, '#16a34a') +
+      stat('Simulés', stats.simulated, '#b45309') +
+      stat('Échecs', stats.failed, '#dc2626') +
+      stat('30 derniers jours', stats.last30d, 'var(--navy2)');
+
+    renderMessagesLog(messages);
+    renderTemplateCatalogue();
+    fillSendForm();
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function tplLabel(name) {
+  return _msgTemplates.find(t => t.name === name)?.label || name;
+}
+
+function msgStatusBadge(st) {
+  if (st === 'sent')      return '<span class="badge badge-green">Envoyé</span>';
+  if (st === 'simulated') return '<span class="badge badge-amber">Simulé</span>';
+  return '<span class="badge badge-red">Échec</span>';
+}
+
+function renderMessagesLog(messages) {
+  const tbody = document.getElementById('msg-tbody');
+  document.getElementById('msg-count').textContent = `${messages.length} message${messages.length !== 1 ? 's' : ''}`;
+  if (!messages.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state" style="padding:32px"><p>Aucun message pour l'instant — ils apparaîtront ici dès la première commande.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = messages.map(m => `
+    <tr title="${m.error ? String(m.error).replace(/"/g, '&quot;') : ''}">
+      <td style="font-size:12px;color:#94a3b8;white-space:nowrap">${new Date(m.created_at + 'Z').toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+      <td><span class="badge badge-gray">${m.channel === 'email' ? '✉ Email' : '📱 SMS'}</span></td>
+      <td style="font-size:12px;font-weight:600">${tplLabel(m.template)}</td>
+      <td style="font-size:12px;color:#64748b;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.recipient}</td>
+      <td style="font-size:12px;color:#94a3b8">${m.order_id ? '#' + m.order_id : '—'}</td>
+      <td>${msgStatusBadge(m.status)}</td>
+    </tr>`).join('');
+}
+
+function renderTemplateCatalogue() {
+  document.getElementById('tpl-list').innerHTML = _msgTemplates.map(t => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #f8fafc">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12.5px;font-weight:600;color:var(--text)">${t.label}
+          <span class="badge ${t.auto ? 'badge-navy' : 'badge-gray'}" style="margin-left:4px">${t.internal ? 'Interne' : t.auto ? 'Auto' : 'Manuel'}</span>
+        </div>
+        <div style="font-size:11px;color:#94a3b8;line-height:1.4">${t.description}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="previewTemplate('${t.name}')">Aperçu</button>
+    </div>`).join('');
+}
+
+async function previewTemplate(name) {
+  const res = await apiFetch(`/api/admin/messages/preview/${name}`);
+  const html = await res.text();
+  const w = window.open('', '_blank');
+  if (!w) { alert('Autorisez les popups pour voir l\'aperçu.'); return; }
+  w.document.write(html);
+  w.document.close();
+}
+
+function fillSendForm() {
+  const sel = document.getElementById('send-template');
+  const manual = _msgTemplates.filter(t => !t.internal);
+  sel.innerHTML = manual.map(t => `<option value="${t.name}">${t.label}${t.auto ? ' (renvoi — n° de commande requis)' : ''}</option>`).join('');
+  sel.onchange = renderSendParams;
+  renderSendParams();
+}
+
+function renderSendParams() {
+  const t = _msgTemplates.find(x => x.name === document.getElementById('send-template').value);
+  const box = document.getElementById('send-params');
+  if (!t) { box.innerHTML = ''; return; }
+  let html = '';
+  if (t.auto) {
+    html += `<div class="task-field"><label class="task-field label">N° de commande</label>
+      <input type="number" class="task-input send-param" data-key="orderId" placeholder="ex. 42"></div>`;
+  }
+  (t.params || []).forEach(p => {
+    html += `<div class="task-field"><label class="task-field label">${p.label}</label>
+      <input type="text" class="task-input send-param" data-key="${p.key}"></div>`;
+  });
+  box.innerHTML = html;
+}
+
+async function sendManualMessage() {
+  const template = document.getElementById('send-template').value;
+  const to = document.getElementById('send-to').value.trim();
+  if (!to) { alert('Renseignez l\'email du destinataire.'); return; }
+  const params = {};
+  document.querySelectorAll('.send-param').forEach(i => { if (i.value.trim()) params[i.dataset.key] = i.value.trim(); });
+
+  const res = await apiFetch('/api/admin/messages/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ template, to, params })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) { alert(data.error || 'Erreur lors de l\'envoi.'); return; }
+  const el = document.getElementById('send-result');
+  el.textContent = data.status === 'sent' ? '✓ Email envoyé' : '✓ Enregistré (mode simulation : rien ne part réellement)';
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+  document.getElementById('send-to').value = '';
+  loadMessagesPanel();
 }
 
 // ═══════════════════════ CRÉNEAUX RÉCURRENTS ═══════════════════════

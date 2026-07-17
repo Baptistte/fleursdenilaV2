@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
 const { feeForZip } = require('../deliveryZones');
+const { sendOrderEmails } = require('../services/mailer');
 
 // Seuil de livraison offerte : réglable depuis l'admin (settings), 60 € par défaut
 function freeDeliveryThreshold() {
@@ -151,9 +152,11 @@ router.post('/', async (req, res) => {
       for (const item of pricedCart) updateStock.run(item.qty, item.id);
       return result.lastInsertRowid;
     });
+    const orderId = createOrder();
+    sendOrderEmails('order_paid', orderId, { notifyAdmin: true });
     return res.json({
       simulation: true,
-      orderId: createOrder()
+      orderId
     });
   }
 

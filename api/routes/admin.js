@@ -6,6 +6,7 @@ const multer = require('multer');
 const db = require('../db/database');
 const requireAdmin = require('../middleware/requireAdmin');
 const { purgeExpiredHolds, takenCount, defaultCapacity } = require('../services/slotAvailability');
+const { TEMPLATES, renderTemplate, sendEmail, sendOrderEmails, sampleData } = require('../services/mailer');
 
 router.use(requireAdmin);
 
@@ -263,6 +264,7 @@ router.patch('/orders/:id/validate', (req, res) => {
 
   if (action === 'accept') {
     db.prepare('UPDATE orders SET validated = 1 WHERE id = ?').run(order.id);
+    sendOrderEmails('order_validated', order.id);
     return res.json({ ok: true, validated: true });
   }
 
@@ -276,6 +278,7 @@ router.patch('/orders/:id/validate', (req, res) => {
     for (const item of items) restock.run(item.qty, item.id);
   });
   refuse();
+  sendOrderEmails('order_refused', order.id);
 
   res.json({ ok: true, refused: true });
 });
@@ -418,6 +421,72 @@ router.delete('/slots', (req, res) => {
 router.delete('/blocked-days/:date', (req, res) => {
   db.prepare('DELETE FROM blocked_dates WHERE date = ?').run(req.params.date);
   res.json({ ok: true });
+});
+
+// ── Panneau Messages (emails / SMS) ────────────────────────────────────
+
+// GET /api/admin/messages — journal + statistiques
+router.get('/messages', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 100, 500);
+  const messages = db.prepare(`
+    SELECT * FROM messages ORDER BY id DESC LIMIT ?
+  `).all(limit);
+
+  const stats = {
+    total:     db.prepare('SELECT COUNT(*) n FROM messages').get().n,
+    sent:      db.prepare("SELECT COUNT(*) n FROM messages WHERE status = 'sent'").get().n,
+    simulated: db.prepare("SELECT COUNT(*) n FROM messages WHERE status = 'simulated'").get().n,
+    failed:    db.prepare("SELECT COUNT(*) n FROM messages WHERE status = 'failed'").get().n,
+    last30d:   db.prepare("SELECT COUNT(*) n FROM messages WHERE created_at > datetime('now', '-30 days')").get().n,
+    byTemplate: db.prepare('SELECT template, COUNT(*) n FROM messages GROUP BY template ORDER BY n DESC').all(),
+  };
+
+  res.json({ stats, messages, mailerConfigured: !!process.env.RESEND_API_KEY });
+});
+
+// GET /api/admin/messages/templates — catalogue des templates
+router.get('/messages/templates', (req, res) => {
+  res.json(Object.entries(TEMPLATES).map(([name, t]) => ({
+    name,
+    label: t.label,
+    description: t.description,
+    auto: !!t.auto,
+    internal: !!t.internal,
+    params: t.params || []
+  })));
+});
+
+// GET /api/admin/messages/preview/:template — aperçu HTML avec données factices
+router.get('/messages/preview/:template', (req, res) => {
+  if (!TEMPLATES[req.params.template]) return res.status(404).json({ error: 'Template inconnu' });
+  const { html } = renderTemplate(req.params.template, sampleData(req.params.template));
+  res.type('html').send(html);
+});
+
+// POST /api/admin/messages/send — envoi manuel (remerciement, code cadeau…)
+router.post('/messages/send', async (req, res) => {
+  const { template, to, params = {} } = req.body;
+  const t = TEMPLATES[template];
+  if (!t) return res.status(400).json({ error: 'Template inconnu' });
+  if (t.internal) return res.status(400).json({ error: 'Template interne, non envoyable manuellement' });
+  if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+    return res.status(400).json({ error: 'Adresse email invalide' });
+  }
+
+  // Les templates automatiques liés à une commande exigent un orderId pour être renvoyés
+  let data = { ...params };   // manuels : uniquement les champs saisis (les templates gèrent les absents)
+  if (t.auto) {
+    const orderId = parseInt(params.orderId);
+    if (!Number.isInteger(orderId)) return res.status(400).json({ error: 'orderId requis pour renvoyer ce template' });
+    const { orderEmailData } = require('../services/mailer');
+    const d = orderEmailData(orderId);
+    if (!d) return res.status(404).json({ error: 'Commande introuvable' });
+    data = d;
+  }
+
+  const result = await sendEmail({ template, to, data, orderId: t.auto ? parseInt(params.orderId) : null });
+  if (result.status === 'failed') return res.status(502).json({ error: `Échec de l'envoi : ${result.error}` });
+  res.status(201).json({ ok: true, status: result.status });
 });
 
 // GET /api/admin/settings — réglages de la boutique

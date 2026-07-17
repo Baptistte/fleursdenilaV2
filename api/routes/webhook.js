@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const db = require('../db/database');
+const { sendOrderEmails } = require('../services/mailer');
 
 // SumUp envoie du JSON brut — on a besoin du body raw pour vérifier la signature HMAC
 router.post('/sumup', express.raw({ type: 'application/json' }), (req, res) => {
@@ -59,6 +60,7 @@ router.post('/sumup', express.raw({ type: 'application/json' }), (req, res) => {
   });
 
   confirm();
+  sendOrderEmails('order_paid', order.id, { notifyAdmin: true });
   console.log(`Commande #${order.id} confirmée (paiement SumUp ${checkoutId})`);
 
   res.json({ received: true });

@@ -121,10 +121,22 @@ La prod finale sur VPS LWS + PostgreSQL reste le plan du CDC (Phase 7).
       sont toujours là (volume OK)
 - [ ] Noter les retours de Manon → itérations
 
+### Emails (Phase 5) — infrastructure faite le 18/07, activation à la demande
+- [x] 6 templates HTML aux couleurs de la marque : confirmation de commande, créneau
+      confirmé, commande annulée, remerciement, code cadeau, alerte interne Manon
+- [x] Envois automatiques câblés (paiement → confirmation + alerte ; validation →
+      confirmé ; refus → annulation) + envois manuels depuis l'admin
+- [x] Panneau admin « Messages » : statistiques, historique, aperçus, envoi manuel
+- [x] Mode simulation par défaut : tout est journalisé, rien ne part
+- [ ] **Pour activer les vrais envois** : créer un compte https://resend.com, vérifier
+      le domaine d'envoi, puis ajouter sur Railway :
+      `RESEND_API_KEY`, `MAIL_FROM` (ex. `Fleurs de Nila <contact@fleursdenila.fr>`),
+      `ADMIN_NOTIF_EMAIL` (adresse de Manon pour les alertes commandes)
+- [ ] SMS : la table `messages` gère déjà le canal, l'envoi reste à brancher (Brevo/Twilio)
+
 ### Rappels pour la bascule en prod (hors périmètre test)
 - Migration SQLite → PostgreSQL, VPS LWS + PM2 + Nginx, DNS `api.fleursdenila.fr`,
   SSL Let's Encrypt, clés SumUp **live** + webhook vérifié (cf. `plan-technique.md`, Phase 7)
-- Emails Resend (Phase 5) — toujours à faire
 
 ---
 
