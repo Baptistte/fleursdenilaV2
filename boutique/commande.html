@@ -226,8 +226,16 @@
     }).catch(() => {});
     const DELIVERY_PRICE = 5;
 
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const orderSlot = JSON.parse(localStorage.getItem('order_slot') || 'null');
+
+    // Panier modifié depuis le volet (ou un autre onglet) : resynchroniser le récap et le total
+    window.addEventListener('cart:updated', () => {
+      cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      if (!cart.length) { window.location.href = 'panier.html'; return; }
+      updateCartBadge();
+      renderSummary();
+    });
 
     // Rediriger si panier vide ou pas de créneau
     if (!cart.length) { window.location.href = 'panier.html'; }
@@ -237,8 +245,13 @@
 
     function cartTotal() {
       const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
-      // Tarif de livraison déjà résolu (zone + seuil livraison offerte) à l'étape précédente
-      const delivery = orderSlot?.mode === 'delivery' ? (orderSlot.deliveryFee || 0) : 0;
+      // Frais recalculés à partir du tarif brut de la zone : si le panier change ici
+      // (volet panier), le seuil de livraison offerte est réappliqué comme le fera le serveur.
+      let delivery = 0;
+      if (orderSlot?.mode === 'delivery') {
+        const zoneFee = Number.isFinite(orderSlot.zoneBaseFee) ? orderSlot.zoneBaseFee : (orderSlot.deliveryFee || 0);
+        delivery = sub >= DELIVERY_THRESHOLD ? 0 : zoneFee;
+      }
       return { sub, delivery, total: sub + delivery };
     }
 
@@ -438,6 +451,6 @@
     })();
   </script>
   <script src="../script.js"></script>
-  <script src="cart-drawer.js?v=2"></script>
+  <script src="cart-drawer.js?v=3"></script>
 </body>
 </html>

@@ -318,6 +318,9 @@
       document.body.style.overflow = '';
     });
 
+    // Panier modifié depuis un autre onglet : resynchroniser la page
+    window.addEventListener('storage', e => { if (e.key === 'cart') render(); });
+
     render();
   </script>
   <script src="../script.js"></script>

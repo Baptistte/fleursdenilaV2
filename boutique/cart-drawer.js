@@ -190,6 +190,8 @@
     localStorage.setItem('cart', JSON.stringify(cart));
     renderDrawer();
     updateAllBadges();
+    // Prévenir la page hôte (récap « Votre commande », page panier…) que le panier a changé
+    window.dispatchEvent(new CustomEvent('cart:updated'));
   }
 
   function updateAllBadges() {
@@ -336,5 +338,13 @@
 
   /* Ré-intercepter après que le DOM des pages JS soit injecté (boutique/index.html charge les produits en async) */
   window.addEventListener('load', interceptCartLinks);
+
+  /* Panier modifié depuis un autre onglet : resynchroniser volet, badges et page hôte */
+  window.addEventListener('storage', e => {
+    if (e.key !== 'cart') return;
+    renderDrawer();
+    updateAllBadges();
+    window.dispatchEvent(new CustomEvent('cart:updated'));
+  });
 
 })();

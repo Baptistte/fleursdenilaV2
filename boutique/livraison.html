@@ -754,7 +754,8 @@
         date: selectedDate,
         mode: selectedMode,
         address: buildOrderAddress(),
-        deliveryFee: delivery
+        deliveryFee: delivery,
+        zoneBaseFee: deliveryFee   // tarif brut de la zone, pour recalculer si le panier change à l'étape paiement
       }));
 
       // La réservation doit survivre à la navigation vers l'étape paiement
@@ -788,11 +789,17 @@
       } catch { /* données corrompues : ignorées */ }
     })();
 
+    // Panier modifié depuis le volet (ou un autre onglet) : resynchroniser le récap « Votre commande »
+    window.addEventListener('cart:updated', () => {
+      renderCartSummary();
+      updateCartBadge();
+    });
+
     updateCartBadge();
     buildDateTabs();
     setMode('delivery');   // établit la visibilité initiale (zone à choisir, créneaux masqués)
   </script>
   <script src="../script.js"></script>
-  <script src="cart-drawer.js?v=2"></script>
+  <script src="cart-drawer.js?v=3"></script>
 </body>
 </html>
