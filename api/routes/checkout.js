@@ -30,7 +30,9 @@ async function getSumUpToken() {
 }
 
 router.post('/', async (req, res) => {
-  const { customer_name, customer_email, customer_phone, cart, slot_id, slot_token, delivery_type, delivery_address } = req.body;
+  const { customer_name, customer_email, customer_phone, customer_note, cart, slot_id, slot_token, delivery_type, delivery_address } = req.body;
+  // Commentaire libre du client au fleuriste, distinct du message par article joint au bouquet
+  const note = typeof customer_note === 'string' ? customer_note.trim().slice(0, 500) : '';
 
   if (!customer_name || !customer_phone || !Array.isArray(cart) || !cart.length || !slot_id || !delivery_type) {
     return res.status(400).json({ error: 'Données manquantes' });
@@ -133,8 +135,8 @@ router.post('/', async (req, res) => {
       const result = db.prepare(`
         INSERT INTO orders
           (sumup_checkout_id, customer_name, customer_email, customer_phone,
-           customer_address, slot_id, items, total, delivery_type, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'paid')
+           customer_address, slot_id, items, total, delivery_type, status, customer_note)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'paid', ?)
       `).run(
         checkoutRef,
         customer_name,
@@ -144,7 +146,8 @@ router.post('/', async (req, res) => {
         slot_id,
         JSON.stringify(pricedCart),
         total,
-        delivery_type
+        delivery_type,
+        note
       );
       // La commande occupe la place : le hold est consommé. Décrément des stocks (pas de webhook en simulation)
       db.prepare('DELETE FROM slot_holds WHERE token = ?').run(slot_token);
@@ -191,8 +194,8 @@ router.post('/', async (req, res) => {
     db.prepare(`
       INSERT INTO orders
         (sumup_checkout_id, customer_name, customer_email, customer_phone,
-         customer_address, slot_id, items, total, delivery_type, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+         customer_address, slot_id, items, total, delivery_type, status, customer_note)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
     `).run(
       checkout.id,
       customer_name,
@@ -202,7 +205,8 @@ router.post('/', async (req, res) => {
       slot_id,
       JSON.stringify(pricedCart),
       total,
-      delivery_type
+      delivery_type,
+      note
     );
 
     // La commande pending occupe la place pendant 30 min (cf. slotAvailability) : hold consommé

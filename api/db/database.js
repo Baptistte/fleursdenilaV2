@@ -121,6 +121,8 @@ try {
 // Les colonnes slots.reserved_until / reservation_token / order_id de l'ancien
 // modèle exclusif ne sont plus utilisées (remplacées par slot_holds + comptage des commandes).
 try { db.exec('ALTER TABLE slots ADD COLUMN capacity INTEGER NOT NULL DEFAULT 3'); } catch { /* déjà appliquée */ }
+// Commentaire libre du client au fleuriste (distinct du message par article, joint au bouquet)
+try { db.exec("ALTER TABLE orders ADD COLUMN customer_note TEXT DEFAULT ''"); } catch { /* déjà appliquée */ }
 
 // Compte admin initial : créé depuis les variables d'env si la table est vide
 // (nécessaire au premier démarrage sur une base neuve, ex. volume Railway).

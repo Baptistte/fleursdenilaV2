@@ -145,6 +145,12 @@
               class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
               placeholder="marie@exemple.fr">
           </div>
+          <div>
+            <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Commentaire pour le fleuriste <span class="normal-case tracking-normal text-gray-400">(facultatif)</span></label>
+            <textarea id="customer-note" rows="3" maxlength="500"
+              class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm resize-none transition-colors bg-white"
+              placeholder="Ex : sonner à l'interphone, allergie, précision sur la commande…"></textarea>
+          </div>
         </div>
 
           </div><!-- /Sous-colonne 1 -->
@@ -331,6 +337,7 @@
       const lastname = document.getElementById('customer-lastname').value.trim();
       const email = document.getElementById('customer-email').value.trim();
       const phone = document.getElementById('customer-phone').value.trim();
+      const note = document.getElementById('customer-note').value.trim();
       const errEl = document.getElementById('error-msg');
       errEl.classList.add('hidden');
 
@@ -370,6 +377,7 @@
             customer_name: name,
             customer_email: email || null,
             customer_phone: phone,
+            customer_note: note || null,
             cart,
             slot_id: orderSlot.slotId,
             slot_token: orderSlot.slotToken || null,

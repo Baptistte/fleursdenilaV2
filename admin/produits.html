@@ -2021,6 +2021,7 @@ function renderTournee(date, orders) {
               : `<span class="badge" style="background:#fef3c7;color:#b45309">Retrait boutique</span>`}
           </div>
           ${addr ? `<div class="to-line to-muted" style="margin-top:4px">${esc(addr.street)}${addr.extra ? ' — ' + esc(addr.extra) : ''}<br>${esc(addr.zip)} ${esc(addr.city)}</div>` : ''}
+          ${o.customer_note ? `<div class="to-line" style="margin-top:6px;padding:6px 8px;background:#fef3c7;border-radius:6px;font-size:12px">💬 ${esc(o.customer_note)}</div>` : ''}
         </div>
         <div>
           <div class="to-line to-muted" style="margin-bottom:2px">Produits</div>
@@ -2962,7 +2963,7 @@ async function loadOrders() {
           <div style="font-weight:600">${o.customer_name}</div>
           <div style="font-size:11px;color:#94a3b8">${o.customer_email}</div>
         </td>
-        <td style="font-size:12px;color:#64748b;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${items}</td>
+        <td style="font-size:12px;color:#64748b;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" ${o.customer_note ? `title="Commentaire client : ${o.customer_note.replace(/"/g, '&quot;')}"` : ''}>${items}${o.customer_note ? ' 💬' : ''}</td>
         <td style="font-weight:700" class="tabular">${o.total.toFixed(2)} €</td>
         <td><span class="badge ${o.delivery_type === 'delivery' ? 'badge-blue' : 'badge-gray'}">${modeLabel}</span></td>
         <td style="font-size:12px;color:#64748b;white-space:nowrap">${creneau}</td>
