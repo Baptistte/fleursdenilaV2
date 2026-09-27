@@ -270,12 +270,16 @@
 
       if (cart.length === 0) {
         document.getElementById('empty-cart').classList.remove('hidden');
-        document.getElementById('cart-content').classList.add('hidden');
+        // display:none inline : la classe utilitaire "hidden" seule ne suffit pas ici,
+        // car "lg:grid" (règle média définie plus loin dans le CSS compilé) l'emporte
+        // sur "hidden" à partir de 1024px et laisse le panier réapparaître en desktop.
+        document.getElementById('cart-content').style.display = 'none';
+        document.getElementById('cart-items').innerHTML = '';
         return;
       }
 
       document.getElementById('empty-cart').classList.add('hidden');
-      document.getElementById('cart-content').classList.remove('hidden');
+      document.getElementById('cart-content').style.display = '';
       document.getElementById('cart-items').innerHTML = cart.map((item, i) => renderItem(item, i)).join('');
       renderSummary(cart);
     }

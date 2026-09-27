@@ -5,7 +5,7 @@
     <!-- Page principale -->
     <url>
         <loc>https://www.fleursdenila.fr/</loc>
-        <lastmod>2026-03-10</lastmod>
+        <lastmod>2026-07-17</lastmod>
 
         <image:image>
             <image:loc>https://www.fleursdenila.fr/images/boutique-fleuriste-nimes-livraison-fleurs.webp</image:loc>
@@ -38,10 +38,22 @@
         </image:image>
     </url>
 
+    <!-- Boutique en ligne -->
+    <url>
+        <loc>https://www.fleursdenila.fr/boutique/index.html</loc>
+        <lastmod>2026-07-21</lastmod>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/bouquet-fleurs-fraiches-nimes.webp</image:loc>
+            <image:title>Boutique en ligne Fleurs de Nila - Bouquets à commander à Nîmes</image:title>
+            <image:caption>Commande en ligne de bouquets et compositions, livraison à Nîmes ou retrait en boutique</image:caption>
+        </image:image>
+    </url>
+
     <!-- Blog -->
     <url>
         <loc>https://www.fleursdenila.fr/blog.html</loc>
-        <lastmod>2026-03-10</lastmod>
+        <lastmod>2026-07-14</lastmod>
 
         <image:image>
             <image:loc>https://www.fleursdenila.fr/images/bouquet-fleurs-fraiches-nimes.webp</image:loc>
@@ -53,7 +65,7 @@
     <!-- Article 1 : Entretien bouquets -->
     <url>
         <loc>https://www.fleursdenila.fr/entretien-bouquets-fleurs-fraiches.html</loc>
-        <lastmod>2026-03-10</lastmod>
+        <lastmod>2026-07-14</lastmod>
 
         <image:image>
             <image:loc>https://www.fleursdenila.fr/images/bouquet-fleurs-fraiches-nimes.webp</image:loc>
@@ -65,7 +77,7 @@
     <!-- Article 2 : Fleurs séchées déco -->
     <url>
         <loc>https://www.fleursdenila.fr/decoration-fleurs-sechees-idees.html</loc>
-        <lastmod>2026-03-10</lastmod>
+        <lastmod>2026-07-14</lastmod>
 
         <image:image>
             <image:loc>https://www.fleursdenila.fr/images/bouquet-fleurs-sechees-decoration-durable-nimes.webp</image:loc>
@@ -77,7 +89,7 @@
     <!-- Article 3 : Livraison de fleurs à Nîmes -->
     <url>
         <loc>https://www.fleursdenila.fr/livraison-fleurs-nimes-zones-tarifs.html</loc>
-        <lastmod>2026-03-03</lastmod>
+        <lastmod>2026-07-14</lastmod>
 
         <image:image>
             <image:loc>https://www.fleursdenila.fr/images/boutique-fleuriste-nimes-livraison-fleurs.webp</image:loc>
@@ -89,7 +101,7 @@
     <!-- Mariage -->
     <url>
         <loc>https://www.fleursdenila.fr/mariage.html</loc>
-        <lastmod>2026-03-10</lastmod>
+        <lastmod>2026-07-14</lastmod>
 
         <image:image>
             <image:loc>https://www.fleursdenila.fr/images/decoration-florale-mariage-nimes.webp</image:loc>
@@ -101,7 +113,7 @@
     <!-- À propos -->
     <url>
         <loc>https://www.fleursdenila.fr/a-propos.html</loc>
-        <lastmod>2026-03-10</lastmod>
+        <lastmod>2026-07-14</lastmod>
 
         <image:image>
             <image:loc>https://www.fleursdenila.fr/images/atelier-fleuriste-nimes-fleurs-de-nila.webp</image:loc>
@@ -109,6 +121,4 @@
             <image:caption>L'atelier Fleurs de Nila, 3 rue Auguste-Pellet, Nîmes — bouquets de saison et compositions sur mesure</image:caption>
         </image:image>
     </url>
-
-
 </urlset>

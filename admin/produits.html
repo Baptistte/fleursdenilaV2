@@ -1815,21 +1815,21 @@
         </div>
       </div>
       <div class="field-group">
-        <label class="field-label">Image du produit</label>
-        <input type="file" id="f-image-file" accept="image/webp,image/jpeg,image/png" style="display:none">
+        <label class="field-label">Photos du produit</label>
+        <div id="images-editor" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px"></div>
+        <input type="file" id="f-image-file" accept="image/webp,image/jpeg,image/png" multiple style="display:none">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
           <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('f-image-file').click()">
             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-            Choisir une image…
+            Ajouter des photos…
           </button>
           <span id="f-image-status" style="font-size:11px;color:#94a3b8"></span>
         </div>
-        <input id="f-image" class="field-input" type="text" placeholder="ou URL manuelle (../images/mon-bouquet.webp)">
-        <p style="font-size:11px;color:#94a3b8;margin-top:5px">webp, jpeg ou png — 5 Mo maximum</p>
-      </div>
-
-      <div id="img-preview" style="display:none;margin-bottom:18px">
-        <img id="img-preview-el" src="" alt="" style="height:80px;border-radius:10px;border:1px solid var(--border);object-fit:cover">
+        <div style="display:flex;gap:8px">
+          <input id="f-image-url" class="field-input" type="text" placeholder="ou coller une URL (../images/mon-bouquet.webp)" style="flex:1">
+          <button type="button" id="btn-add-image-url" class="btn btn-ghost btn-sm">Ajouter</button>
+        </div>
+        <p style="font-size:11px;color:#94a3b8;margin-top:5px">webp, jpeg ou png — 5 Mo maximum par photo. La première photo est celle affichée dans le catalogue.</p>
       </div>
 
       <div class="field-group">
@@ -3201,22 +3201,58 @@ document.getElementById('btn-add').addEventListener('click', () => {
   document.getElementById('f-desc').value = '';
   document.getElementById('f-price').value = '';
   document.getElementById('f-stock').value = '0';
-  document.getElementById('f-image').value = '';
   document.getElementById('f-active').checked = true;
   document.getElementById('f-active-label').textContent = 'Visible en boutique';
   document.getElementById('options-editor').innerHTML = '';
   document.getElementById('btn-delete').style.display = 'none';
   document.getElementById('modal-error').style.display = 'none';
-  document.getElementById('img-preview').style.display = 'none';
+  currentImages = [];
+  renderImagesEditor();
   openModal();
 });
 
-document.getElementById('f-image').addEventListener('input', e => {
-  const val = e.target.value.trim();
-  const preview = document.getElementById('img-preview');
-  const img = document.getElementById('img-preview-el');
-  if (val) { img.src = val; preview.style.display = 'block'; }
-  else { preview.style.display = 'none'; }
+// ── Galerie photo du produit (édition) ─────────────────────────────────
+// currentImages : tableau d'URLs, dans l'ordre d'affichage côté boutique.
+// La première entrée est celle utilisée comme vignette catalogue.
+let currentImages = [];
+
+function renderImagesEditor() {
+  const wrap = document.getElementById('images-editor');
+  wrap.innerHTML = currentImages.map((src, i) => `
+    <div class="img-thumb" data-index="${i}" style="position:relative;width:76px;height:76px;border-radius:8px;overflow:hidden;border:2px solid ${i === 0 ? 'var(--primary,#7a3b52)' : 'var(--border)'}">
+      <img src="${src}" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+      ${i === 0 ? '<span style="position:absolute;bottom:2px;left:2px;right:2px;background:rgba(0,0,0,.55);color:#fff;font-size:8px;text-align:center;border-radius:3px;padding:1px 0">Principale</span>' : ''}
+      <button type="button" class="img-thumb-remove" data-index="${i}" title="Supprimer"
+        style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:12px;line-height:1;cursor:pointer">×</button>
+      ${i > 0 ? `<button type="button" class="img-thumb-left" data-index="${i}" title="Déplacer à gauche"
+        style="position:absolute;bottom:2px;left:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:10px;line-height:1;cursor:pointer">‹</button>` : ''}
+      ${i < currentImages.length - 1 ? `<button type="button" class="img-thumb-right" data-index="${i}" title="Déplacer à droite"
+        style="position:absolute;bottom:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:10px;line-height:1;cursor:pointer">›</button>` : ''}
+    </div>`).join('');
+
+  wrap.querySelectorAll('.img-thumb-remove').forEach(btn => btn.addEventListener('click', () => {
+    currentImages.splice(parseInt(btn.dataset.index), 1);
+    renderImagesEditor();
+  }));
+  wrap.querySelectorAll('.img-thumb-left').forEach(btn => btn.addEventListener('click', () => {
+    const i = parseInt(btn.dataset.index);
+    [currentImages[i - 1], currentImages[i]] = [currentImages[i], currentImages[i - 1]];
+    renderImagesEditor();
+  }));
+  wrap.querySelectorAll('.img-thumb-right').forEach(btn => btn.addEventListener('click', () => {
+    const i = parseInt(btn.dataset.index);
+    [currentImages[i + 1], currentImages[i]] = [currentImages[i], currentImages[i + 1]];
+    renderImagesEditor();
+  }));
+}
+
+document.getElementById('btn-add-image-url').addEventListener('click', () => {
+  const input = document.getElementById('f-image-url');
+  const val = input.value.trim();
+  if (!val) return;
+  currentImages.push(val);
+  input.value = '';
+  renderImagesEditor();
 });
 
 // Compression côté navigateur : redimensionne à 1600 px max et convertit en webp.
@@ -3239,21 +3275,11 @@ async function compressImage(file) {
 }
 
 // Upload d'une image produit vers l'API
-document.getElementById('f-image-file').addEventListener('change', async e => {
-  const original = e.target.files[0];
-  const status = document.getElementById('f-image-status');
-  if (!original) return;
-
-  status.textContent = 'Préparation de l\'image…';
+async function uploadOneImage(original) {
   const file = await compressImage(original);
   if (file.size > 5 * 1024 * 1024) {
-    status.textContent = '';
-    alert('Image trop lourde (5 Mo maximum après compression).');
-    e.target.value = '';
-    return;
+    throw new Error('Image trop lourde (5 Mo maximum après compression) : ' + original.name);
   }
-
-  status.textContent = 'Envoi en cours…';
   const abort = new AbortController();
   const timeout = setTimeout(() => abort.abort(), 30000);   // 30 s max
   try {
@@ -3261,25 +3287,40 @@ document.getElementById('f-image-file').addEventListener('change', async e => {
     fd.append('image', file);
     const res = await apiFetch('/api/admin/upload', { method: 'POST', body: fd, signal: abort.signal });
     const data = await res.json();
-    if (!res.ok) {
-      status.textContent = '';
-      alert(data.error || 'Erreur lors de l\'envoi de l\'image.');
-      return;
-    }
-    document.getElementById('f-image').value = data.url;
-    document.getElementById('img-preview-el').src = data.url;
-    document.getElementById('img-preview').style.display = 'block';
-    status.textContent = '✓ Image envoyée';
-    setTimeout(() => { status.textContent = ''; }, 3000);
+    if (!res.ok) throw new Error(data.error || 'Erreur lors de l\'envoi de l\'image.');
+    return data.url;
   } catch (err) {
-    status.textContent = '';
-    alert(err.name === 'AbortError'
-      ? 'L\'envoi a pris trop de temps (30 s). Vérifiez votre connexion et réessayez.'
-      : 'Erreur réseau pendant l\'envoi.');
+    throw err.name === 'AbortError'
+      ? new Error('L\'envoi a pris trop de temps (30 s). Vérifiez votre connexion et réessayez.')
+      : err;
   } finally {
     clearTimeout(timeout);
-    e.target.value = '';   // permet de re-choisir le même fichier
   }
+}
+
+// Envoi possible de plusieurs photos à la fois : uploadées une par une, ajoutées
+// à la galerie au fur et à mesure pour un retour visuel immédiat.
+document.getElementById('f-image-file').addEventListener('change', async e => {
+  const files = [...e.target.files];
+  const status = document.getElementById('f-image-status');
+  if (!files.length) return;
+
+  for (let i = 0; i < files.length; i++) {
+    status.textContent = files.length > 1
+      ? `Envoi de la photo ${i + 1}/${files.length}…`
+      : 'Envoi en cours…';
+    try {
+      const url = await uploadOneImage(files[i]);
+      currentImages.push(url);
+      renderImagesEditor();
+    } catch (err) {
+      status.textContent = '';
+      alert(err.message || 'Erreur réseau pendant l\'envoi.');
+    }
+  }
+  status.textContent = '✓ Photo(s) envoyée(s)';
+  setTimeout(() => { status.textContent = ''; }, 3000);
+  e.target.value = '';   // permet de re-choisir les mêmes fichiers
 });
 
 document.getElementById('f-active').addEventListener('change', e => {
@@ -3295,10 +3336,8 @@ async function openEdit(id) {
   document.getElementById('f-desc').value = p.description || '';
   document.getElementById('f-price').value = p.price;
   document.getElementById('f-stock').value = p.stock;
-  const img = p.images?.[0] || '';
-  document.getElementById('f-image').value = img;
-  if (img) { document.getElementById('img-preview-el').src = img; document.getElementById('img-preview').style.display = 'block'; }
-  else { document.getElementById('img-preview').style.display = 'none'; }
+  currentImages = [...(p.images || [])];
+  renderImagesEditor();
   document.getElementById('f-active').checked = !!p.active;
   document.getElementById('f-active-label').textContent = p.active ? 'Visible en boutique' : 'Masqué en boutique';
   renderOptionsEditor(p.options || []);
@@ -3390,14 +3429,13 @@ document.getElementById('btn-save').addEventListener('click', async () => {
     errEl.style.display = 'block'; return;
   }
 
-  const image = document.getElementById('f-image').value.trim();
   const payload = {
     name,
     description: document.getElementById('f-desc').value.trim(),
     price,
     stock: parseInt(document.getElementById('f-stock').value) || 0,
     active: document.getElementById('f-active').checked ? 1 : 0,
-    images: image ? [image] : [],
+    images: [...currentImages],
     options: readOptions()
   };
 

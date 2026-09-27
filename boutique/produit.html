@@ -107,8 +107,19 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
         <!-- Image -->
-        <div class="border border-gray-100 bg-white overflow-hidden" style="height:400px">
-          <img id="product-img" src="" alt="" class="w-full h-full object-cover">
+        <div>
+          <div id="product-img-main" class="relative border border-gray-100 bg-white overflow-hidden" style="height:400px">
+            <img id="product-img" src="" alt="" class="w-full h-full object-cover">
+            <button id="img-prev" type="button" aria-label="Image précédente" style="display:none"
+              class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/85 hover:bg-white border border-gray-200 items-center justify-center transition-colors">
+              <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button id="img-next" type="button" aria-label="Image suivante" style="display:none"
+              class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/85 hover:bg-white border border-gray-200 items-center justify-center transition-colors">
+              <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+          <div id="product-thumbs" style="display:none" class="mt-3 grid grid-cols-5 gap-2"></div>
         </div>
 
         <!-- Détails -->
@@ -270,6 +281,65 @@
       }
     }
 
+    // Galerie photo : image principale + vignettes + flèches, active seulement
+    // si le produit a plusieurs images (`images` reste un tableau à 1 entrée sinon).
+    let galleryImages = [];
+    let galleryIndex = 0;
+
+    function showGalleryImage(i) {
+      if (!galleryImages.length) return;
+      galleryIndex = (i + galleryImages.length) % galleryImages.length;
+      document.getElementById('product-img').src = galleryImages[galleryIndex];
+      document.querySelectorAll('#product-thumbs .thumb-btn').forEach((btn, idx) => {
+        btn.classList.toggle('border-primary', idx === galleryIndex);
+        btn.classList.toggle('border-gray-100', idx !== galleryIndex);
+      });
+    }
+
+    function renderGallery(images) {
+      galleryImages = images && images.length ? images : ['../images/bouquet-fleurs-fraiches-nimes.webp'];
+      galleryIndex = 0;
+
+      const img = document.getElementById('product-img');
+      img.alt = currentProduct.name;
+
+      const prevBtn = document.getElementById('img-prev');
+      const nextBtn = document.getElementById('img-next');
+      const thumbsWrap = document.getElementById('product-thumbs');
+      const multi = galleryImages.length > 1;
+
+      prevBtn.style.display = multi ? 'flex' : 'none';
+      nextBtn.style.display = multi ? 'flex' : 'none';
+      thumbsWrap.style.display = multi ? 'grid' : 'none';
+
+      thumbsWrap.innerHTML = multi ? galleryImages.map((src, idx) => `
+        <button type="button" class="thumb-btn border-2 border-gray-100 overflow-hidden" style="aspect-ratio:1;padding:0" data-index="${idx}" aria-label="Voir la photo ${idx + 1}">
+          <img src="${src}" alt="" class="w-full h-full object-cover">
+        </button>`).join('') : '';
+
+      thumbsWrap.querySelectorAll('.thumb-btn').forEach(btn => {
+        btn.addEventListener('click', () => showGalleryImage(parseInt(btn.dataset.index)));
+      });
+
+      prevBtn.onclick = () => showGalleryImage(galleryIndex - 1);
+      nextBtn.onclick = () => showGalleryImage(galleryIndex + 1);
+
+      showGalleryImage(0);
+    }
+
+    // Balayage tactile sur l'image principale (mobile)
+    (function setupSwipe() {
+      const zone = document.getElementById('product-img-main');
+      let startX = null;
+      zone.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+      zone.addEventListener('touchend', e => {
+        if (startX === null || galleryImages.length < 2) return;
+        const delta = e.changedTouches[0].clientX - startX;
+        if (Math.abs(delta) > 40) showGalleryImage(galleryIndex + (delta < 0 ? 1 : -1));
+        startX = null;
+      });
+    })();
+
     async function loadProduct() {
       const id = getProductId();
       if (!id) { showError(); return; }
@@ -285,9 +355,7 @@
         document.getElementById('product-desc').textContent = currentProduct.description;
         document.getElementById('product-price').textContent = currentProduct.price;
 
-        const img = document.getElementById('product-img');
-        img.src = currentProduct.images[0] || '../images/bouquet-fleurs-fraiches-nimes.webp';
-        img.alt = currentProduct.name;
+        renderGallery(currentProduct.images);
 
         renderOptions(currentProduct.options);
 
