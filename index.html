@@ -488,7 +488,7 @@
             <div class="lg:col-span-12 px-10 py-5 lg:px-16 lg:py-8">
                 <p class="text-xs font-bold uppercase tracking-[0.3em] text-secondary mb-4">Les incontournables</p>
                 <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                    <h2 class="font-display text-5xl md:text-6xl text-primary leading-tight">
+                    <h2 class="font-display text-5xl md:text-6xl text-primary leading-tight whitespace-nowrap">
                         E-shop
                     </h2>
                     <a href="boutique/index.html"
@@ -795,9 +795,6 @@
             <!-- Option 1 : Nous contacter -->
             <div
                 class="border-b lg:border-b-0 lg:border-r border-primary p-12 lg:p-20 flex flex-col justify-center items-center text-center bg-white relative overflow-hidden group hover:bg-cream transition-colors duration-500">
-                <!-- Numéro décoratif -->
-                <span class="absolute top-8 left-8 text-8xl lg:text-9xl font-light text-primary/5 select-none">01</span>
-
                 <!-- Icône Téléphone -->
                 <div
                     class="w-20 h-20 rounded-full border-2 border-primary flex items-center justify-center mb-8 group-hover:bg-primary group-hover:text-white transition-all duration-300">
@@ -844,9 +841,6 @@
             <!-- Option 2 : Venir en Boutique -->
             <div
                 class="p-12 lg:p-20 flex flex-col justify-center items-center text-center bg-primary text-white relative overflow-hidden group">
-                <!-- Numéro décoratif -->
-                <span class="absolute top-8 right-8 text-8xl lg:text-9xl font-light text-white/5 select-none">02</span>
-
                 <!-- Icône Boutique -->
                 <div
                     class="w-20 h-20 rounded-full border-2 border-white flex items-center justify-center mb-8 group-hover:bg-white group-hover:text-primary transition-all duration-300">
@@ -904,69 +898,13 @@
         </div>
 
         <!-- Widget Elfsight -->
+        <!-- Résumé IA et taille des cartes désormais réglés depuis l'éditeur Elfsight
+             (elfsight.com) : le widget s'affiche nativement en pleine largeur. -->
         <div class="w-full px-6 lg:px-16 py-10 border-b border-primary">
-            <div id="elfsight-reviews-wrap" style="max-width:900px;margin:0 auto">
-                <div class="elfsight-app-baddfc27-187c-4edc-9c0c-b89e217260b3" data-elfsight-app-lazy></div>
-            </div>
+            <div class="elfsight-app-baddfc27-187c-4edc-9c0c-b89e217260b3" data-elfsight-app-lazy></div>
         </div>
 
     </section>
-
-    <script>
-        // Widget Elfsight : le résumé « AI-Generated Summary » et la taille des cartes
-        // sont générés dynamiquement par leur script tiers (pas dans notre HTML).
-        // La façon fiable de désactiver/reconfigurer ça reste l'éditeur du widget sur
-        // elfsight.com (réglage « Enable AI Summary » + style de carte). Ce script est
-        // un correctif de secours côté page : il masque le bloc résumé par son texte
-        // (fixe) et réduit visuellement la taille des cartes en attendant ce réglage.
-        (function () {
-            var wrap = document.getElementById('elfsight-reviews-wrap');
-            if (!wrap) return;
-
-            function hideAiSummary() {
-                var walker = document.createTreeWalker(wrap, NodeFilter.SHOW_TEXT);
-                var node;
-                while ((node = walker.nextNode())) {
-                    if (/AI-Generated Summary/i.test(node.textContent)) {
-                        var el = node.parentElement;
-                        // Remonte jusqu'à un conteneur qui ne contient QUE le résumé
-                        // (s'arrête dès que le parent contient aussi la liste d'avis,
-                        // reconnaissable à la présence de plusieurs "★").
-                        var block = el;
-                        while (block.parentElement &&
-                               (block.parentElement.textContent.match(/★/g) || []).length ===
-                               (block.textContent.match(/★/g) || []).length) {
-                            block = block.parentElement;
-                        }
-                        block.style.display = 'none';
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            var attempts = 0;
-            var timer = setInterval(function () {
-                attempts++;
-                if (hideAiSummary() || attempts > 20) clearInterval(timer);
-            }, 500);
-        })();
-    </script>
-
-    <style>
-        /* Réduction visuelle des cartes d'avis Elfsight (widget tiers, pas de classes
-           internes stables à cibler) : mise à l'échelle globale du conteneur.
-           Réglage fin de la taille définitive à faire depuis l'éditeur Elfsight. */
-        #elfsight-reviews-wrap {
-            transform: scale(0.8);
-            transform-origin: top center;
-            width: 125%;
-            margin-left: -12.5%;
-        }
-        @media (max-width: 640px) {
-            #elfsight-reviews-wrap { transform: scale(0.9); width: 111%; margin-left: -5.5%; }
-        }
-    </style>
 
     <!-- Abonnement & Infos Pratiques - Grid Split -->
     <section id="abonnement" class="w-full bg-white">
