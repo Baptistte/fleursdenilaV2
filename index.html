@@ -905,10 +905,68 @@
 
         <!-- Widget Elfsight -->
         <div class="w-full px-6 lg:px-16 py-10 border-b border-primary">
-            <div class="elfsight-app-baddfc27-187c-4edc-9c0c-b89e217260b3" data-elfsight-app-lazy></div>
+            <div id="elfsight-reviews-wrap" style="max-width:900px;margin:0 auto">
+                <div class="elfsight-app-baddfc27-187c-4edc-9c0c-b89e217260b3" data-elfsight-app-lazy></div>
+            </div>
         </div>
 
     </section>
+
+    <script>
+        // Widget Elfsight : le résumé « AI-Generated Summary » et la taille des cartes
+        // sont générés dynamiquement par leur script tiers (pas dans notre HTML).
+        // La façon fiable de désactiver/reconfigurer ça reste l'éditeur du widget sur
+        // elfsight.com (réglage « Enable AI Summary » + style de carte). Ce script est
+        // un correctif de secours côté page : il masque le bloc résumé par son texte
+        // (fixe) et réduit visuellement la taille des cartes en attendant ce réglage.
+        (function () {
+            var wrap = document.getElementById('elfsight-reviews-wrap');
+            if (!wrap) return;
+
+            function hideAiSummary() {
+                var walker = document.createTreeWalker(wrap, NodeFilter.SHOW_TEXT);
+                var node;
+                while ((node = walker.nextNode())) {
+                    if (/AI-Generated Summary/i.test(node.textContent)) {
+                        var el = node.parentElement;
+                        // Remonte jusqu'à un conteneur qui ne contient QUE le résumé
+                        // (s'arrête dès que le parent contient aussi la liste d'avis,
+                        // reconnaissable à la présence de plusieurs "★").
+                        var block = el;
+                        while (block.parentElement &&
+                               (block.parentElement.textContent.match(/★/g) || []).length ===
+                               (block.textContent.match(/★/g) || []).length) {
+                            block = block.parentElement;
+                        }
+                        block.style.display = 'none';
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            var attempts = 0;
+            var timer = setInterval(function () {
+                attempts++;
+                if (hideAiSummary() || attempts > 20) clearInterval(timer);
+            }, 500);
+        })();
+    </script>
+
+    <style>
+        /* Réduction visuelle des cartes d'avis Elfsight (widget tiers, pas de classes
+           internes stables à cibler) : mise à l'échelle globale du conteneur.
+           Réglage fin de la taille définitive à faire depuis l'éditeur Elfsight. */
+        #elfsight-reviews-wrap {
+            transform: scale(0.8);
+            transform-origin: top center;
+            width: 125%;
+            margin-left: -12.5%;
+        }
+        @media (max-width: 640px) {
+            #elfsight-reviews-wrap { transform: scale(0.9); width: 111%; margin-left: -5.5%; }
+        }
+    </style>
 
     <!-- Abonnement & Infos Pratiques - Grid Split -->
     <section id="abonnement" class="w-full bg-white">
