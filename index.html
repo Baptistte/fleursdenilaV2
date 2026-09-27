@@ -586,20 +586,13 @@
     <!-- Événementiel Section - Grid Layout -->
     <section id="evenementiel" class="w-full bg-cream">
         <div class="grid grid-cols-1 lg:grid-cols-12 border-b border-primary min-h-[80vh]">
-            <!-- Titre Vertical (Desktop) -->
-            <div
-                class="hidden lg:flex lg:col-span-1 border-r border-primary items-center justify-center py-16 bg-white">
-                <h2 class="writing-vertical transform rotate-180 font-display text-6xl whitespace-nowrap tracking-wide">
-                    Événementiel</h2>
-            </div>
-
-            <!-- Contenu Mobile Title -->
-            <div class="lg:hidden p-10 border-b border-primary bg-white">
-                <h2 class="font-display text-5xl text-center">Événementiel</h2>
+            <!-- Titre -->
+            <div class="p-10 border-b border-primary bg-white lg:col-span-12">
+                <h2 class="font-display text-5xl lg:text-6xl text-center">Événementiel</h2>
             </div>
 
             <!-- Services Grid -->
-            <div class="lg:col-span-11 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+            <div class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                 <!-- Mariages -->
                 <div
                     class="border-b md:border-b-0 md:border-r border-primary p-10 lg:p-16 flex flex-col justify-between hover:bg-white transition-colors h-full">
@@ -884,13 +877,13 @@
         <!-- En-tête de section -->
         <div class="grid grid-cols-1 lg:grid-cols-12 border-b border-primary">
             <div class="lg:col-span-12 p-10 lg:p-16 bg-cream border-b border-primary lg:border-b-0">
-                <p class="text-xs font-bold uppercase tracking-[0.3em] text-secondary mb-4">Retours clients</p>
-                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                    <h2 class="font-display text-5xl md:text-6xl text-primary leading-tight">
-                        Ils nous font confiance
-                    </h2>
+                <p class="text-xs font-bold uppercase tracking-[0.3em] text-secondary mb-4 text-center">Retours clients</p>
+                <h2 class="font-display text-5xl md:text-6xl text-primary leading-tight text-center">
+                    Ils nous font confiance
+                </h2>
+                <div class="mt-4 text-right">
                     <a href="https://www.google.com/maps?cid=4398111084857870137" target="_blank" rel="noopener noreferrer"
-                        class="text-xs uppercase tracking-widest text-secondary hover:text-primary border-b border-secondary hover:border-primary transition-colors pb-0.5 whitespace-nowrap self-end">
+                        class="text-xs uppercase tracking-widest text-secondary hover:text-primary border-b border-secondary hover:border-primary transition-colors pb-0.5 whitespace-nowrap">
                         Laisser un avis →
                     </a>
                 </div>
@@ -1129,9 +1122,6 @@
     </footer>
 
     <style>
-        .writing-vertical {
-            writing-mode: vertical-rl;
-        }
         /* Cartes vitrine — même système que la page boutique */
         .product-card {
             display: flex;
