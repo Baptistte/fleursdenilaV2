@@ -266,7 +266,7 @@
             <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center justify-center h-24">
                 <div class="flex items-center justify-center gap-6 lg:gap-10 xl:gap-14 w-full">
                     <a href="#accueil" class="nav-link text-sm lg:text-base xl:text-lg">Accueil</a>
-                    <a href="#collections" class="nav-link text-sm lg:text-base xl:text-lg">Collections</a>
+                    <a href="#instagram" class="nav-link text-sm lg:text-base xl:text-lg">Instagram</a>
                     <a href="#evenementiel" class="nav-link text-sm lg:text-base xl:text-lg">Événementiel</a>
                     <a href="boutique/index.html" class="nav-link text-sm lg:text-base xl:text-lg">Boutique</a>
                     <a href="#apropos" class="nav-link text-sm lg:text-base xl:text-lg">À propos</a>
@@ -288,7 +288,7 @@
             </button>
 
             <a href="#accueil" class="mobile-nav-link text-6xl">Accueil</a>
-            <a href="#collections" class="mobile-nav-link text-6xl">Collections</a>
+            <a href="#instagram" class="mobile-nav-link text-6xl">Instagram</a>
             <a href="#evenementiel" class="mobile-nav-link text-6xl">Événementiel</a>
             <a href="boutique/index.html" class="mobile-nav-link text-6xl">Boutique</a>
             <a href="#apropos" class="mobile-nav-link text-6xl">À propos</a>
@@ -321,7 +321,7 @@
                     </p>
 
                     <!-- CTA -->
-                    <a href="#collections"
+                    <a href="#instagram"
                         class="btn-primary py-3 px-10 hover:bg-primary hover:text-white transition-colors inline-block">
                         Explorer
                     </a>
@@ -341,123 +341,74 @@
     </section>
 
 
-    <!-- Collections Section - Bento Grid 100% Width -->
-    <section id="collections" class="w-full bg-white">
-        <!-- Titre Section intégré à la grille -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 border-b border-primary">
-            <div
-                class="lg:col-span-1 border-b lg:border-b-0 lg:border-r border-primary p-10 lg:p-12 flex flex-col justify-center items-start bg-cream relative">
-                <span class="text-xs font-bold uppercase tracking-widest text-secondary mb-3">Catalogue 2026</span>
-                <h2 class="font-display text-5xl lg:text-6xl text-primary leading-none mb-6">Nos<br>Collections</h2>
-                <p class="text-sm text-gray-600 leading-relaxed mb-8">
-                    Une sélection rigoureuse de fleurs de saison et de compositions séchées.
-                </p>
-            </div>
-
-            <!-- Grille Produits Bento -->
-            <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                <!-- Item 1 -->
-                <article
-                    class="group relative border-b md:border-b-0 lg:border-r border-primary aspect-[4/5] overflow-hidden">
-                    <img src="images/bouquet-fleurs-fraiches-nimes.webp" loading="lazy"
-                        alt="Bouquet de fleurs fraîches de saison - Collection Moment I - Fleuriste Nîmes" width="675"
-                        height="900"
-                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        srcset="images/bouquet-fleurs-fraiches-nimes-400w.webp 400w, images/bouquet-fleurs-fraiches-nimes.webp 675w"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw">
-                    <div class="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300">
-                    </div>
-                    <a href="#commander"
-                        class="absolute bottom-0 left-0 w-full border-t border-primary bg-white p-4 flex justify-between items-center transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 hover:bg-cream">
-                        <div>
-                            <h3 class="font-display text-2xl text-primary">Essentiel</h3>
-                            <p class="text-xs uppercase tracking-wider">Fleurs Fraîches</p>
-                        </div>
-                        <span class="text-xl transition-transform group-hover:translate-x-1">→</span>
-                    </a>
-                    <div
-                        class="absolute top-4 right-4 bg-white border border-primary px-3 py-1 text-xs font-bold uppercase tracking-widest">
-                        Fraîches
-                    </div>
-                </article>
-
-                <!-- Item 2 -->
-                <article
-                    class="group relative border-b md:border-b-0 lg:border-r border-primary aspect-[4/5] overflow-hidden">
-                    <img src="images/bouquet-fleurs-sechees-nimes.webp" loading="lazy"
-                        alt="Bouquet de fleurs séchées - Collection Moment II - Fleuriste Nîmes" width="675"
-                        height="900"
-                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        srcset="images/bouquet-fleurs-sechees-nimes-400w.webp 400w, images/bouquet-fleurs-sechees-nimes.webp 675w"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw">
-                    <a href="#commander"
-                        class="absolute bottom-0 left-0 w-full border-t border-primary bg-white p-4 flex justify-between items-center transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 hover:bg-cream">
-                        <div>
-                            <h3 class="font-display text-2xl text-primary">Intemporel</h3>
-                            <p class="text-xs uppercase tracking-wider">Fleurs Séchées</p>
-                        </div>
-                        <span class="text-xl transition-transform group-hover:translate-x-1">→</span>
-                    </a>
-                    <div
-                        class="absolute top-4 right-4 bg-white border border-primary px-3 py-1 text-xs font-bold uppercase tracking-widest">
-                        Séchées
-                    </div>
-                </article>
-
-                <!-- Item 3 -->
-                <article class="group relative aspect-[4/5] overflow-hidden">
-                    <img src="images/accessoires-decoration-florale-nimes.webp" loading="lazy"
-                        alt="Accessoires et objets décoratifs floraux - Collection Moment III - Fleuriste Nîmes"
-                        width="675" height="900"
-                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        srcset="images/accessoires-decoration-florale-nimes-400w.webp 400w, images/accessoires-decoration-florale-nimes.webp 675w"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw">
-                    <a href="#commander"
-                        class="absolute bottom-0 left-0 w-full border-t border-primary bg-white p-4 flex justify-between items-center transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 hover:bg-cream">
-                        <div>
-                            <h3 class="font-display text-2xl text-primary">Décoratif</h3>
-                            <p class="text-xs uppercase tracking-wider">Objets</p>
-                        </div>
-                        <span class="text-xl transition-transform group-hover:translate-x-1">→</span>
-                    </a>
-                    <div
-                        class="absolute top-4 right-4 bg-white border border-primary px-3 py-1 text-xs font-bold uppercase tracking-widest">
-                        Déco
-                    </div>
-                </article>
-            </div>
-        </div>
-
-        <!-- Seconde ligne Bento - Large visuals -->
-        <div class="grid grid-cols-1 md:grid-cols-2 border-b border-primary">
-            <div
-                class="aspect-square md:aspect-[16/9] border-b md:border-b-0 md:border-r border-primary relative overflow-hidden group">
-                <img src="images/creation-florale-sur-mesure-nimes.webp" loading="lazy"
-                    alt="Création florale sur mesure personnalisée - Fleuriste artisan Nîmes" width="900" height="1200"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        srcset="images/creation-florale-sur-mesure-nimes-400w.webp 400w, images/creation-florale-sur-mesure-nimes-800w.webp 800w, images/creation-florale-sur-mesure-nimes.webp 900w"
-                        sizes="(max-width: 768px) 100vw, 50vw">
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div
-                        class="bg-white border border-primary p-6 text-center transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                        <h3 class="font-display text-4xl mb-2">Sur Mesure</h3>
-                        <p class="text-sm uppercase tracking-widest">Créations Uniques</p>
-                    </div>
+    <!-- Instagram : aperçu fictif du feed en attendant un widget en direct -->
+    <!-- Remplace l'ancien bloc « Nos Collections / Catalogue 2026 » (4 catégories +
+         bannière « commander » avec la photo d'hortensia). Les vignettes ci-dessous
+         réutilisent des photos déjà présentes sur le site et renvoient toutes vers le
+         vrai profil Instagram ; ce n'est pas un flux en direct (ça nécessiterait un
+         widget tiers, ex. Elfsight/SnapWidget, à décider avant intégration). -->
+    <section id="instagram" class="w-full bg-white">
+        <div class="max-w-6xl mx-auto px-6 lg:px-16 py-16 lg:py-20">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 lg:mb-10">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-[0.3em] text-secondary mb-3">Instagram</p>
+                    <h2 class="font-display text-5xl md:text-6xl text-primary leading-tight">@fleurs_de_nila</h2>
                 </div>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer"
+                    class="text-xs uppercase tracking-widest text-secondary hover:text-primary border-b border-secondary hover:border-primary transition-colors pb-0.5 whitespace-nowrap self-end">
+                    Suivre sur Instagram →
+                </a>
             </div>
-            <div
-                class="aspect-square md:aspect-[16/9] relative overflow-hidden bg-primary text-white p-12 lg:p-16 flex flex-col justify-center items-center text-center">
-                <div class="max-w-md">
-                    <h3 class="font-display text-5xl mb-8">L'Art du Détail</h3>
-                    <p class="text-lg font-light mb-10 leading-relaxed opacity-90">
-                        Chaque composition raconte une histoire. La vôtre. Nous prenons le temps d'écouter vos envies
-                        pour créer l'inattendu.
-                    </p>
-                    <a href="#contact"
-                        class="inline-block border border-white px-8 py-3 uppercase tracking-widest hover:bg-white hover:text-primary transition-colors">
-                        Commander
-                    </a>
-                </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-2">
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/bouquet-multicolore-artisanal-nimes-400w.webp" loading="lazy" alt="Bouquet multicolore artisanal - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/decoration-florale-mariage-nimes-400w.webp" loading="lazy" alt="Décoration florale mariage - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/bouquet-fleurs-sechees-tons-bleus-nimes-400w.webp" loading="lazy" alt="Bouquet de fleurs séchées tons bleus - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/detail-floral-artisanal-nimes-400w.webp" loading="lazy" alt="Détail floral artisanal - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/creation-florale-sur-mesure-nimes-400w.webp" loading="lazy" alt="Composition d'hortensias - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/atelier-fleuriste-nimes-fleurs-de-nila-400w.webp" loading="lazy" alt="Atelier Fleurs de Nila - Fleuriste Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/bouquet-fleurs-rouges-romantique-nimes-400w.webp" loading="lazy" alt="Bouquet de fleurs rouges romantique - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/composition-florale-esthetique-nimes-400w.webp" loading="lazy" alt="Composition florale esthétique - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
