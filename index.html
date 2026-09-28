@@ -733,29 +733,17 @@
 
     <!-- Section À propos -->
     <section id="apropos" class="w-full bg-white border-b border-primary">
-        <div class="grid grid-cols-1 md:grid-cols-2">
-            <div
-                class="p-10 lg:p-16 border-b md:border-b-0 md:border-r border-primary flex items-center justify-center bg-cream">
-                <div class="max-w-md">
-                    <span class="text-xs font-bold uppercase tracking-widest text-secondary mb-3 block">À propos</span>
-                    <h2 class="font-display text-5xl text-primary leading-tight mb-6">Fleurs de Nila</h2>
-                    <p class="text-base text-gray-700 leading-relaxed mb-8">
-                        Fleurs de Nila est un atelier de fleuriste indépendant à Nîmes. Nous travaillons des fleurs de
-                        saison,
-                        fraîches et séchées, dans un esprit artisanal et poétique, pour les petits gestes du quotidien
-                        comme pour les grands événements.
-                    </p>
-                    <a href="a-propos.html" class="btn-primary inline-block">En savoir plus</a>
-                </div>
-            </div>
-            <div class="p-10 lg:p-16 flex items-center justify-center bg-white">
-                <div class="max-w-md w-full group">
-                    <img src="images/atelier-fleuriste-nimes-fleurs-de-nila.webp" loading="lazy" alt="Fleurs de Nila - Atelier fleuriste" width="1200"
-                        height="900"
-                        class="w-full h-auto object-cover border border-primary group-hover:scale-105 transition-transform duration-500"
-                        srcset="images/atelier-fleuriste-nimes-fleurs-de-nila-400w.webp 400w, images/atelier-fleuriste-nimes-fleurs-de-nila-800w.webp 800w, images/atelier-fleuriste-nimes-fleurs-de-nila.webp 1200w"
-                        sizes="(max-width: 640px) 100vw, 100vw">
-                </div>
+        <div class="p-10 lg:p-16 flex items-center justify-center bg-cream text-center">
+            <div class="max-w-2xl">
+                <span class="text-xs font-bold uppercase tracking-widest text-secondary mb-3 block">À propos</span>
+                <h2 class="font-display text-5xl text-primary leading-tight mb-6">Fleurs de Nila</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-8">
+                    Fleurs de Nila est un atelier de fleuriste indépendant à Nîmes. Nous travaillons des fleurs de
+                    saison,
+                    fraîches et séchées, dans un esprit artisanal et poétique, pour les petits gestes du quotidien
+                    comme pour les grands événements.
+                </p>
+                <a href="a-propos.html" class="btn-primary inline-block">En savoir plus</a>
             </div>
         </div>
     </section>
@@ -882,46 +870,13 @@
     <!-- Abonnement & Infos Pratiques - Grid Split -->
     <section id="abonnement" class="w-full bg-white">
         <div class="grid grid-cols-1 lg:grid-cols-2 border-b border-primary">
-            <!-- Abonnement -->
-            <div
-                class="border-b lg:border-b-0 p-10 lg:p-16 flex flex-col justify-center bg-cream relative overflow-hidden group">
-                <!-- Image de fond subtile -->
-                <div
-                    class="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none">
-                    <img src="images/bouquet-fleurs-fraiches-nimes.webp" loading="lazy"
-                        alt="Bouquet de fleurs fraîches de saison — Fleurs de Nila Nîmes" width="675" height="900"
-                        class="w-full h-full object-cover"
-                        srcset="images/bouquet-fleurs-fraiches-nimes-400w.webp 400w, images/bouquet-fleurs-fraiches-nimes.webp 675w"
-                        sizes="(max-width: 768px) 100vw, 50vw">
-                </div>
-
-                <div
-                    class="relative z-10 max-w-md mx-auto text-center border border-primary p-8 bg-white/80 backdrop-blur-sm">
-                    <span class="text-xs font-bold uppercase tracking-widest text-secondary mb-3 block">Formule
-                        Florale</span>
-                    <h2 class="font-display text-5xl mb-5 text-primary">L'abonnement</h2>
-                    <div class="w-12 h-px bg-primary mx-auto mb-5"></div>
-                    <p class="text-base text-gray-600 mb-6 leading-relaxed italic">
-                        "Le plaisir de recevoir des fleurs, sans y penser."
-                    </p>
-
-                    <ul class="text-left space-y-3 mb-6 pl-3">
-                        <li class="flex items-center gap-3 text-sm uppercase tracking-wide">
-                            <span class="w-1.5 h-1.5 bg-primary rounded-full"></span> Sans engagement
-                        </li>
-                        <li class="flex items-center gap-3 text-sm uppercase tracking-wide">
-                            <span class="w-1.5 h-1.5 bg-primary rounded-full"></span> Fréquence au choix
-                        </li>
-                        <li class="flex items-center gap-3 text-sm uppercase tracking-wide">
-                            <span class="w-1.5 h-1.5 bg-primary rounded-full"></span> Fleurs de saison
-                        </li>
-                    </ul>
-
-                    <a href="boutique/index.html"
-                        class="inline-block w-full py-3 bg-primary text-white text-sm uppercase tracking-widest hover:bg-secondary transition-colors border border-primary">
-                        Découvrir les formules
-                    </a>
-                </div>
+            <!-- Photo boutique (déplacée depuis la section À propos) -->
+            <div class="border-b lg:border-b-0 min-h-[320px] lg:min-h-0">
+                <img src="images/atelier-fleuriste-nimes-fleurs-de-nila.webp" loading="lazy"
+                    alt="Fleurs de Nila - Atelier fleuriste" width="1200" height="900"
+                    class="w-full h-full object-cover"
+                    srcset="images/atelier-fleuriste-nimes-fleurs-de-nila-400w.webp 400w, images/atelier-fleuriste-nimes-fleurs-de-nila-800w.webp 800w, images/atelier-fleuriste-nimes-fleurs-de-nila.webp 1200w"
+                    sizes="(max-width: 1024px) 100vw, 50vw">
             </div>
 
             <!-- FAQ - Accordéon à hauteur constante -->
