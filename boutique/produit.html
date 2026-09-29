@@ -151,6 +151,22 @@
               placeholder="Ex : Joyeux anniversaire Marie…"></textarea>
           </div>
 
+          <!-- Commentaire pour le fleuriste : un seul champ pour toute la commande
+               (pas par bouquet), replié par défaut, partagé avec la page paiement
+               via localStorage pour n'avoir qu'une seule valeur. -->
+          <div class="mb-8">
+            <button type="button" id="toggle-order-note-btn"
+              class="inline-flex items-center gap-2 text-xs tracking-widest uppercase text-gray-400 hover:text-primary transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Ajouter un commentaire pour le fleuriste <span class="normal-case tracking-normal">(pour toute la commande)</span>
+            </button>
+            <div id="order-note-field" class="hidden mt-2">
+              <textarea id="order-note" rows="2" maxlength="500"
+                class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm resize-none transition-colors"
+                placeholder="Ex : sonner à l'interphone, allergie, précision sur la commande… (facultatif)"></textarea>
+            </div>
+          </div>
+
           <!-- Bouton ajout panier -->
           <button id="add-to-cart"
             class="w-full bg-primary text-white py-4 text-sm tracking-widest uppercase hover:bg-secondary transition-colors duration-300">
@@ -194,6 +210,27 @@
     function getProductId() {
       return new URLSearchParams(window.location.search).get('id');
     }
+
+    // Commentaire pour le fleuriste : une seule valeur pour toute la commande,
+    // partagée (localStorage) avec la page paiement. Pré-rempli et déplié s'il
+    // contient déjà quelque chose (ex. client revenu ajouter un 2e bouquet).
+    (function initOrderNote() {
+      const saved = localStorage.getItem('order_note') || '';
+      const field = document.getElementById('order-note-field');
+      const toggleBtn = document.getElementById('toggle-order-note-btn');
+      const textarea = document.getElementById('order-note');
+      textarea.value = saved;
+      if (saved) { field.classList.remove('hidden'); toggleBtn.classList.add('hidden'); }
+
+      toggleBtn.addEventListener('click', () => {
+        field.classList.remove('hidden');
+        toggleBtn.classList.add('hidden');
+        textarea.focus();
+      });
+      textarea.addEventListener('input', () => {
+        localStorage.setItem('order_note', textarea.value);
+      });
+    })();
 
     function getCart() {
       return JSON.parse(localStorage.getItem('cart') || '[]');

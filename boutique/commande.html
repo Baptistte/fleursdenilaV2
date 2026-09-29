@@ -239,12 +239,26 @@
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const orderSlot = JSON.parse(localStorage.getItem('order_slot') || 'null');
 
-    // Champ commentaire replié par défaut (allège la vue) : un clic le révèle et y place le focus
-    document.getElementById('toggle-note-btn').addEventListener('click', function () {
-      document.getElementById('note-field').classList.remove('hidden');
-      this.classList.add('hidden');
-      document.getElementById('customer-note').focus();
-    });
+    // Commentaire pour le fleuriste : une seule valeur pour toute la commande,
+    // partagée (localStorage) avec la fiche produit. Replié par défaut (allège
+    // la vue), sauf s'il contient déjà quelque chose saisi plus tôt.
+    (function initOrderNote() {
+      const saved = localStorage.getItem('order_note') || '';
+      const field = document.getElementById('note-field');
+      const toggleBtn = document.getElementById('toggle-note-btn');
+      const textarea = document.getElementById('customer-note');
+      textarea.value = saved;
+      if (saved) { field.classList.remove('hidden'); toggleBtn.classList.add('hidden'); }
+
+      toggleBtn.addEventListener('click', function () {
+        field.classList.remove('hidden');
+        this.classList.add('hidden');
+        textarea.focus();
+      });
+      textarea.addEventListener('input', () => {
+        localStorage.setItem('order_note', textarea.value);
+      });
+    })();
 
     // Panier modifié depuis le volet (ou un autre onglet) : resynchroniser le récap et le total
     window.addEventListener('cart:updated', () => {
