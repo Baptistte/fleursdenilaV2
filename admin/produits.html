@@ -1881,7 +1881,7 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div class="field-group">
           <label class="field-label">Prix de base (€) *</label>
-          <input id="f-price" class="field-input" type="number" min="0" step="0.01" placeholder="35.00">
+          <input id="f-price" class="field-input" type="number" min="0" step="1" placeholder="35">
         </div>
         <div class="field-group">
           <label class="field-label">Stock</label>
@@ -3715,7 +3715,7 @@ function choiceRow(c) {
   return `<div class="choice-row" style="display:grid;grid-template-columns:1fr 1fr 70px 28px;gap:6px;margin-bottom:6px;align-items:center">
     <input class="field-input ch-label" style="padding:7px 8px" placeholder="ex: Grand" value="${c?.label || ''}">
     <input class="field-input ch-value" style="padding:7px 8px" placeholder="ex: L" value="${c?.value || ''}">
-    <input class="field-input ch-delta" style="padding:7px 8px" type="number" step="0.01" placeholder="0" value="${c?.priceDelta ?? 0}">
+    <input class="field-input ch-delta" style="padding:7px 8px" type="number" step="1" placeholder="0" value="${c?.priceDelta ?? 0}">
     <button type="button" class="ch-remove" style="background:none;border:none;color:#cbd5e1;font-size:18px;cursor:pointer;line-height:1;padding:0 4px;transition:color .15s" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#cbd5e1'">×</button>
   </div>`;
 }
