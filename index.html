@@ -436,60 +436,65 @@
 
     <!-- Section Identité / À propos — texte sur 2/3, photo des fondatrices sur 1/3 -->
     <section id="apropos" class="w-full bg-white border-b border-primary">
-        <div class="grid grid-cols-1 lg:grid-cols-3">
+        <div class="grid grid-cols-1 lg:grid-cols-5">
 
-            <!-- Colonne texte (2/3) -->
-            <div class="lg:col-span-2 bg-cream p-10 lg:p-16">
+            <!-- Colonne texte (3/5) -->
+            <div class="lg:col-span-3 bg-cream p-10 lg:p-16">
 
                 <!-- Identité / valeurs -->
                 <div class="mb-14">
                     <p class="text-xs font-bold uppercase tracking-[0.3em] text-primary mb-6">Identité / valeurs</p>
                     <h2 class="font-display text-5xl md:text-6xl text-primary leading-tight mb-6">Une vague<br>de fraîcheur</h2>
                     <p class="text-lg text-gray-800 font-light leading-relaxed max-w-2xl">
-                        Fleurs de Nila c'est une vague de fraîcheur dans l'Écusson Nîmois, un lieu coloré où savoir-faire
-                        et artisanat sont maîtres. Un style plus léger, une offre sur-mesure, chacun y trouve son bonheur.
-                        En plus de son large choix de fleurs de saisons et de fleurs séchées, la boutique propose de
-                        jolies poteries et plantes d'intérieur.
+                        Fleurs de Nila c'est une vague de fraîcheur dans l'Écusson Nîmois, un lieu coloré où
+                        <strong class="font-semibold text-primary">savoir-faire et artisanat sont maîtres</strong>.
+                        Un style plus léger, <strong class="font-semibold text-primary">une offre sur-mesure</strong>,
+                        chacun y trouve son bonheur. En plus de son large choix de fleurs de saisons et de fleurs
+                        séchées, la boutique propose de jolies poteries et plantes d'intérieur.
                     </p>
                 </div>
 
                 <!-- À propos / Fleurs de Nila -->
-                <div class="mb-14">
+                <div>
                     <span class="text-xs font-bold uppercase tracking-widest text-secondary mb-3 block">À propos</span>
                     <h2 class="font-display text-4xl text-primary leading-tight mb-6">Fleurs de Nila</h2>
                     <p class="text-base text-gray-700 leading-relaxed max-w-2xl">
-                        Fleurs de Nila est un atelier de fleuriste indépendant à Nîmes. Nous travaillons des fleurs de
-                        saison,
-                        fraîches et séchées, dans un esprit artisanal et poétique, pour les petits gestes du quotidien
-                        comme pour les grands événements.
-                    </p>
-                </div>
-
-                <!-- À propos de Fleurs de Nila (histoire des fondatrices) -->
-                <div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-secondary mb-3 block">Notre histoire</span>
-                    <h2 class="font-display text-4xl text-primary leading-tight mb-6">À propos de Fleurs de Nila</h2>
-                    <p class="text-base text-gray-700 leading-relaxed max-w-2xl">
-                        L'histoire de la boutique, c'est tout d'abord la rencontre de deux jeunes femmes, deux
-                        parcours distincts mais un amour commun pour la fleur. Elles partagent tout de suite un
-                        même objectif : casser les codes tout en modernisant les créations florales. Issues d'un
-                        savoir-faire hollandais, elles développent un autre style, une autre esthétique et des
-                        techniques d'entretien plus durable. La variété et la provenance des fleurs sont un point
-                        qu'elles mettent à l'honneur à la boutique : un maximum de fleurs françaises selon les
-                        saisons et un travail avec des producteurs européens pour toute l'année. Elles accordent
-                        une importance à la relation avec le client, un passage en boutique est plus qu'une simple
-                        vente, c'est un nouveau lien créé personnellement, ainsi qu'un suivi de qualité.
+                        Fleurs de Nila est <strong class="font-semibold text-primary">un atelier de fleuriste
+                        indépendant à Nîmes</strong>. Nous travaillons des fleurs de saison, fraîches et séchées,
+                        dans un esprit artisanal et poétique, pour les petits gestes du quotidien comme pour les
+                        grands événements.
                     </p>
                 </div>
             </div>
 
-            <!-- Colonne photo (1/3) : les deux fondatrices -->
-            <div class="lg:col-span-1 min-h-[320px] lg:min-h-0">
+            <!-- Colonne photo (2/5) : les deux fondatrices, agrandie -->
+            <div class="lg:col-span-2 min-h-[380px] lg:min-h-0">
                 <img src="images/manon-suz-fondatrices-fleurs-de-nila.webp" loading="lazy"
                     alt="Manon et Suz, les deux fondatrices de Fleurs de Nila, devant leur boutique à Nîmes"
                     width="1200" height="1600" class="w-full h-full object-cover"
                     srcset="images/manon-suz-fondatrices-fleurs-de-nila-400w.webp 400w, images/manon-suz-fondatrices-fleurs-de-nila-800w.webp 800w, images/manon-suz-fondatrices-fleurs-de-nila.webp 1200w"
-                    sizes="(max-width: 1024px) 100vw, 33vw">
+                    sizes="(max-width: 1024px) 100vw, 40vw">
+            </div>
+        </div>
+
+        <!-- Notre histoire : récit des fondatrices, pleine largeur -->
+        <div class="p-10 lg:p-16 border-t border-primary">
+            <div class="max-w-3xl mx-auto">
+                <span class="text-xs font-bold uppercase tracking-widest text-secondary mb-3 block text-center">Notre histoire</span>
+                <h2 class="font-display text-4xl text-primary leading-tight mb-6 text-center">À propos de Fleurs de Nila</h2>
+                <p class="text-base text-gray-700 leading-relaxed">
+                    L'histoire de la boutique, c'est tout d'abord <strong class="font-semibold text-primary">la
+                    rencontre de deux jeunes femmes</strong>, deux parcours distincts mais un amour commun pour la
+                    fleur. Elles partagent tout de suite un même objectif : casser les codes tout en modernisant
+                    les créations florales. Issues d'un <strong class="font-semibold text-primary">savoir-faire
+                    hollandais</strong>, elles développent un autre style, une autre esthétique et des techniques
+                    d'entretien plus durable. La variété et la provenance des fleurs sont un point qu'elles
+                    mettent à l'honneur à la boutique : un maximum de <strong class="font-semibold text-primary">fleurs
+                    françaises</strong> selon les saisons et un travail avec des producteurs européens pour toute
+                    l'année. Elles accordent une importance à la relation avec le client, un passage en boutique
+                    est plus qu'une simple vente, c'est <strong class="font-semibold text-primary">un nouveau lien
+                    créé personnellement</strong>, ainsi qu'un suivi de qualité.
+                </p>
             </div>
         </div>
     </section>
