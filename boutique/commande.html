@@ -146,10 +146,16 @@
               placeholder="marie@exemple.fr">
           </div>
           <div>
-            <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Commentaire pour le fleuriste <span class="normal-case tracking-normal text-gray-400">(facultatif)</span></label>
-            <textarea id="customer-note" rows="3" maxlength="500"
-              class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm resize-none transition-colors bg-white"
-              placeholder="Ex : sonner à l'interphone, allergie, précision sur la commande…"></textarea>
+            <button type="button" id="toggle-note-btn"
+              class="inline-flex items-center gap-1.5 text-xs tracking-widest uppercase text-gray-400 hover:text-primary transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Ajouter un commentaire pour le fleuriste
+            </button>
+            <div id="note-field" class="hidden mt-2">
+              <textarea id="customer-note" rows="2" maxlength="500"
+                class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm resize-none transition-colors bg-white"
+                placeholder="Ex : sonner à l'interphone, allergie, précision sur la commande… (facultatif)"></textarea>
+            </div>
           </div>
         </div>
 
@@ -234,6 +240,13 @@
 
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const orderSlot = JSON.parse(localStorage.getItem('order_slot') || 'null');
+
+    // Champ commentaire replié par défaut (allège la vue) : un clic le révèle et y place le focus
+    document.getElementById('toggle-note-btn').addEventListener('click', function () {
+      document.getElementById('note-field').classList.remove('hidden');
+      this.classList.add('hidden');
+      document.getElementById('customer-note').focus();
+    });
 
     // Panier modifié depuis le volet (ou un autre onglet) : resynchroniser le récap et le total
     window.addEventListener('cart:updated', () => {
