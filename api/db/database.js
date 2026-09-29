@@ -18,6 +18,21 @@ db.exec(`
     options TEXT DEFAULT '[]',
     stock INTEGER NOT NULL DEFAULT 0,
     active INTEGER NOT NULL DEFAULT 1,
+    category_id INTEGER DEFAULT NULL,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+  );
+
+  -- Catégories du catalogue (permanentes, saisonnières, deuil…). Un produit
+  -- appartient à au plus une catégorie (category_id sur products) ; la
+  -- supprimer ne supprime pas ses produits, elle les décatégorise (SET NULL).
+  CREATE TABLE IF NOT EXISTS categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    type TEXT NOT NULL DEFAULT 'permanente' CHECK(type IN ('permanente', 'saisonniere', 'speciale')),
+    position INTEGER NOT NULL DEFAULT 0,
+    active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT DEFAULT (datetime('now'))
   );
 
@@ -123,6 +138,8 @@ try {
 try { db.exec('ALTER TABLE slots ADD COLUMN capacity INTEGER NOT NULL DEFAULT 3'); } catch { /* déjà appliquée */ }
 // Commentaire libre du client au fleuriste (distinct du message par article, joint au bouquet)
 try { db.exec("ALTER TABLE orders ADD COLUMN customer_note TEXT DEFAULT ''"); } catch { /* déjà appliquée */ }
+// Catégories de produits (colonne ajoutée après coup sur une base déjà en place)
+try { db.exec('ALTER TABLE products ADD COLUMN category_id INTEGER DEFAULT NULL REFERENCES categories(id) ON DELETE SET NULL'); } catch { /* déjà appliquée */ }
 
 // Compte admin initial : créé depuis les variables d'env si la table est vide
 // (nécessaire au premier démarrage sur une base neuve, ex. volume Railway).
@@ -133,6 +150,18 @@ if (process.env.ADMIN_USER && process.env.ADMIN_PASSWORD) {
     db.prepare('INSERT INTO admins (username, password_hash) VALUES (?, ?)').run(process.env.ADMIN_USER, hash);
     console.log(`Compte admin « ${process.env.ADMIN_USER} » créé (bootstrap).`);
   }
+}
+
+// Catalogue réel (catégories + produits) : idempotent, sûr à chaque démarrage
+// (n'ajoute que ce qui manque, ne touche jamais aux produits existants).
+try {
+  const { seedCatalog } = require('./seed-catalog');
+  const r = seedCatalog(db);
+  if (r.categoriesCreated || r.productsCreated) {
+    console.log(`Catalogue : ${r.categoriesCreated} catégorie(s) et ${r.productsCreated} produit(s) initialisés.`);
+  }
+} catch (e) {
+  console.error('Erreur lors du seed du catalogue :', e.message);
 }
 
 module.exports = db;

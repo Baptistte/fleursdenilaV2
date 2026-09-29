@@ -100,9 +100,13 @@ router.get('/orders', (req, res) => {
   res.json(rows);
 });
 
-// GET /api/admin/products — tous les produits (actifs et inactifs)
+// GET /api/admin/products — tous les produits (actifs et inactifs), avec le nom de leur catégorie
 router.get('/products', (req, res) => {
-  const products = db.prepare('SELECT * FROM products ORDER BY id ASC').all();
+  const products = db.prepare(`
+    SELECT p.*, c.name AS category_name
+    FROM products p LEFT JOIN categories c ON c.id = p.category_id
+    ORDER BY p.id ASC
+  `).all();
   products.forEach(p => {
     p.images = JSON.parse(p.images);
     p.options = JSON.parse(p.options);
@@ -112,26 +116,26 @@ router.get('/products', (req, res) => {
 
 // POST /api/admin/products — créer un produit
 router.post('/products', (req, res) => {
-  const { name, description, price, images = [], options = [], stock, active = 1 } = req.body;
+  const { name, description, price, images = [], options = [], stock, active = 1, category_id = null } = req.body;
   if (!name || price == null) return res.status(400).json({ error: 'name et price requis' });
 
   const result = db.prepare(`
-    INSERT INTO products (name, description, price, images, options, stock, active)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(name, description, price, JSON.stringify(images), JSON.stringify(options), stock ?? 0, active);
+    INSERT INTO products (name, description, price, images, options, stock, active, category_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(name, description, price, JSON.stringify(images), JSON.stringify(options), stock ?? 10000, active, category_id);
 
   res.status(201).json({ id: result.lastInsertRowid });
 });
 
 // PUT /api/admin/products/:id — modifier un produit
 router.put('/products/:id', (req, res) => {
-  const { name, description, price, images, options, stock, active } = req.body;
+  const { name, description, price, images, options, stock, active, category_id } = req.body;
   const product = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
   if (!product) return res.status(404).json({ error: 'Produit introuvable' });
 
   db.prepare(`
     UPDATE products SET
-      name = ?, description = ?, price = ?, images = ?, options = ?, stock = ?, active = ?
+      name = ?, description = ?, price = ?, images = ?, options = ?, stock = ?, active = ?, category_id = ?
     WHERE id = ?
   `).run(
     name ?? product.name,
@@ -141,6 +145,9 @@ router.put('/products/:id', (req, res) => {
     options ? JSON.stringify(options) : product.options,
     stock ?? product.stock,
     active ?? product.active,
+    // category_id peut être remis à null volontairement (produit décatégorisé) :
+    // seul "non fourni" (undefined) doit conserver la valeur actuelle.
+    category_id !== undefined ? category_id : product.category_id,
     req.params.id
   );
 
@@ -150,6 +157,70 @@ router.put('/products/:id', (req, res) => {
 // DELETE /api/admin/products/:id — supprimer un produit
 router.delete('/products/:id', (req, res) => {
   db.prepare('DELETE FROM products WHERE id = ?').run(req.params.id);
+  res.json({ ok: true });
+});
+
+// ── Catégories ───────────────────────────────────────────────────────────
+
+// GET /api/admin/categories — toutes les catégories, avec leur nombre de produits
+router.get('/categories', (req, res) => {
+  const categories = db.prepare(`
+    SELECT c.*, COUNT(p.id) AS product_count
+    FROM categories c LEFT JOIN products p ON p.category_id = c.id
+    GROUP BY c.id
+    ORDER BY c.position ASC, c.id ASC
+  `).all();
+  res.json(categories);
+});
+
+function slugify(s) {
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'categorie';
+}
+
+// POST /api/admin/categories — créer une catégorie
+router.post('/categories', (req, res) => {
+  const { name, type = 'permanente', position = 0, active = 1 } = req.body;
+  if (!name) return res.status(400).json({ error: 'name requis' });
+
+  let slug = slugify(name);
+  // Garantit l'unicité du slug (contrainte UNIQUE en base)
+  let suffix = 2;
+  while (db.prepare('SELECT 1 FROM categories WHERE slug = ?').get(slug)) {
+    slug = `${slugify(name)}-${suffix++}`;
+  }
+
+  const result = db.prepare(`
+    INSERT INTO categories (name, slug, type, position, active) VALUES (?, ?, ?, ?, ?)
+  `).run(name, slug, type, position, active);
+
+  res.status(201).json({ id: result.lastInsertRowid, slug });
+});
+
+// PUT /api/admin/categories/:id — modifier une catégorie (nom, type, ordre, visibilité).
+// Les produits qui en font partie se gèrent via PUT /products/:id (champ category_id).
+router.put('/categories/:id', (req, res) => {
+  const { name, type, position, active } = req.body;
+  const category = db.prepare('SELECT * FROM categories WHERE id = ?').get(req.params.id);
+  if (!category) return res.status(404).json({ error: 'Catégorie introuvable' });
+
+  db.prepare(`
+    UPDATE categories SET name = ?, type = ?, position = ?, active = ? WHERE id = ?
+  `).run(
+    name ?? category.name,
+    type ?? category.type,
+    position ?? category.position,
+    active ?? category.active,
+    req.params.id
+  );
+
+  res.json({ ok: true });
+});
+
+// DELETE /api/admin/categories/:id — supprimer une catégorie (les produits qu'elle
+// contenait sont décatégorisés, jamais supprimés — cf. FOREIGN KEY ON DELETE SET NULL)
+router.delete('/categories/:id', (req, res) => {
+  db.prepare('DELETE FROM categories WHERE id = ?').run(req.params.id);
   res.json({ ok: true });
 });
 

@@ -55,6 +55,27 @@
       opacity: 1;
       transform: translateY(0);
     }
+    .cat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: #fff;
+      color: #1a1410;
+      border: 1px solid #e8e0d4;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .cat-pill:hover { border-color: #1a1410; }
+    .cat-pill.active {
+      background: #1a1410;
+      color: #fff;
+      border-color: #1a1410;
+    }
+    .cat-pill .cat-count { opacity: 0.55; font-size: 10px; }
   </style>
   <script src="../config.js"></script>
 </head>
@@ -152,6 +173,9 @@
 
   <!-- Grille produits -->
   <main class="px-6 lg:px-16 max-w-6xl mx-auto" style="padding-top:36px;padding-bottom:60px">
+
+    <!-- Filtres par catégorie (injectés par JS) -->
+    <div id="category-filters" class="hidden" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px"></div>
 
     <!-- État chargement -->
     <div id="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style="gap:28px">
@@ -327,31 +351,70 @@
       });
     }
 
+    let allProducts = [];
+    let currentCategoryId = null;   // null = toutes catégories
+
+    // Pastilles de filtre par catégorie. N'apparaissent que s'il y a au moins
+    // une catégorie avec des produits à afficher.
+    async function loadCategories() {
+      try {
+        const res = await fetch(`${API}/api/categories`);
+        if (!res.ok) throw new Error();
+        const categories = (await res.json()).filter(c => c.product_count > 0);
+        const wrap = document.getElementById('category-filters');
+        if (!categories.length) return;
+
+        wrap.classList.remove('hidden');
+        wrap.innerHTML = `<button class="cat-pill active" data-cat="">Tout voir</button>` +
+          categories.map(c => `<button class="cat-pill" data-cat="${c.id}">${c.name} <span class="cat-count">${c.product_count}</span></button>`).join('');
+
+        wrap.querySelectorAll('.cat-pill').forEach(btn => {
+          btn.addEventListener('click', () => {
+            wrap.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentCategoryId = btn.dataset.cat ? parseInt(btn.dataset.cat) : null;
+            renderGrid();
+          });
+        });
+      } catch { /* pas de catégories : la grille reste affichée sans filtre */ }
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('products-grid');
+      const list = currentCategoryId ? allProducts.filter(p => p.category_id === currentCategoryId) : allProducts;
+
+      if (list.length === 0) {
+        grid.innerHTML = '<p class="col-span-3 text-center py-20 text-gray-500">Aucun produit dans cette catégorie pour le moment.</p>';
+        return;
+      }
+      grid.innerHTML = list.map(renderCard).join('');
+      grid.querySelectorAll('.quick-add-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          openQuickPanel(btn.dataset.id, btn);
+        });
+      });
+    }
+
     async function loadProducts() {
       try {
         const res = await fetch(`${API}/api/products`);
         if (!res.ok) throw new Error();
-        const products = await res.json();
+        allProducts = await res.json();
 
         document.getElementById('loading').classList.add('hidden');
         const grid = document.getElementById('products-grid');
         grid.classList.remove('hidden');
 
-        if (products.length === 0) {
+        if (allProducts.length === 0) {
           grid.innerHTML = '<p class="col-span-3 text-center py-20 text-gray-500">Aucun produit disponible pour le moment.</p>';
           return;
         }
 
-        products.forEach(p => productsMap[p.id] = p);
-        grid.innerHTML = products.map(renderCard).join('');
-
-        grid.querySelectorAll('.quick-add-btn').forEach(btn => {
-          btn.addEventListener('click', e => {
-            e.preventDefault();
-            e.stopPropagation();
-            openQuickPanel(btn.dataset.id, btn);
-          });
-        });
+        allProducts.forEach(p => productsMap[p.id] = p);
+        renderGrid();
+        loadCategories();
       } catch {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('error').classList.remove('hidden');
