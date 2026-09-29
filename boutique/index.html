@@ -300,6 +300,15 @@
         }
       }
 
+      html += `<div style="margin-top:10px">
+        <button type="button" class="q-toggle-msg" style="display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#9b8f80;padding:0">
+          <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Joindre un message au bouquet
+        </button>
+        <textarea class="q-message" rows="2" maxlength="200" style="display:none;width:100%;margin-top:8px;padding:8px 10px;border:1px solid #e8e0d4;font-size:12px;font-family:inherit;resize:none"
+          placeholder="Ex : Joyeux anniversaire Marie… (facultatif)"></textarea>
+      </div>`;
+
       html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:10px">
         <div style="display:inline-flex;align-items:center;border:1px solid #e8e0d4;flex-shrink:0">
           <button class="q-dec" style="width:30px;height:30px;border:none;background:none;cursor:pointer;font-size:16px;color:#6b5f55">−</button>
@@ -324,6 +333,14 @@
         });
       });
 
+      // Message au bouquet : replié par défaut, révélé au clic (allège le panneau)
+      const msgField = panel.querySelector('.q-message');
+      panel.querySelector('.q-toggle-msg').addEventListener('click', function () {
+        msgField.style.display = 'block';
+        this.style.display = 'none';
+        msgField.focus();
+      });
+
       // Quantité
       const qVal = panel.querySelector('.q-val');
       panel.querySelector('.q-dec').addEventListener('click', () => { if (qty > 1) { qty--; qVal.textContent = qty; } });
@@ -337,10 +354,11 @@
           opts[type] = sel.value;
           price += sel.delta;
         }
+        const message = msgField.value.trim();
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const existing = cart.find(c => c.id === p.id && JSON.stringify(c.options) === JSON.stringify(opts) && !c.message);
+        const existing = cart.find(c => c.id === p.id && JSON.stringify(c.options) === JSON.stringify(opts) && c.message === message);
         if (existing) existing.qty += qty;
-        else cart.push({ id: p.id, name: p.name, image: p.images[0] || '', price, options: opts, message: '', qty });
+        else cart.push({ id: p.id, name: p.name, image: p.images[0] || '', price, options: opts, message, qty });
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartBadge();
         panel.style.display = 'none';
