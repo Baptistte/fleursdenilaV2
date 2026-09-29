@@ -110,15 +110,4 @@
         </image:image>
     </url>
 
-    <!-- À propos -->
-    <url>
-        <loc>https://www.fleursdenila.fr/a-propos.html</loc>
-        <lastmod>2026-07-14</lastmod>
-
-        <image:image>
-            <image:loc>https://www.fleursdenila.fr/images/atelier-fleuriste-nimes-fleurs-de-nila.webp</image:loc>
-            <image:title>Atelier Fleurs de Nila, fleuriste artisan à Nîmes</image:title>
-            <image:caption>L'atelier Fleurs de Nila, 3 rue Auguste-Pellet, Nîmes — bouquets de saison et compositions sur mesure</image:caption>
-        </image:image>
-    </url>
 </urlset>
