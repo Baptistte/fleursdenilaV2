@@ -1888,11 +1888,22 @@
           <input id="f-stock" class="field-input" type="number" min="0" step="1" value="10000">
         </div>
       </div>
-      <div class="field-group">
-        <label class="field-label">Catégorie</label>
-        <select id="f-category" class="field-input">
-          <option value="">— Aucune —</option>
-        </select>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="field-group">
+          <label class="field-label">Catégorie</label>
+          <select id="f-category" class="field-input">
+            <option value="">— Aucune —</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Taux de TVA</label>
+          <select id="f-vat" class="field-input">
+            <option value="20">20 % — taux normal</option>
+            <option value="10">10 % — taux réduit</option>
+            <option value="5.5">5,5 % — taux réduit</option>
+            <option value="2.1">2,1 % — taux particulier</option>
+          </select>
+        </div>
       </div>
       <div class="field-group">
         <label class="field-label">Photos du produit</label>
@@ -2339,7 +2350,24 @@ function openInvoice(ids) {
   const num = `FDN-${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}-${orders.map(o => o.id).join('.')}`;
   const esc = s => String(s ?? '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 
+  // Taux de livraison : non rattachable à un taux de marchandise précis quand
+  // la commande mélange plusieurs taux (frais vendus à 20%, séchés à 10%...) —
+  // le transport est donc facturé au taux normal (20%), par défaut prudent.
+  const DELIVERY_VAT_RATE = 20;
+  const FALLBACK_VAT_RATE = 20; // commandes passées avant l'ajout du taux par produit
+
   let grandTotal = 0;
+  const vatBuckets = {}; // { "20": { ht, tva, ttc }, "10": {...}, ... }
+  const addToBucket = (rate, ttc) => {
+    const key = String(rate);
+    const ht = Math.round((ttc / (1 + rate / 100)) * 100) / 100;
+    const tva = Math.round((ttc - ht) * 100) / 100;
+    if (!vatBuckets[key]) vatBuckets[key] = { rate, ht: 0, tva: 0, ttc: 0 };
+    vatBuckets[key].ht += ht;
+    vatBuckets[key].tva += tva;
+    vatBuckets[key].ttc += ttc;
+  };
+
   const blocks = orders.map(o => {
     const itemsSum = (o.items || []).reduce((s, i) => s + i.price * i.qty, 0);
     const deliveryFee = Math.max(0, Math.round((o.total - itemsSum) * 100) / 100);
@@ -2347,20 +2375,32 @@ function openInvoice(ids) {
     const dateCmd = o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR') : '';
     const creneau = o.date ? ` — ${o.delivery_type === 'delivery' ? 'livraison' : 'retrait'} le ${new Date(o.date + 'T12:00:00').toLocaleDateString('fr-FR')}${o.start_time ? ' (' + o.start_time + '–' + o.end_time + ')' : ''}` : '';
     return `
-      <tr class="order-head"><td colspan="4">Commande n°${o.id} du ${dateCmd}${esc(creneau)}</td></tr>
+      <tr class="order-head"><td colspan="5">Commande n°${o.id} du ${dateCmd}${esc(creneau)}</td></tr>
       ${(o.items || []).map(i => {
         const opts = i.options && Object.keys(i.options).length
           ? `<div class="opts">${Object.entries(i.options).map(([k, v]) => `${esc(k)} : ${esc(v)}`).join(' · ')}</div>` : '';
+        const rate = Number.isFinite(i.vat_rate) ? i.vat_rate : FALLBACK_VAT_RATE;
+        const lineTotal = i.price * i.qty;
+        addToBucket(rate, lineTotal);
         return `<tr>
           <td>${esc(i.name)}${opts}</td>
           <td class="num">${i.qty}</td>
           <td class="num">${i.price.toFixed(2)} €</td>
-          <td class="num">${(i.price * i.qty).toFixed(2)} €</td>
+          <td class="num">${String(rate).replace('.', ',')}%</td>
+          <td class="num">${lineTotal.toFixed(2)} €</td>
         </tr>`;
       }).join('')}
-      ${deliveryFee > 0 ? `<tr><td>Frais de livraison</td><td class="num">1</td><td class="num">${deliveryFee.toFixed(2)} €</td><td class="num">${deliveryFee.toFixed(2)} €</td></tr>` : ''}
+      ${deliveryFee > 0 ? (() => {
+        addToBucket(DELIVERY_VAT_RATE, deliveryFee);
+        return `<tr><td>Frais de livraison</td><td class="num">1</td><td class="num">${deliveryFee.toFixed(2)} €</td><td class="num">${DELIVERY_VAT_RATE}%</td><td class="num">${deliveryFee.toFixed(2)} €</td></tr>`;
+      })() : ''}
     `;
   }).join('');
+
+  const vatRows = Object.values(vatBuckets).sort((a, b) => b.rate - a.rate).map(b => `
+    <div class="row"><span>Total HT (TVA ${String(b.rate).replace('.', ',')}%)</span><span>${b.ht.toFixed(2)} €</span></div>
+    <div class="row"><span>dont TVA ${String(b.rate).replace('.', ',')}%</span><span>${b.tva.toFixed(2)} €</span></div>
+  `).join('');
 
   const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
 <title>Facture ${num}</title>
@@ -2418,10 +2458,11 @@ function openInvoice(ids) {
     </div>
   </div>
   <table>
-    <thead><tr><th>Désignation</th><th class="num">Qté</th><th class="num">Prix unitaire</th><th class="num">Montant</th></tr></thead>
+    <thead><tr><th>Désignation</th><th class="num">Qté</th><th class="num">Prix unitaire TTC</th><th class="num">TVA</th><th class="num">Montant TTC</th></tr></thead>
     <tbody>${blocks}</tbody>
   </table>
   <div class="totals">
+    ${vatRows}
     <div class="row grand"><span>Total TTC</span><span>${grandTotal.toFixed(2)} €</span></div>
   </div>
   <div class="paid">Facture acquittée — paiement en ligne</div>
@@ -2946,7 +2987,7 @@ function renderProductTable() {
           <div style="font-size:11.5px;color:#94a3b8;margin-top:2px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.description || ''}</div>
         </td>
         <td>${p.category_name ? `<span class="badge badge-gray">${p.category_name}</span>` : '<span style="color:#cbd5e1">—</span>'}</td>
-        <td class="tabular" style="font-weight:600;color:var(--text)">${p.price.toFixed(2)} €</td>
+        <td class="tabular" style="font-weight:600;color:var(--text)">${p.price.toFixed(2)} € <span style="font-weight:400;font-size:10.5px;color:#94a3b8">TVA ${String(p.vat_rate ?? 20).replace('.', ',')}%</span></td>
         <td>
           <input type="number" class="stock-input ${stockCls}" value="${p.stock}" min="0"
             data-id="${p.id}" onchange="updateStock(${p.id}, this.value, this)">
@@ -3521,6 +3562,7 @@ document.getElementById('btn-add').addEventListener('click', () => {
   document.getElementById('f-price').value = '';
   document.getElementById('f-stock').value = '10000';
   document.getElementById('f-category').value = '';
+  document.getElementById('f-vat').value = '20';
   document.getElementById('f-active').checked = true;
   document.getElementById('f-active-label').textContent = 'Visible en boutique';
   document.getElementById('options-editor').innerHTML = '';
@@ -3657,6 +3699,7 @@ async function openEdit(id) {
   document.getElementById('f-price').value = p.price;
   document.getElementById('f-stock').value = p.stock;
   document.getElementById('f-category').value = p.category_id ?? '';
+  document.getElementById('f-vat').value = String(p.vat_rate ?? 20);
   currentImages = [...(p.images || [])];
   renderImagesEditor();
   document.getElementById('f-active').checked = !!p.active;
@@ -3758,6 +3801,7 @@ document.getElementById('btn-save').addEventListener('click', async () => {
     stock: parseInt(document.getElementById('f-stock').value) || 0,
     active: document.getElementById('f-active').checked ? 1 : 0,
     category_id: catVal ? parseInt(catVal) : null,
+    vat_rate: parseFloat(document.getElementById('f-vat').value) || 20,
     images: [...currentImages],
     options: readOptions()
   };

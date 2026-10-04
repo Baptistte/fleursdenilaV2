@@ -108,7 +108,10 @@ router.post('/', async (req, res) => {
       price: unitPrice,
       qty,
       options: chosen,
-      message: typeof item.message === 'string' ? item.message.slice(0, 500) : ''
+      message: typeof item.message === 'string' ? item.message.slice(0, 500) : '',
+      // Taux de TVA figé au moment de la vente (ne doit jamais changer
+      // rétroactivement sur une facture déjà émise si le taux produit change).
+      vat_rate: product.vat_rate
     });
   }
 

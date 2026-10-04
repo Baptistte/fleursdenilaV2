@@ -116,26 +116,26 @@ router.get('/products', (req, res) => {
 
 // POST /api/admin/products — créer un produit
 router.post('/products', (req, res) => {
-  const { name, description, price, images = [], options = [], stock, active = 1, category_id = null } = req.body;
+  const { name, description, price, images = [], options = [], stock, active = 1, category_id = null, vat_rate = 20 } = req.body;
   if (!name || price == null) return res.status(400).json({ error: 'name et price requis' });
 
   const result = db.prepare(`
-    INSERT INTO products (name, description, price, images, options, stock, active, category_id)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(name, description, price, JSON.stringify(images), JSON.stringify(options), stock ?? 10000, active, category_id);
+    INSERT INTO products (name, description, price, images, options, stock, active, category_id, vat_rate)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(name, description, price, JSON.stringify(images), JSON.stringify(options), stock ?? 10000, active, category_id, vat_rate);
 
   res.status(201).json({ id: result.lastInsertRowid });
 });
 
 // PUT /api/admin/products/:id — modifier un produit
 router.put('/products/:id', (req, res) => {
-  const { name, description, price, images, options, stock, active, category_id } = req.body;
+  const { name, description, price, images, options, stock, active, category_id, vat_rate } = req.body;
   const product = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
   if (!product) return res.status(404).json({ error: 'Produit introuvable' });
 
   db.prepare(`
     UPDATE products SET
-      name = ?, description = ?, price = ?, images = ?, options = ?, stock = ?, active = ?, category_id = ?
+      name = ?, description = ?, price = ?, images = ?, options = ?, stock = ?, active = ?, category_id = ?, vat_rate = ?
     WHERE id = ?
   `).run(
     name ?? product.name,
@@ -148,6 +148,7 @@ router.put('/products/:id', (req, res) => {
     // category_id peut être remis à null volontairement (produit décatégorisé) :
     // seul "non fourni" (undefined) doit conserver la valeur actuelle.
     category_id !== undefined ? category_id : product.category_id,
+    vat_rate ?? product.vat_rate,
     req.params.id
   );
 

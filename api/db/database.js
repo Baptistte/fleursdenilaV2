@@ -19,6 +19,7 @@ db.exec(`
     stock INTEGER NOT NULL DEFAULT 0,
     active INTEGER NOT NULL DEFAULT 1,
     category_id INTEGER DEFAULT NULL,
+    vat_rate REAL NOT NULL DEFAULT 20,
     created_at TEXT DEFAULT (datetime('now')),
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
   );
@@ -140,6 +141,8 @@ try { db.exec('ALTER TABLE slots ADD COLUMN capacity INTEGER NOT NULL DEFAULT 3'
 try { db.exec("ALTER TABLE orders ADD COLUMN customer_note TEXT DEFAULT ''"); } catch { /* déjà appliquée */ }
 // Catégories de produits (colonne ajoutée après coup sur une base déjà en place)
 try { db.exec('ALTER TABLE products ADD COLUMN category_id INTEGER DEFAULT NULL REFERENCES categories(id) ON DELETE SET NULL'); } catch { /* déjà appliquée */ }
+// Taux de TVA par produit (20% par défaut à l'ajout de la colonne, voir backfill ciblé plus bas)
+try { db.exec('ALTER TABLE products ADD COLUMN vat_rate REAL NOT NULL DEFAULT 20'); } catch { /* déjà appliquée */ }
 
 // Compte admin initial : créé depuis les variables d'env si la table est vide
 // (nécessaire au premier démarrage sur une base neuve, ex. volume Railway).
@@ -162,6 +165,26 @@ try {
   }
 } catch (e) {
   console.error('Erreur lors du seed du catalogue :', e.message);
+}
+
+// Rétro-remplissage ponctuel du taux de TVA par catégorie (produits "bouquets
+// séchés" → 10%, le reste reste au défaut 20%). Protégé par un drapeau en base
+// pour ne s'exécuter qu'une seule fois : si Manon modifie ensuite un taux
+// manuellement dans l'admin, aucun redémarrage ne doit jamais l'écraser.
+try {
+  const already = db.prepare("SELECT 1 FROM settings WHERE key = 'vat_rate_backfilled_v1'").get();
+  if (!already) {
+    const seches = db.prepare("SELECT id FROM categories WHERE slug = 'seches'").get();
+    if (seches) {
+      db.prepare('UPDATE products SET vat_rate = 10 WHERE category_id = ?').run(seches.id);
+    }
+    db.prepare(`
+      INSERT INTO settings (key, value) VALUES ('vat_rate_backfilled_v1', '1')
+      ON CONFLICT(key) DO UPDATE SET value = excluded.value
+    `).run();
+  }
+} catch (e) {
+  console.error('Erreur lors du rétro-remplissage des taux de TVA :', e.message);
 }
 
 module.exports = db;

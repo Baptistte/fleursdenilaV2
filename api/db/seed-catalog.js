@@ -41,11 +41,15 @@ function formatOption(prices) {
   };
 }
 
+// TVA par catégorie (France) : 10% pour les fleurs n'ayant subi aucune
+// transformation (art. 278 bis, 3° bis d du CGI), 20% dès qu'il s'agit d'une
+// composition élaborée. Les bouquets frais et le deuil vendus ici sont des
+// compositions travaillées → 20% ; les bouquets séchés simples → 10%.
 const CATEGORIES = [
-  { slug: 'permanents', name: 'Bouquets permanents', type: 'permanente', position: 1 },
-  { slug: 'saison', name: 'Bouquets de saison', type: 'saisonniere', position: 2 },
-  { slug: 'seches', name: 'Bouquets séchés', type: 'speciale', position: 3 },
-  { slug: 'deuil', name: 'Deuil', type: 'speciale', position: 4 },
+  { slug: 'permanents', name: 'Bouquets permanents', type: 'permanente', position: 1, vat: 20 },
+  { slug: 'saison', name: 'Bouquets de saison', type: 'saisonniere', position: 2, vat: 20 },
+  { slug: 'seches', name: 'Bouquets séchés', type: 'speciale', position: 3, vat: 10 },
+  { slug: 'deuil', name: 'Deuil', type: 'speciale', position: 4, vat: 20 },
 ];
 
 function productsFor(slug) {
@@ -107,8 +111,8 @@ function seedCatalog(db) {
     INSERT INTO categories (name, slug, type, position, active) VALUES (?, ?, ?, ?, 1)
   `);
   const insertProduct = db.prepare(`
-    INSERT INTO products (name, description, price, images, options, stock, active, category_id)
-    VALUES (?, ?, ?, '[]', ?, 10000, 1, ?)
+    INSERT INTO products (name, description, price, images, options, stock, active, category_id, vat_rate)
+    VALUES (?, ?, ?, '[]', ?, 10000, 1, ?, ?)
   `);
 
   for (const cat of CATEGORIES) {
@@ -126,7 +130,7 @@ function seedCatalog(db) {
       // d'origine — la recatégorisation est définitive.
       const exists = db.prepare('SELECT id FROM products WHERE name = ?').get(p.name);
       if (exists) continue;
-      insertProduct.run(p.name, p.description, p.price, JSON.stringify(p.options), row.id);
+      insertProduct.run(p.name, p.description, p.price, JSON.stringify(p.options), row.id, cat.vat);
       productsCreated++;
     }
   }
