@@ -199,7 +199,7 @@
                 <a href="mariage.html" class="text-sm uppercase tracking-widest text-secondary hover:text-primary transition-colors inline-block mb-6">
                     → Découvrir notre approche mariage en détail
                 </a>
-                <a href="#devis-mariage" class="btn-primary inline-block self-start">Demander un devis</a>
+                <a href="#devis" onclick="document.getElementById('quote-category').value='mariage'" class="btn-primary inline-block self-start">Demander un devis</a>
             </div>
             <div class="order-1 lg:order-2 relative overflow-hidden aspect-[4/3] lg:aspect-auto border-b lg:border-b-0 lg:border-l border-primary">
                 <img src="images/decoration-florale-mariage-nimes.webp"
@@ -209,49 +209,6 @@
                     srcset="images/decoration-florale-mariage-nimes-400w.webp 400w, images/decoration-florale-mariage-nimes.webp 675w"
                     sizes="(max-width: 1024px) 100vw, 50vw">
             </div>
-        </div>
-        <div class="max-w-3xl mx-auto px-6 lg:px-12 py-16 lg:py-20" id="devis-mariage">
-            <h3 class="font-display text-3xl text-primary mb-2 text-center">Demander un devis mariage</h3>
-            <p class="text-gray-600 text-sm text-center mb-8">Réponse sous 48h pour fixer un premier rendez-vous.</p>
-            <form class="quote-form" data-category="mariage">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Nom *</label>
-                        <input name="name" type="text" required
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="Marie Dupont">
-                    </div>
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Date du mariage</label>
-                        <input name="eventDate" type="text"
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="14 juin 2027">
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Téléphone</label>
-                        <input name="phone" type="tel"
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="06 12 34 56 78">
-                    </div>
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Email</label>
-                        <input name="email" type="email"
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="marie@exemple.fr">
-                    </div>
-                </div>
-                <p class="text-xs text-gray-400 mb-4">Indiquez au moins un téléphone ou un email pour être recontacté·e.</p>
-                <div class="mb-6">
-                    <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Votre projet</label>
-                    <textarea name="message" rows="3" maxlength="1000"
-                        class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm resize-none transition-colors bg-white"
-                        placeholder="Lieu, style souhaité, nombre d'invités… (facultatif)"></textarea>
-                </div>
-                <button type="submit" class="btn-primary w-full sm:w-auto">Envoyer ma demande</button>
-                <p class="quote-feedback mt-4 text-sm hidden"></p>
-            </form>
         </div>
     </section>
 
@@ -274,51 +231,8 @@
                     accompagnons les professionnels avec des créations florales sur mesure, livrées et
                     installées, ponctuelles ou en abonnement régulier.
                 </p>
-                <a href="#devis-professionnel" class="btn-primary inline-block self-start">Demander un devis</a>
+                <a href="#devis" onclick="document.getElementById('quote-category').value='professionnel'" class="btn-primary inline-block self-start">Demander un devis</a>
             </div>
-        </div>
-        <div class="max-w-3xl mx-auto px-6 lg:px-12 py-16 lg:py-20" id="devis-professionnel">
-            <h3 class="font-display text-3xl text-primary mb-2 text-center">Demander un devis professionnel</h3>
-            <p class="text-gray-600 text-sm text-center mb-8">Réponse sous 48h pour fixer un premier rendez-vous.</p>
-            <form class="quote-form" data-category="professionnel">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Nom / Société *</label>
-                        <input name="name" type="text" required
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="Entreprise ou nom">
-                    </div>
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Date envisagée</label>
-                        <input name="eventDate" type="text"
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="Ponctuel ou récurrent">
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Téléphone</label>
-                        <input name="phone" type="tel"
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="06 12 34 56 78">
-                    </div>
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Email</label>
-                        <input name="email" type="email"
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="contact@entreprise.fr">
-                    </div>
-                </div>
-                <p class="text-xs text-gray-400 mb-4">Indiquez au moins un téléphone ou un email pour être recontacté·e.</p>
-                <div class="mb-6">
-                    <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Votre projet</label>
-                    <textarea name="message" rows="3" maxlength="1000"
-                        class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm resize-none transition-colors bg-white"
-                        placeholder="Type d'événement, fréquence, budget… (facultatif)"></textarea>
-                </div>
-                <button type="submit" class="btn-primary w-full sm:w-auto">Envoyer ma demande</button>
-                <p class="quote-feedback mt-4 text-sm hidden"></p>
-            </form>
         </div>
     </section>
 
@@ -333,7 +247,7 @@
                     qui habille votre réception, des centres de table aux bouquets d'ambiance, dans le style
                     qui vous correspond.
                 </p>
-                <a href="#devis-reception" class="btn-primary inline-block self-start">Demander un devis</a>
+                <a href="#devis" onclick="document.getElementById('quote-category').value='reception'" class="btn-primary inline-block self-start">Demander un devis</a>
             </div>
             <div class="order-1 lg:order-2 relative overflow-hidden aspect-[4/3] lg:aspect-auto border-b lg:border-b-0 lg:border-l border-primary">
                 <img src="images/fleuriste-nimes-creation-bouquet.webp"
@@ -343,49 +257,6 @@
                     srcset="images/fleuriste-nimes-creation-bouquet-400w.webp 400w, images/fleuriste-nimes-creation-bouquet.webp 675w"
                     sizes="(max-width: 1024px) 100vw, 50vw">
             </div>
-        </div>
-        <div class="max-w-3xl mx-auto px-6 lg:px-12 py-16 lg:py-20" id="devis-reception">
-            <h3 class="font-display text-3xl text-primary mb-2 text-center">Demander un devis réception</h3>
-            <p class="text-gray-600 text-sm text-center mb-8">Réponse sous 48h pour fixer un premier rendez-vous.</p>
-            <form class="quote-form" data-category="reception">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Nom *</label>
-                        <input name="name" type="text" required
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="Marie Dupont">
-                    </div>
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Date de l'événement</label>
-                        <input name="eventDate" type="text"
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="14 juin 2027">
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Téléphone</label>
-                        <input name="phone" type="tel"
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="06 12 34 56 78">
-                    </div>
-                    <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Email</label>
-                        <input name="email" type="email"
-                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="marie@exemple.fr">
-                    </div>
-                </div>
-                <p class="text-xs text-gray-400 mb-4">Indiquez au moins un téléphone ou un email pour être recontacté·e.</p>
-                <div class="mb-6">
-                    <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Votre projet</label>
-                    <textarea name="message" rows="3" maxlength="1000"
-                        class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm resize-none transition-colors bg-white"
-                        placeholder="Type de réception, nombre d'invités, style souhaité… (facultatif)"></textarea>
-                </div>
-                <button type="submit" class="btn-primary w-full sm:w-auto">Envoyer ma demande</button>
-                <p class="quote-feedback mt-4 text-sm hidden"></p>
-            </form>
         </div>
     </section>
 
@@ -408,25 +279,41 @@
                     discrétion les hommages floraux pour accompagner vos proches, en lien avec les familles
                     ou les pompes funèbres, dans les délais nécessaires.
                 </p>
-                <a href="#devis-deuil" class="btn-primary inline-block self-start">Demander un devis</a>
+                <a href="#devis" onclick="document.getElementById('quote-category').value='deuil'" class="btn-primary inline-block self-start">Demander un devis</a>
             </div>
         </div>
-        <div class="max-w-3xl mx-auto px-6 lg:px-12 py-16 lg:py-20" id="devis-deuil">
-            <h3 class="font-display text-3xl text-primary mb-2 text-center">Demander un devis — hommage floral</h3>
-            <p class="text-gray-600 text-sm text-center mb-8">Nous vous recontactons rapidement, y compris en urgence.</p>
-            <form class="quote-form" data-category="deuil">
+    </section>
+
+    <!-- Demande de devis / contact — unique, catégorie au choix -->
+    <section id="devis" class="w-full bg-white border-b border-primary">
+        <div class="max-w-3xl mx-auto px-6 lg:px-12 py-16 lg:py-20">
+            <h2 class="font-display text-4xl md:text-5xl text-primary mb-2 text-center">Demander un devis</h2>
+            <p class="text-gray-600 text-sm text-center mb-10">Réponse sous 48h pour fixer un premier rendez-vous, y compris pour une demande urgente.</p>
+            <form class="quote-form">
+                <div class="mb-4">
+                    <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Quelle prestation vous intéresse ? *</label>
+                    <select id="quote-category" name="category" required
+                        class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white">
+                        <option value="" disabled selected>Choisissez une prestation</option>
+                        <option value="mariage">Mariage</option>
+                        <option value="professionnel">Professionnel</option>
+                        <option value="reception">Réception</option>
+                        <option value="deuil">Deuil</option>
+                        <option value="autre">Autre demande / contact ouvert</option>
+                    </select>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Nom *</label>
                         <input name="name" type="text" required
                             class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="Nom">
+                            placeholder="Marie Dupont">
                     </div>
                     <div>
-                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Date de la cérémonie</label>
+                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Date envisagée</label>
                         <input name="eventDate" type="text"
                             class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
-                            placeholder="Date si connue">
+                            placeholder="14 juin 2027, ou date si connue">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -448,7 +335,7 @@
                     <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Votre demande</label>
                     <textarea name="message" rows="3" maxlength="1000"
                         class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm resize-none transition-colors bg-white"
-                        placeholder="Type d'hommage, lieu de la cérémonie, délai… (facultatif)"></textarea>
+                        placeholder="Lieu, style souhaité, nombre d'invités, délai… (facultatif)"></textarea>
                 </div>
                 <button type="submit" class="btn-primary w-full sm:w-auto">Envoyer ma demande</button>
                 <p class="quote-feedback mt-4 text-sm hidden"></p>
@@ -574,7 +461,7 @@
                 const feedback = form.querySelector('.quote-feedback');
                 const submitBtn = form.querySelector('button[type="submit"]');
                 const data = {
-                    category: form.dataset.category,
+                    category: form.category.value,
                     name: form.name.value.trim(),
                     phone: form.phone.value.trim(),
                     email: form.email.value.trim(),

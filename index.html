@@ -588,6 +588,65 @@
         </div>
     </section>
 
+    <!-- Demande de devis / contact — catégorie au choix -->
+    <section id="devis" class="w-full bg-white border-b border-primary">
+        <div class="max-w-3xl mx-auto px-6 lg:px-12 py-16 lg:py-20">
+            <h2 class="font-display text-4xl md:text-5xl text-primary mb-2 text-center">Demander un devis</h2>
+            <p class="text-gray-600 text-sm text-center mb-10">Réponse sous 48h pour fixer un premier rendez-vous, y compris pour une demande urgente.</p>
+            <form class="quote-form">
+                <div class="mb-4">
+                    <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Quelle prestation vous intéresse ? *</label>
+                    <select name="category" required
+                        class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white">
+                        <option value="" disabled selected>Choisissez une prestation</option>
+                        <option value="mariage">Mariage</option>
+                        <option value="professionnel">Professionnel</option>
+                        <option value="reception">Réception</option>
+                        <option value="deuil">Deuil</option>
+                        <option value="autre">Autre demande / contact ouvert</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Nom *</label>
+                        <input name="name" type="text" required
+                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
+                            placeholder="Marie Dupont">
+                    </div>
+                    <div>
+                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Date envisagée</label>
+                        <input name="eventDate" type="text"
+                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
+                            placeholder="14 juin 2027, ou date si connue">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Téléphone</label>
+                        <input name="phone" type="tel"
+                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
+                            placeholder="06 12 34 56 78">
+                    </div>
+                    <div>
+                        <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Email</label>
+                        <input name="email" type="email"
+                            class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
+                            placeholder="marie@exemple.fr">
+                    </div>
+                </div>
+                <p class="text-xs text-gray-400 mb-4">Indiquez au moins un téléphone ou un email pour être recontacté·e.</p>
+                <div class="mb-6">
+                    <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Votre demande</label>
+                    <textarea name="message" rows="3" maxlength="1000"
+                        class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm resize-none transition-colors bg-white"
+                        placeholder="Lieu, style souhaité, nombre d'invités, délai… (facultatif)"></textarea>
+                </div>
+                <button type="submit" class="btn-primary w-full sm:w-auto">Envoyer ma demande</button>
+                <p class="quote-feedback mt-4 text-sm hidden"></p>
+            </form>
+        </div>
+    </section>
+
     <!-- Avis Google -->
     <section id="avis" class="w-full bg-white">
 
@@ -887,6 +946,53 @@
 
         loadVitrine();
       })();
+    </script>
+
+    <script>
+      document.querySelectorAll('.quote-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const feedback = form.querySelector('.quote-feedback');
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const data = {
+            category: form.category.value,
+            name: form.name.value.trim(),
+            phone: form.phone.value.trim(),
+            email: form.email.value.trim(),
+            eventDate: form.eventDate.value.trim(),
+            message: form.message.value.trim(),
+          };
+
+          feedback.classList.remove('hidden', 'text-red-600', 'text-green-700');
+          if (!data.phone && !data.email) {
+            feedback.textContent = 'Merci d\'indiquer au moins un téléphone ou un email.';
+            feedback.classList.add('text-red-600');
+            return;
+          }
+
+          submitBtn.disabled = true;
+          submitBtn.classList.add('opacity-60');
+          try {
+            const res = await fetch(`${window.API_URL}/api/quotes`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.error || 'Erreur lors de l\'envoi.');
+
+            feedback.textContent = 'Merci ! Votre demande a bien été envoyée, nous vous recontactons très vite.';
+            feedback.classList.add('text-green-700');
+            form.reset();
+          } catch (err) {
+            feedback.textContent = err.message || 'Une erreur est survenue, merci de réessayer ou de nous appeler.';
+            feedback.classList.add('text-red-600');
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-60');
+          }
+        });
+      });
     </script>
 
     <script src="script.js" defer></script>

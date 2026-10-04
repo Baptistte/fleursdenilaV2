@@ -8,6 +8,7 @@ const CATEGORY_LABELS = {
   professionnel: 'Professionnel',
   reception: 'Réception',
   deuil: 'Deuil',
+  autre: 'Demande générale',
 };
 
 // POST /api/quotes — demande de devis depuis la page « Nos prestations »

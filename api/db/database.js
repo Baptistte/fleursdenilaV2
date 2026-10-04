@@ -125,11 +125,11 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now'))
   );
 
-  -- Demandes de devis depuis la page « Nos prestations »
-  -- (mariage, professionnel, réception, deuil).
+  -- Demandes de devis / contact depuis la page « Nos prestations » et l'accueil
+  -- (mariage, professionnel, réception, deuil, ou « autre » pour une demande ouverte).
   CREATE TABLE IF NOT EXISTS quote_requests (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    category TEXT NOT NULL CHECK(category IN ('mariage', 'professionnel', 'reception', 'deuil')),
+    category TEXT NOT NULL CHECK(category IN ('mariage', 'professionnel', 'reception', 'deuil', 'autre')),
     name TEXT NOT NULL,
     phone TEXT,
     email TEXT,
@@ -157,6 +157,33 @@ try { db.exec("ALTER TABLE orders ADD COLUMN customer_note TEXT DEFAULT ''"); } 
 try { db.exec('ALTER TABLE products ADD COLUMN category_id INTEGER DEFAULT NULL REFERENCES categories(id) ON DELETE SET NULL'); } catch { /* déjà appliquée */ }
 // Taux de TVA par produit (20% par défaut à l'ajout de la colonne, voir backfill ciblé plus bas)
 try { db.exec('ALTER TABLE products ADD COLUMN vat_rate REAL NOT NULL DEFAULT 20'); } catch { /* déjà appliquée */ }
+
+// Catégorie « autre » (demande ouverte) pour quote_requests : la contrainte CHECK
+// d'origine ne l'autorisait pas. SQLite ne permet pas d'altérer un CHECK existant,
+// on reconstruit donc la table si elle a été créée avec l'ancienne contrainte.
+try {
+  const tableDef = db.prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'quote_requests'").get();
+  if (tableDef && !tableDef.sql.includes("'autre'")) {
+    db.exec(`
+      ALTER TABLE quote_requests RENAME TO quote_requests_old_v1;
+      CREATE TABLE quote_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category TEXT NOT NULL CHECK(category IN ('mariage', 'professionnel', 'reception', 'deuil', 'autre')),
+        name TEXT NOT NULL,
+        phone TEXT,
+        email TEXT,
+        event_date TEXT,
+        message TEXT,
+        status TEXT NOT NULL DEFAULT 'nouvelle' CHECK(status IN ('nouvelle', 'traitee', 'archivee')),
+        created_at TEXT DEFAULT (datetime('now'))
+      );
+      INSERT INTO quote_requests SELECT * FROM quote_requests_old_v1;
+      DROP TABLE quote_requests_old_v1;
+    `);
+  }
+} catch (e) {
+  console.error('Erreur lors de la migration de quote_requests (catégorie « autre ») :', e.message);
+}
 
 // Compte admin initial : créé depuis les variables d'env si la table est vide
 // (nécessaire au premier démarrage sur une base neuve, ex. volume Railway).
