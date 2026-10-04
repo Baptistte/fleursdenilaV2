@@ -110,10 +110,22 @@
         </image:image>
     </url>
 
+    <!-- Nos prestations -->
+    <url>
+        <loc>https://www.fleursdenila.fr/prestations.html</loc>
+        <lastmod>2026-10-04</lastmod>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/composition-deuil-couronne-fleuriste-nimes.webp</image:loc>
+            <image:title>Composition florale de deuil Nîmes — Fleurs de Nila</image:title>
+            <image:caption>Hommage floral réalisé par Fleurs de Nila, fleuriste artisan à Nîmes</image:caption>
+        </image:image>
+    </url>
+
     <!-- Plan du site -->
     <url>
         <loc>https://www.fleursdenila.fr/plan-du-site.html</loc>
-        <lastmod>2026-09-30</lastmod>
+        <lastmod>2026-10-04</lastmod>
     </url>
 
 </urlset>

@@ -596,4 +596,22 @@ router.put('/settings', (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Demandes de devis (page « Nos prestations ») ───────────────────────
+
+// GET /api/admin/quotes — toutes les demandes, les plus récentes d'abord
+router.get('/quotes', (req, res) => {
+  const quotes = db.prepare('SELECT * FROM quote_requests ORDER BY created_at DESC').all();
+  res.json(quotes);
+});
+
+// PATCH /api/admin/quotes/:id/status — marquer traitée / archivée / nouvelle
+router.patch('/quotes/:id/status', (req, res) => {
+  const { status } = req.body;
+  if (!['nouvelle', 'traitee', 'archivee'].includes(status)) {
+    return res.status(400).json({ error: 'Statut invalide' });
+  }
+  db.prepare('UPDATE quote_requests SET status = ? WHERE id = ?').run(status, req.params.id);
+  res.json({ ok: true });
+});
+
 module.exports = router;

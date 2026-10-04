@@ -184,6 +184,41 @@ const TEMPLATES = {
     })
   },
 
+  quote_request_client: {
+    label: 'Accusé de réception — demande de devis',
+    description: 'Envoyé automatiquement au client qui demande un devis (Nos prestations).',
+    auto: true,
+    build: d => ({
+      subject: `Votre demande de devis — ${esc(d.categoryLabel)} 🌸`,
+      html: layout(
+        H(`Merci ${esc(d.firstName)} !`) +
+        P(`Nous avons bien reçu votre demande de devis pour <strong>${esc(d.categoryLabel)}</strong>. ` +
+          `Manon vous recontactera très prochainement pour en discuter.`) +
+        (d.message ? `<div style="margin:16px 0;padding:14px 16px;background:${BRAND.cream};border:1px solid #e8edf3;font-size:13px;line-height:1.7;color:#3d4f66;"><strong style="color:${BRAND.navy};">Votre message :</strong><br>${esc(d.message)}</div>` : '') +
+        P(`Une question en attendant ? Appelez-nous au <a href="tel:0434390429" style="color:${BRAND.navy2};">${BRAND.phone}</a>.`)
+      )
+    })
+  },
+
+  quote_request_admin: {
+    label: 'Alerte nouvelle demande de devis (interne)',
+    description: 'Envoyé à Manon à chaque demande de devis (Nos prestations).',
+    auto: true,
+    internal: true,
+    build: d => ({
+      subject: `🌸 Demande de devis — ${esc(d.categoryLabel)}`,
+      html: layout(
+        H(`Nouvelle demande de devis`) +
+        P(`<strong>${esc(d.categoryLabel)}</strong>`) +
+        P(`<strong>${esc(d.name)}</strong>` +
+          (d.phone ? ` · <a href="tel:${esc(d.phone)}" style="color:${BRAND.navy2};">${esc(d.phone)}</a>` : '') +
+          (d.email ? ` · ${esc(d.email)}` : '')) +
+        (d.eventDate ? P(`Date envisagée : <strong>${esc(d.eventDate)}</strong>`) : '') +
+        (d.message ? `<div style="margin:16px 0;padding:14px 16px;background:${BRAND.cream};border:1px solid #e8edf3;font-size:13px;line-height:1.7;color:#3d4f66;">${esc(d.message)}</div>` : '')
+      )
+    })
+  },
+
   admin_new_order: {
     label: 'Alerte nouvelle commande (interne)',
     description: 'Envoyé à Manon à chaque nouvelle commande payée.',
@@ -290,6 +325,13 @@ function sampleData(template) {
     ],
   };
   if (template === 'gift_code') return { ...base, code: 'MERCI-NILA10', amountLabel: '10 €', validUntil: '31/12/2026' };
+  if (template === 'quote_request_client' || template === 'quote_request_admin') {
+    return {
+      ...base, categoryLabel: 'Mariage', name: 'Marie Dupont', phone: '06 12 34 56 78',
+      email: 'marie@exemple.fr', eventDate: '14 juin 2027',
+      message: 'Nous cherchons une décoration champêtre pour environ 80 invités, dans le Gard.',
+    };
+  }
   return base;
 }
 

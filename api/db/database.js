@@ -124,6 +124,20 @@ db.exec(`
     notes TEXT,
     created_at TEXT DEFAULT (datetime('now'))
   );
+
+  -- Demandes de devis depuis la page « Nos prestations »
+  -- (mariage, professionnel, réception, deuil).
+  CREATE TABLE IF NOT EXISTS quote_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category TEXT NOT NULL CHECK(category IN ('mariage', 'professionnel', 'reception', 'deuil')),
+    name TEXT NOT NULL,
+    phone TEXT,
+    email TEXT,
+    event_date TEXT,
+    message TEXT,
+    status TEXT NOT NULL DEFAULT 'nouvelle' CHECK(status IN ('nouvelle', 'traitee', 'archivee')),
+    created_at TEXT DEFAULT (datetime('now'))
+  );
 `);
 
 // Migrations légères (colonnes ajoutées après la création initiale)

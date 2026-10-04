@@ -994,6 +994,10 @@
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
       <span>Messages</span>
     </button>
+    <button class="nav-item" data-section="devis">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h3m-7 5h10a2 2 0 002-2V7.414a1 1 0 00-.293-.707l-3.414-3.414A1 1 0 0015.586 3H6a2 2 0 00-2 2v13a2 2 0 002 2z"/></svg>
+      <span>Demandes de devis</span>
+    </button>
     <div class="sb-section">Planning</div>
     <button class="nav-item" data-section="creneaux">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -1577,6 +1581,48 @@
       </div>
     </div>
 
+    <!-- ─── SECTION DEMANDES DE DEVIS ─── -->
+    <div id="section-devis" class="section">
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:40px;height:40px;border-radius:11px;background:#fef3c7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="20" height="20" fill="none" stroke="#b45309" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h3m-7 5h10a2 2 0 002-2V7.414a1 1 0 00-.293-.707l-3.414-3.414A1 1 0 0015.586 3H6a2 2 0 00-2 2v13a2 2 0 002 2z"/></svg>
+        </div>
+        <div style="flex:1">
+          <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px">Demandes de devis</h2>
+          <div style="font-size:12px;color:#94a3b8">Mariage, professionnel, réception, deuil — page « Nos prestations »</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div class="filter-tabs" id="devis-filters">
+          <button class="filter-tab active" data-filter="all">Toutes</button>
+          <button class="filter-tab" data-filter="nouvelle">Nouvelles</button>
+          <button class="filter-tab" data-filter="traitee">Traitées</button>
+          <button class="filter-tab" data-filter="archivee">Archivées</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Catégorie</th>
+              <th>Contact</th>
+              <th>Date envisagée</th>
+              <th>Message</th>
+              <th>Reçue le</th>
+              <th>Statut</th>
+              <th style="width:90px"></th>
+            </tr>
+          </thead>
+          <tbody id="devis-tbody">
+            <tr><td colspan="7"><div class="empty-state"><p>Chargement…</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- ─── SECTION CRÉNEAUX ─── -->
     <div id="section-creneaux" class="section">
 
@@ -2067,7 +2113,7 @@ function navigate(section) {
   document.querySelector(`.nav-item[data-section="${section}"]`)?.classList.add('active');
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(`section-${section}`)?.classList.add('active');
-  const titles = { dashboard: 'Tableau de bord', produits: 'Produits', categories: 'Catégories', accueil: 'Boutique page accueil', commandes: 'Commandes', clients: 'Clients', factures: 'Factures', messages: 'Emails & SMS', creneaux: 'Créneaux', tournee: 'Tournée', agenda: 'Emploi du temps' };
+  const titles = { dashboard: 'Tableau de bord', produits: 'Produits', categories: 'Catégories', accueil: 'Boutique page accueil', commandes: 'Commandes', clients: 'Clients', factures: 'Factures', messages: 'Emails & SMS', devis: 'Demandes de devis', creneaux: 'Créneaux', tournee: 'Tournée', agenda: 'Emploi du temps' };
   document.getElementById('page-title').textContent = titles[section] || section;
   if (section === 'produits') { loadProducts(); loadCategories(); }
   if (section === 'categories') { loadCategories(); loadProducts(); }
@@ -2076,6 +2122,7 @@ function navigate(section) {
   if (section === 'clients') loadClients();
   if (section === 'factures') loadFactures();
   if (section === 'messages') loadMessagesPanel();
+  if (section === 'devis') loadQuotes();
   if (section === 'creneaux') initCreneaux();
   if (section === 'tournee') initTournee();
   if (section === 'agenda') { calCurrentDate = new Date(); renderCalendar(); }
@@ -3004,6 +3051,75 @@ function renderProductTable() {
         </td>
       </tr>`;
   }).join('');
+}
+
+// ═══════════════════════ DEMANDES DE DEVIS ═══════════════════════
+let allQuotes = [];
+let currentQuoteFilter = 'all';
+const QUOTE_CATEGORY_LABELS = { mariage: 'Mariage', professionnel: 'Professionnel', reception: 'Réception', deuil: 'Deuil' };
+
+async function loadQuotes() {
+  try {
+    const res = await apiFetch('/api/admin/quotes');
+    allQuotes = await res.json();
+    renderQuotesTable();
+  } catch { showToast('Erreur chargement des demandes de devis', true); }
+}
+
+document.getElementById('devis-filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-tab');
+  if (!btn) return;
+  document.querySelectorAll('#devis-filters .filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentQuoteFilter = btn.dataset.filter;
+  renderQuotesTable();
+});
+
+function quoteStatusBadge(s) {
+  if (s === 'nouvelle') return '<span class="badge badge-amber">Nouvelle</span>';
+  if (s === 'traitee') return '<span class="badge badge-green">Traitée</span>';
+  return '<span class="badge badge-gray">Archivée</span>';
+}
+
+function renderQuotesTable() {
+  const tbody = document.getElementById('devis-tbody');
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const list = currentQuoteFilter === 'all' ? allQuotes : allQuotes.filter(q => q.status === currentQuoteFilter);
+
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><p>Aucune demande de devis${currentQuoteFilter !== 'all' ? ' dans ce filtre' : ''}.</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(q => {
+    const dateRecue = q.created_at ? new Date(q.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
+    return `
+      <tr>
+        <td><span class="badge badge-navy">${QUOTE_CATEGORY_LABELS[q.category] || q.category}</span></td>
+        <td>
+          <div style="font-weight:600">${esc(q.name)}</div>
+          <div style="font-size:11px;color:#94a3b8">${q.phone ? `<a href="tel:${esc(q.phone)}" style="color:inherit">${esc(q.phone)}</a>` : ''}${q.phone && q.email ? ' · ' : ''}${q.email ? esc(q.email) : ''}</div>
+        </td>
+        <td style="font-size:12px;color:#64748b">${q.event_date ? esc(q.event_date) : '—'}</td>
+        <td style="font-size:12px;color:#64748b;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(q.message || '')}">${q.message ? esc(q.message) : '—'}</td>
+        <td style="font-size:12px;color:#94a3b8;white-space:nowrap">${dateRecue}</td>
+        <td>${quoteStatusBadge(q.status)}</td>
+        <td style="white-space:nowrap">
+          ${q.status !== 'traitee' ? `<button class="btn btn-ghost btn-sm" onclick="setQuoteStatus(${q.id},'traitee')">Traitée</button>` : ''}
+          ${q.status !== 'archivee' ? `<button class="btn btn-ghost btn-sm" onclick="setQuoteStatus(${q.id},'archivee')">Archiver</button>` : ''}
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+async function setQuoteStatus(id, status) {
+  try {
+    await apiFetch(`/api/admin/quotes/${id}/status`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status })
+    });
+    showToast('Demande mise à jour');
+    await loadQuotes();
+  } catch { showToast('Erreur lors de la mise à jour', true); }
 }
 
 // ═══════════════════════ CATÉGORIES ═══════════════════════
