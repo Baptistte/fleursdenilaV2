@@ -122,6 +122,18 @@
         </image:image>
     </url>
 
+    <!-- Découvrir -->
+    <url>
+        <loc>https://www.fleursdenila.fr/decouvrir.html</loc>
+        <lastmod>2026-10-04</lastmod>
+
+        <image:image>
+            <image:loc>https://www.fleursdenila.fr/images/atelier-fleuriste-nimes-fleurs-de-nila.webp</image:loc>
+            <image:title>Atelier Fleurs de Nila à Nîmes</image:title>
+            <image:caption>La vie de l'atelier Fleurs de Nila, fleuriste artisan à Nîmes</image:caption>
+        </image:image>
+    </url>
+
     <!-- Plan du site -->
     <url>
         <loc>https://www.fleursdenila.fr/plan-du-site.html</loc>

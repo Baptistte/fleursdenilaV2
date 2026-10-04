@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Découvrir Fleurs de Nila — Fleuriste Artisan à Nîmes</title>
+    <meta name="description"
+        content="Découvrez la vie de l'atelier Fleurs de Nila à Nîmes : nos fleurs, nos créations, nos livraisons et les produits disponibles en magasin (plantes, vases, accessoires).">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <link rel="canonical" href="https://www.fleursdenila.fr/decouvrir.html">
+    <link rel="preload" as="font" href="FleurDeLeah-Regular.woff2" type="font/woff2" crossorigin>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="tailwind.css">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.fleursdenila.fr/decouvrir.html">
+    <meta property="og:title" content="Découvrir Fleurs de Nila">
+    <meta property="og:description"
+        content="La vie de l'atelier, nos créations, nos livraisons et les produits disponibles en magasin — Fleurs de Nila, fleuriste à Nîmes.">
+    <meta property="og:image" content="https://www.fleursdenila.fr/images/atelier-fleuriste-nimes-fleurs-de-nila.webp">
+    <meta property="og:image:alt" content="Atelier Fleurs de Nila à Nîmes">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:site_name" content="Fleurs de Nila">
+
+    <!-- Schema.org - BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.fleursdenila.fr/"},
+            {"@type": "ListItem", "position": 2, "name": "Découvrir", "item": "https://www.fleursdenila.fr/decouvrir.html"}
+        ]
+    }
+    </script>
+</head>
+
+<body class="font-sans text-primary bg-cream antialiased selection:bg-primary selection:text-white">
+
+    <!-- Navigation -->
+    <nav id="nav" class="fixed w-full z-50 transition-all duration-500 border-b border-primary bg-white">
+        <!-- Mobile Layout -->
+        <div class="lg:hidden w-full px-4 py-2">
+            <div class="flex items-center justify-between">
+                <div class="flex-1"></div>
+                <a href="index.html#accueil" class="transition-opacity hover:opacity-80 flex-shrink-0">
+                    <img src="images/logo-fleurs-de-nila-fleuriste-nimes.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes"
+                        width="1013" height="564" class="h-16 sm:h-20 w-auto">
+                </a>
+                <div class="flex-1 flex justify-end">
+                    <button id="mobile-menu-btn" class="text-primary p-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Layout -->
+        <div class="hidden lg:grid w-full grid-cols-[20%_70%]">
+            <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center h-24">
+                <a href="index.html#accueil" class="transition-opacity hover:opacity-80">
+                    <img src="images/logo-fleurs-de-nila-fleuriste-nimes.webp" alt="Fleurs de Nila - Fleuriste artisan Nîmes"
+                        width="1013" height="564" class="h-16 lg:h-20 w-auto">
+                </a>
+            </div>
+            <div class="px-6 lg:px-12 xl:px-16 py-4 flex items-center justify-center h-24">
+                <div class="flex items-center justify-center gap-6 lg:gap-10 xl:gap-14 w-full">
+                    <a href="index.html#accueil" class="nav-link text-sm lg:text-base xl:text-lg">Accueil</a>
+                    <a href="boutique/index.html" class="nav-link text-sm lg:text-base xl:text-lg">e-Shop</a>
+                    <a href="prestations.html" class="nav-link text-sm lg:text-base xl:text-lg">Nos prestations</a>
+                    <a href="decouvrir.html" class="nav-link text-sm lg:text-base xl:text-lg">Découvrir</a>
+                    <a href="index.html#contact" class="nav-link text-sm lg:text-base xl:text-lg">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu Mobile Fullscreen -->
+    <div id="mobile-menu" class="fixed inset-0 bg-cream z-40 hidden opacity-0 transition-opacity duration-500">
+        <div class="flex flex-col items-center justify-center h-full space-y-5 relative">
+            <button id="close-menu-btn" class="absolute top-6 right-6 text-primary p-2">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <a href="index.html#accueil" class="mobile-nav-link text-6xl">Accueil</a>
+            <a href="boutique/index.html" class="mobile-nav-link text-6xl">e-Shop</a>
+            <a href="prestations.html" class="mobile-nav-link text-6xl">Nos prestations</a>
+            <a href="decouvrir.html" class="mobile-nav-link text-6xl">Découvrir</a>
+            <a href="index.html#contact" class="mobile-nav-link text-6xl">Contact</a>
+        </div>
+    </div>
+
+    <!-- Fil d'Ariane -->
+    <div class="bg-white border-b border-primary mt-24 lg:mt-24">
+        <div class="max-w-5xl mx-auto px-6 lg:px-12 py-4">
+            <nav class="text-xs uppercase tracking-widest">
+                <a href="index.html" class="text-secondary hover:text-primary transition-colors">Accueil</a>
+                <span class="mx-2 text-gray-400">/</span>
+                <span class="text-primary">Découvrir</span>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="w-full bg-white border-b border-primary">
+        <div class="max-w-5xl mx-auto px-6 lg:px-12 py-16 lg:py-24 text-center">
+            <p class="text-xs uppercase tracking-widest text-secondary mb-4">Fleuriste artisan à Nîmes</p>
+            <h1 class="font-display text-5xl md:text-6xl lg:text-7xl text-primary leading-tight mb-8">
+                Découvrir
+            </h1>
+            <p class="text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto font-light">
+                La vie de notre atelier, nos créations florales, nos livraisons, et les plantes, vases et
+                objets de décoration que vous trouverez en boutique — un aperçu de ce qui vous attend
+                au 3 rue Auguste-Pellet, à Nîmes.
+            </p>
+        </div>
+    </section>
+
+    <!-- La vie de l'atelier -->
+    <section class="w-full bg-cream border-b border-primary">
+        <div class="max-w-6xl mx-auto px-6 lg:px-16 py-16 lg:py-20">
+            <p class="text-xs font-bold uppercase tracking-[0.3em] text-secondary mb-3">Dans les coulisses</p>
+            <h2 class="font-display text-4xl md:text-5xl text-primary leading-tight mb-8 lg:mb-10">La vie de l'atelier</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-2">
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/atelier-fleuriste-nimes-fleurs-de-nila-400w.webp" loading="lazy"
+                        alt="Atelier Fleurs de Nila à Nîmes" class="w-full h-full object-cover">
+                </div>
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/manon-suz-fondatrices-fleurs-de-nila-400w.webp" loading="lazy"
+                        alt="Manon et Suz, fondatrices de Fleurs de Nila" class="w-full h-full object-cover">
+                </div>
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/boutique-fleuriste-nimes-livraison-fleurs-400w.webp" loading="lazy"
+                        alt="Devanture de la boutique Fleurs de Nila à Nîmes" class="w-full h-full object-cover">
+                </div>
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/creation-florale-sur-mesure-nimes-400w.webp" loading="lazy"
+                        alt="Création florale sur mesure en atelier" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Produits en magasin -->
+    <section class="w-full bg-white border-b border-primary">
+        <div class="max-w-6xl mx-auto px-6 lg:px-16 py-16 lg:py-20">
+            <p class="text-xs font-bold uppercase tracking-[0.3em] text-secondary mb-3">Uniquement en boutique</p>
+            <h2 class="font-display text-4xl md:text-5xl text-primary leading-tight mb-4">Nos produits en magasin</h2>
+            <p class="text-gray-700 leading-relaxed max-w-2xl mb-8 lg:mb-10">
+                Plantes, vases, accessoires de décoration florale… En plus des bouquets disponibles sur notre
+                e-shop, retrouvez en boutique une sélection d'objets qui n'est pas vendue en ligne.
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-2">
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/vase-arrangement-floral-nimes-400w.webp" loading="lazy"
+                        alt="Vases disponibles en boutique - Fleurs de Nila" class="w-full h-full object-cover">
+                </div>
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/accessoires-decoration-florale-nimes-400w.webp" loading="lazy"
+                        alt="Accessoires de décoration florale en boutique" class="w-full h-full object-cover">
+                </div>
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/arrangement-vegetal-vert-nimes-400w.webp" loading="lazy"
+                        alt="Plantes vertes disponibles en boutique" class="w-full h-full object-cover">
+                </div>
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/composition-florale-artisanale-nimes-400w.webp" loading="lazy"
+                        alt="Composition florale artisanale en boutique" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nos livraisons -->
+    <section class="w-full bg-cream border-b border-primary">
+        <div class="max-w-6xl mx-auto px-6 lg:px-16 py-16 lg:py-20">
+            <p class="text-xs font-bold uppercase tracking-[0.3em] text-secondary mb-3">À votre porte</p>
+            <h2 class="font-display text-4xl md:text-5xl text-primary leading-tight mb-8 lg:mb-10">Nos livraisons</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-2">
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/bouquet-multicolore-artisanal-nimes-400w.webp" loading="lazy"
+                        alt="Bouquet prêt pour la livraison - Fleurs de Nila" class="w-full h-full object-cover">
+                </div>
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/bouquet-fleurs-rouges-romantique-nimes-400w.webp" loading="lazy"
+                        alt="Bouquet de fleurs rouges prêt à livrer" class="w-full h-full object-cover">
+                </div>
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/composition-florale-esthetique-nimes-400w.webp" loading="lazy"
+                        alt="Composition florale prête pour la livraison" class="w-full h-full object-cover">
+                </div>
+                <div class="relative block aspect-square overflow-hidden">
+                    <img src="images/bouquet-fleurs-sechees-tons-bleus-nimes-400w.webp" loading="lazy"
+                        alt="Bouquet de fleurs séchées prêt à livrer" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nos fleurs -->
+    <section class="w-full bg-white border-b border-primary">
+        <div class="max-w-6xl mx-auto px-6 lg:px-16 py-16 lg:py-20">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 lg:mb-10">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-[0.3em] text-secondary mb-3">Au fil des saisons</p>
+                    <h2 class="font-display text-4xl md:text-5xl text-primary leading-tight">Nos fleurs</h2>
+                </div>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer"
+                    class="text-xs uppercase tracking-widest text-secondary hover:text-primary border-b border-secondary hover:border-primary transition-colors pb-0.5 whitespace-nowrap self-end">
+                    Suivre sur Instagram →
+                </a>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-2">
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/detail-floral-artisanal-nimes-400w.webp" loading="lazy" alt="Détail floral artisanal - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/detail-petales-fleurs-nimes-400w.webp" loading="lazy" alt="Détail de pétales - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/decoration-florale-mariage-nimes-400w.webp" loading="lazy" alt="Décoration florale mariage - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="images/fleuriste-nimes-creation-bouquet-400w.webp" loading="lazy" alt="Création de bouquet - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9.33-8.28C.86 10.24 1.02 6.9 3.5 5.09c2.1-1.53 4.7-1.02 6.2.7L12 8.2l2.3-2.41c1.5-1.72 4.1-2.23 6.2-.7 2.48 1.81 2.64 5.15.83 7.63C18.5 16.65 12 21 12 21z"/></svg>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA e-shop -->
+    <section class="w-full bg-primary text-white border-b border-primary">
+        <div class="max-w-5xl mx-auto px-6 lg:px-12 py-16 lg:py-20 text-center">
+            <h2 class="font-display text-4xl lg:text-5xl text-white mb-6">Envie de commander ?</h2>
+            <p class="text-white/80 leading-relaxed max-w-xl mx-auto mb-8">
+                Retrouvez nos bouquets de saison, permanents et séchés sur notre e-shop, livrés à Nîmes et
+                dans le Gard — ou passez nous voir en boutique pour découvrir le reste.
+            </p>
+            <a href="boutique/index.html" class="btn-primary inline-block">Voir l'e-shop</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="w-full bg-primary text-white border-t border-primary">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+            <div class="p-10 border-b md:border-b-0 md:border-r border-white/20">
+                <h4 class="text-xs uppercase tracking-widest mb-6 text-accent">Nous trouver</h4>
+                <p class="text-2xl font-display mb-2">L'Atelier</p>
+                <p class="font-light text-white/80">3 rue Auguste-Pellet<br>30000 Nîmes</p>
+            </div>
+            <div class="p-10 border-b md:border-b-0 lg:border-r border-white/20">
+                <h4 class="text-xs uppercase tracking-widest mb-6 text-accent">Nous contacter</h4>
+                <p class="mb-4">
+                    <a href="tel:0434390429" class="text-2xl hover:text-accent transition-colors">04 34 39 04 29</a>
+                </p>
+                <p>
+                    <a href="mailto:fleursdenila@icloud.com"
+                        class="text-lg font-light hover:text-accent transition-colors">fleursdenila@icloud.com</a>
+                </p>
+            </div>
+            <div class="p-10 border-b md:border-b-0 md:border-r border-white/20">
+                <h4 class="text-xs uppercase tracking-widest mb-6 text-accent">Horaires</h4>
+                <table class="w-full text-sm font-light text-white/80">
+                    <tr>
+                        <td class="pb-2 text-accent">Lundi</td>
+                        <td class="pb-2 text-right text-accent">Fermé</td>
+                    </tr>
+                    <tr>
+                        <td class="pb-2">Mar — Sam</td>
+                        <td class="pb-2 text-right">10h — 19h</td>
+                    </tr>
+                    <tr>
+                        <td>Dimanche</td>
+                        <td class="text-right">10h — 13h</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="p-10 flex flex-col justify-between">
+                <div>
+                    <h4 class="text-xs uppercase tracking-widest mb-6 text-accent">Suivez-nous</h4>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="https://www.facebook.com/fleurs.de.nila"
+                            class="social-icon w-11 h-11 border border-white/30 flex items-center justify-center hover:bg-[#1877F2] hover:border-[#1877F2] transition-all duration-300 group"
+                            aria-label="Facebook">
+                            <svg class="w-5 h-5 fill-current transition-transform duration-300 group-hover:scale-110"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                            </svg>
+                        </a>
+                        <a href="https://www.instagram.com/fleurs_de_nila"
+                            class="social-icon w-11 h-11 border border-white/30 flex items-center justify-center hover:bg-gradient-to-br hover:from-[#833AB4] hover:via-[#FD1D1D] hover:to-[#F77737] hover:border-transparent transition-all duration-300 group"
+                            aria-label="Instagram">
+                            <svg class="w-5 h-5 fill-current transition-transform duration-300 group-hover:scale-110"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="mt-8 pt-8 border-t border-white/10">
+                    <div class="flex flex-col gap-2 mb-4">
+                        <a href="mentions-legales.html" class="text-xs text-white/60 hover:text-white transition-colors">Mentions légales</a>
+                        <a href="politique-confidentialite.html" class="text-xs text-white/60 hover:text-white transition-colors">Politique de confidentialité</a>
+                        <a href="plan-du-site.html" class="text-xs text-white/60 hover:text-white transition-colors">Plan du site</a>
+                    </div>
+                    <p class="text-xs text-white/40">© 2026 Fleurs de Nila — Tous droits réservés</p>
+                </div>
+            </div>
+        </div>
+        <!-- NAP -->
+        <div class="border-t border-white/10 px-10 py-8">
+            <div class="max-w-5xl mx-auto text-center">
+                <p class="text-sm font-medium text-white/90 mb-2">
+                    <strong>Fleurs de Nila</strong> — Fleuriste artisan à Nîmes et dans le Gard
+                </p>
+                <p class="text-xs text-white/60 mb-3">
+                    3 rue Auguste-Pellet, 30000 Nîmes, France · Tél : <a href="tel:0434390429"
+                        class="text-accent hover:text-white transition-colors">04 34 39 04 29</a> · Email : <a
+                        href="mailto:fleursdenila@icloud.com"
+                        class="text-accent hover:text-white transition-colors">fleursdenila@icloud.com</a>
+                </p>
+                <p class="text-xs text-white/40">
+                    Découvrez Fleurs de Nila : atelier, créations, livraisons et boutique à Nîmes, Uzès, Alès et dans tout le Gard.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                if (mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.remove('hidden');
+                    setTimeout(() => mobileMenu.classList.remove('opacity-0'), 10);
+                } else {
+                    mobileMenu.classList.add('opacity-0');
+                    setTimeout(() => mobileMenu.classList.add('hidden'), 500);
+                }
+            });
+
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('opacity-0');
+                    setTimeout(() => mobileMenu.classList.add('hidden'), 500);
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
