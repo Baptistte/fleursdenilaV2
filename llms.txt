@@ -17,11 +17,12 @@
 
 Fleurs de Nila propose un service de **livraison de fleurs à Nîmes** et dans l'agglomération nîmoise. Les bouquets sont composés le jour même dans l'atelier et livrés à domicile.
 
-### Zones de livraison
-- Nîmes centre (30000) — 10 €
-- Nîmes ouest (30900) — 10 €
-- Caissargues, Milhaud, Marguerittes, Bouillargues — 10–15 €
-- Manduel, Caveirac, Garons, Bernis, Redessan, Générac, Saint-Gilles, Vauvert — 15 €
+### Zones et tarifs de livraison
+- Nîmes — Écusson (centre historique) : 5 €
+- Nîmes — hors Écusson (30000, 30900) : 9 €
+- Hors Nîmes : 15 € — Caissargues, Bouillargues, Milhaud, Garons, Marguerittes, Manduel, Redessan, Caveirac, Bernis, Générac, Saint-Gilles, Vauvert
+- Livraison offerte dès 50 € d'achat à Nîmes, dès 80 € hors Nîmes
+- Retrait en boutique gratuit
 
 ### Créneaux de livraison
 - Mardi au samedi : 10h–19h

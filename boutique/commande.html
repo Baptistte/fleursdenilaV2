@@ -141,6 +141,22 @@
               class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm transition-colors bg-white"
               placeholder="marie@exemple.fr">
           </div>
+          <!-- Option « demander une facture » -->
+          <div class="border border-gray-100 bg-white px-4 py-3">
+            <label class="flex items-start gap-3 cursor-pointer select-none">
+              <input id="invoice-requested" type="checkbox" class="mt-1 h-4 w-4 accent-[#1a365d] flex-shrink-0">
+              <span class="text-sm text-gray-600">
+                <span class="text-primary font-medium">Je souhaite recevoir une facture</span>
+                <span class="block text-xs text-gray-400 mt-0.5">Elle vous sera adressée par la boutique, avec le numéro de votre commande.</span>
+              </span>
+            </label>
+            <div id="invoice-info-field" class="hidden mt-3">
+              <label class="block text-xs tracking-widest uppercase text-gray-400 mb-1">Nom / société et adresse de facturation <span class="normal-case tracking-normal">(si différents)</span></label>
+              <textarea id="invoice-info" rows="3" maxlength="500"
+                class="w-full border border-gray-200 focus:border-primary outline-none px-4 py-3 text-sm resize-none transition-colors bg-white"
+                placeholder="Ex : SARL Les Jardins du Sud — 12 rue de la République, 30000 Nîmes — SIRET…"></textarea>
+            </div>
+          </div>
           <div>
             <button type="button" id="toggle-note-btn"
               class="inline-flex items-center gap-1.5 text-xs tracking-widest uppercase text-gray-400 hover:text-primary transition-colors">
@@ -197,7 +213,14 @@
             <span id="total-display" class="text-2xl font-medium text-primary">—</span>
           </div>
 
-          <button id="pay-btn"
+          <!-- Acceptation des CGV : bloquante (bouton désactivé tant que non cochée, revérifiée côté serveur) -->
+          <label class="flex items-start gap-3 cursor-pointer select-none mb-4">
+            <input id="cgv-accept" type="checkbox" class="mt-0.5 h-4 w-4 accent-[#1a365d] flex-shrink-0">
+            <span class="text-xs text-gray-600 leading-relaxed">J'ai lu et j'accepte les
+              <a href="../cgv.html" target="_blank" rel="noopener" class="underline underline-offset-2 text-primary hover:text-secondary">conditions générales de vente</a>.</span>
+          </label>
+
+          <button id="pay-btn" disabled
             class="w-full bg-primary text-white py-4 text-sm tracking-widest uppercase transition-colors duration-300 hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3">
             <span id="pay-label">Procéder au paiement</span>
             <svg id="pay-spinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -224,16 +247,12 @@
     </div>
   </footer>
 
+  <script src="delivery-zones.js?v=2"></script>
   <script>
     const API = window.API_URL;
-    let DELIVERY_THRESHOLD = 60;   // valeur par défaut, remplacée par le réglage admin via /api/config
-    fetch(`${API}/api/config`).then(r => r.json()).then(c => {
-      if (Number.isFinite(c.freeDeliveryThreshold)) {
-        DELIVERY_THRESHOLD = c.freeDeliveryThreshold;
-        renderSummary();
-      }
-    }).catch(() => {});
-    const DELIVERY_PRICE = 5;
+    // Seuils de livraison offerte par zone (réglables en admin) : chargés depuis /api/config
+    DELIVERY.onConfig(() => renderSummary());
+    DELIVERY.loadConfig();
 
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const orderSlot = JSON.parse(localStorage.getItem('order_slot') || 'null');
@@ -259,6 +278,23 @@
       });
     })();
 
+    // Option « demander une facture » : le champ de facturation n'apparaît que si la case est cochée
+    (function initInvoice() {
+      const box = document.getElementById('invoice-requested');
+      const field = document.getElementById('invoice-info-field');
+      box.checked = localStorage.getItem('order_invoice') === '1';
+      document.getElementById('invoice-info').value = localStorage.getItem('order_invoice_info') || '';
+      const sync = () => {
+        field.classList.toggle('hidden', !box.checked);
+        localStorage.setItem('order_invoice', box.checked ? '1' : '0');
+      };
+      box.addEventListener('change', sync);
+      document.getElementById('invoice-info').addEventListener('input', e => {
+        localStorage.setItem('order_invoice_info', e.target.value);
+      });
+      sync();
+    })();
+
     // Panier modifié depuis le volet (ou un autre onglet) : resynchroniser le récap et le total
     window.addEventListener('cart:updated', () => {
       cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -280,7 +316,8 @@
       let delivery = 0;
       if (orderSlot?.mode === 'delivery') {
         const zoneFee = Number.isFinite(orderSlot.zoneBaseFee) ? orderSlot.zoneBaseFee : (orderSlot.deliveryFee || 0);
-        delivery = sub >= DELIVERY_THRESHOLD ? 0 : zoneFee;
+        // Zone mémorisée à l'étape livraison ; à défaut (ancienne session), tarif hors Nîmes
+        delivery = sub >= DELIVERY.thresholdFor(orderSlot.zone || 'outside') ? 0 : zoneFee;
       }
       return { sub, delivery, total: sub + delivery };
     }
@@ -299,8 +336,9 @@
       const { sub, delivery, total } = cartTotal();
       let deliveryLine = '';
       if (orderSlot?.mode === 'delivery') {
+        const zoneLabel = orderSlot.zone && DELIVERY.LABELS[orderSlot.zone] ? ` (${DELIVERY.LABELS[orderSlot.zone]})` : '';
         deliveryLine = delivery > 0
-          ? `<div class="flex justify-between text-gray-400"><span>Livraison</span><span>${delivery.toFixed(2)} €</span></div>`
+          ? `<div class="flex justify-between text-gray-400"><span>Livraison${zoneLabel}</span><span>${delivery.toFixed(2)} €</span></div>`
           : `<div class="text-green-700 text-xs">Livraison offerte</div>`;
       }
       document.getElementById('cart-summary').innerHTML = [
@@ -356,15 +394,27 @@
       holdInterval = setInterval(tick, 1000);
     }
 
+    document.getElementById('cgv-accept').addEventListener('change', e => {
+      const expired = !document.getElementById('slot-expired').classList.contains('hidden');
+      document.getElementById('pay-btn').disabled = !e.target.checked || expired;
+    });
+
     document.getElementById('pay-btn').addEventListener('click', async () => {
       const firstname = document.getElementById('customer-firstname').value.trim();
       const lastname = document.getElementById('customer-lastname').value.trim();
       const email = document.getElementById('customer-email').value.trim();
       const phone = document.getElementById('customer-phone').value.trim();
       const note = document.getElementById('customer-note').value.trim();
+      const invoiceRequested = document.getElementById('invoice-requested').checked;
+      const invoiceInfo = document.getElementById('invoice-info').value.trim();
       const errEl = document.getElementById('error-msg');
       errEl.classList.add('hidden');
 
+      if (!document.getElementById('cgv-accept').checked) {
+        errEl.textContent = 'Vous devez accepter les conditions générales de vente pour commander.';
+        errEl.classList.remove('hidden');
+        return;
+      }
       if (!firstname || !lastname) {
         errEl.textContent = 'Veuillez renseigner votre prénom et votre nom.';
         errEl.classList.remove('hidden');
@@ -402,6 +452,9 @@
             customer_email: email || null,
             customer_phone: phone,
             customer_note: note || null,
+            cgv_accepted: true,
+            invoice_requested: invoiceRequested,
+            invoice_info: invoiceRequested ? (invoiceInfo || null) : null,
             cart,
             slot_id: orderSlot.slotId,
             slot_token: orderSlot.slotToken || null,
@@ -423,7 +476,7 @@
         if (!res.ok) {
           errEl.textContent = data.error || 'Une erreur est survenue. Veuillez réessayer.';
           errEl.classList.remove('hidden');
-          btn.disabled = false;
+          btn.disabled = !document.getElementById('cgv-accept').checked;
           document.getElementById('pay-label').textContent = 'Procéder au paiement';
           document.getElementById('pay-spinner').classList.add('hidden');
           return;
@@ -431,6 +484,12 @@
 
         if (email) localStorage.setItem('order_email', email);
         else localStorage.removeItem('order_email');
+        // Numéro de commande + choix de facture : relus par la page de confirmation
+        // (le retour de paiement SumUp ne transmet pas ces informations)
+        if (data.orderId) localStorage.setItem('order_number', String(data.orderId));
+        localStorage.setItem('order_invoice_sent', invoiceRequested ? '1' : '0');
+        localStorage.removeItem('order_invoice');
+        localStorage.removeItem('order_invoice_info');
         if (data.simulation) {
           // Mode test sans SumUp : redirection relative (fonctionne depuis file://)
           window.location.href = `confirmation.html?sim=1&orderId=${data.orderId}`;
@@ -441,7 +500,7 @@
       } catch {
         errEl.textContent = 'Erreur de connexion. Vérifiez que le serveur est démarré.';
         errEl.classList.remove('hidden');
-        btn.disabled = false;
+        btn.disabled = !document.getElementById('cgv-accept').checked;
         document.getElementById('pay-label').textContent = 'Procéder au paiement';
         document.getElementById('pay-spinner').classList.add('hidden');
       }
@@ -483,6 +542,6 @@
     })();
   </script>
   <script src="../script.js"></script>
-  <script src="cart-drawer.js?v=3"></script>
+  <script src="cart-drawer.js?v=4"></script>
 </body>
 </html>

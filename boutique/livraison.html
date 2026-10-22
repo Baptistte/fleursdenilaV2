@@ -176,6 +176,8 @@
                     </button>
                   </div>
                   <p id="address-city-note" class="mt-2 text-xs text-gray-400"></p>
+                  <!-- Résultat du calcul de zone/tarif d'après l'adresse (Nîmes : Écusson ou non) -->
+                  <div id="address-quote" class="hidden mt-3 px-4 py-2.5 text-sm border" role="status" aria-live="polite"></div>
                 </div>
               </div>
 
@@ -280,16 +282,12 @@
     </div>
   </footer>
 
-  <script src="delivery-zones.js"></script>
+  <script src="delivery-zones.js?v=2"></script>
   <script>
     const API = window.API_URL;
-    let DELIVERY_THRESHOLD = 60;   // valeur par défaut, remplacée par le réglage admin via /api/config
-    fetch(`${API}/api/config`).then(r => r.json()).then(c => {
-      if (Number.isFinite(c.freeDeliveryThreshold)) {
-        DELIVERY_THRESHOLD = c.freeDeliveryThreshold;
-        renderCartSummary();
-      }
-    }).catch(() => {});
+    // Seuils de livraison offerte par zone (réglables en admin) : chargés depuis /api/config
+    DELIVERY.onConfig(() => { renderCartSummary(); renderZoneInfo(); });
+    DELIVERY.loadConfig();
 
     let selectedMode = 'delivery';
     let selectedDate = null;
@@ -302,10 +300,16 @@
     let skipRelease = false;    // vrai quand on part vers commande.html (la réservation doit survivre)
 
     // --- Zone de livraison ---
-    let deliveryZoneValid = false;   // code postal desservi et validé
+    let deliveryZoneValid = false;   // commune desservie choisie
+    let deliveryIsNimes = false;     // Nîmes : la zone (Écusson ou non) dépend de l'adresse
+    let deliveryZone = null;         // 'ecusson' | 'nimes' | 'outside' — null tant que non vérifiée
+    let deliveryVerified = false;    // zone et tarif confirmés (par le serveur pour Nîmes)
+    let deliveryChecking = false;    // vérification d'adresse en cours
     let deliveryFee = 0;             // tarif de la zone (avant seuil livraison offerte)
     let deliveryZip = '';
     let deliveryCommune = '';
+    let quoteTimer = null;
+    let quoteSeq = 0;                // ignore les réponses obsolètes
 
     // --- Panier ---
     function getCart() { return JSON.parse(localStorage.getItem('cart') || '[]'); }
@@ -313,8 +317,8 @@
     function cartTotal() {
       const sub = getCart().reduce((s, i) => s + i.price * i.qty, 0);
       let delivery = 0;
-      if (selectedMode === 'delivery' && deliveryZoneValid) {
-        delivery = sub >= DELIVERY_THRESHOLD ? 0 : deliveryFee;
+      if (selectedMode === 'delivery' && deliveryZoneValid && deliveryVerified) {
+        delivery = DELIVERY.feeFor(deliveryZone, sub);
       }
       return { sub, delivery, total: sub + delivery };
     }
@@ -337,10 +341,14 @@
       if (selectedMode === 'delivery') {
         if (!deliveryZoneValid) {
           deliveryLine = `<div class="flex justify-between text-gray-400"><span>Livraison</span><span>à définir</span></div>`;
+        } else if (!deliveryVerified) {
+          deliveryLine = `<div class="flex justify-between text-gray-400"><span>Livraison (${deliveryCommune})</span><span>${deliveryChecking ? 'calcul…' : 'selon l\'adresse'}</span></div>`;
         } else if (delivery > 0) {
-          deliveryLine = `<div class="flex justify-between text-gray-400"><span>Livraison (${deliveryCommune})</span><span>${delivery.toFixed(2)} €</span></div>`;
+          const missing = Math.max(0, DELIVERY.thresholdFor(deliveryZone) - sub);
+          deliveryLine = `<div class="flex justify-between text-gray-400"><span>Livraison (${DELIVERY.LABELS[deliveryZone]})</span><span>${delivery.toFixed(2)} €</span></div>
+            <div class="text-xs text-gray-400">Offerte dès ${DELIVERY.fmt(DELIVERY.thresholdFor(deliveryZone))} d'achat — encore ${missing.toFixed(2)} €</div>`;
         } else {
-          deliveryLine = `<div class="text-green-700 text-xs">Livraison offerte (dès ${DELIVERY_THRESHOLD} €)</div>`;
+          deliveryLine = `<div class="text-green-700 text-xs">Livraison offerte (dès ${DELIVERY.fmt(DELIVERY.thresholdFor(deliveryZone))})</div>`;
         }
       }
 
@@ -520,11 +528,18 @@
     const zoneOptions = document.getElementById('zone-options');
 
     function resetZone() {
+      clearTimeout(quoteTimer);
+      quoteSeq++;
       deliveryZoneValid = false;
+      deliveryIsNimes = false;
+      deliveryZone = null;
+      deliveryVerified = false;
+      deliveryChecking = false;
       deliveryFee = 0;
       deliveryZip = '';
       deliveryCommune = '';
       document.getElementById('zone-ok').classList.add('hidden');
+      document.getElementById('address-quote').classList.add('hidden');
       document.getElementById('address-rest').classList.add('hidden');
       document.getElementById('zone-clear').classList.toggle('hidden', !zoneSearch.value);
     }
@@ -540,9 +555,11 @@
       } else {
         zoneOptions.innerHTML = list.map(z => `
           <button type="button" class="zone-opt w-full text-left px-4 py-2.5 text-sm hover:bg-cream flex justify-between items-center gap-3"
-            data-zip="${z.zip}" data-fee="${z.fee}" data-commune="${z.commune}">
+            data-zip="${z.zip}" data-nimes="${z.nimes ? '1' : ''}" data-commune="${z.commune}">
             <span>${z.commune} <span class="text-gray-400">· ${z.zip}</span></span>
-            <span class="text-gray-500 whitespace-nowrap">${z.fee} €</span>
+            <span class="text-gray-500 whitespace-nowrap">${z.nimes
+              ? `${DELIVERY.FEES.ecusson} € ou ${DELIVERY.FEES.nimes} €`
+              : `${DELIVERY.FEES.outside} €`}</span>
           </button>`).join('');
       }
       zoneOptions.classList.remove('hidden');
@@ -550,19 +567,37 @@
 
     function closeZoneOptions() { zoneOptions.classList.add('hidden'); }
 
-    function selectZone(zip, fee, commune) {
+    // Bandeau d'information sous le champ commune : rappelle la grille applicable
+    function renderZoneInfo() {
+      if (!deliveryZoneValid) return;
+      const okEl = document.getElementById('zone-ok');
+      if (deliveryIsNimes) {
+        okEl.innerHTML = `<strong>Nîmes</strong> : ${DELIVERY.FEES.ecusson} € dans l'Écusson, ${DELIVERY.FEES.nimes} € hors Écusson
+          <span class="text-green-700/70">— tarif calculé d'après votre adresse. Offerte dès ${DELIVERY.fmt(DELIVERY.THRESHOLDS.nimes)}.</span>`;
+      } else {
+        okEl.innerHTML = `Frais de livraison : <strong>${DELIVERY.FEES.outside} €</strong>
+          <span class="text-green-700/70">— offerts dès ${DELIVERY.fmt(DELIVERY.THRESHOLDS.outside)}.</span>`;
+      }
+      okEl.classList.remove('hidden');
+    }
+
+    function selectZone(zip, commune, isNimes) {
+      resetZone();
       deliveryZoneValid = true;
+      deliveryIsNimes = isNimes;
       deliveryZip = zip;
-      deliveryFee = fee;
       deliveryCommune = commune;
+      // Hors Nîmes : tarif unique, connu immédiatement. Nîmes : à vérifier d'après la rue.
+      if (!isNimes) {
+        deliveryZone = 'outside';
+        deliveryFee = DELIVERY.FEES.outside;
+        deliveryVerified = true;
+      }
 
       zoneSearch.value = `${commune} (${zip})`;
       document.getElementById('zone-clear').classList.remove('hidden');
       closeZoneOptions();
-
-      const okEl = document.getElementById('zone-ok');
-      okEl.innerHTML = `Frais de livraison : <strong>${fee} €</strong> <span class="text-green-700/70">— offerts dès ${DELIVERY_THRESHOLD} €.</span>`;
-      okEl.classList.remove('hidden');
+      renderZoneInfo();
 
       const addressRest = document.getElementById('address-rest');
       addressRest.classList.remove('hidden');
@@ -570,6 +605,83 @@
       document.getElementById('address-city-note').textContent = `Livraison à ${commune} (${zip})`;
 
       updateFlowVisibility();
+      renderCartSummary();
+      updateNextBtn();
+      // Une rue déjà saisie (retour sur la page, changement de code postal) est revérifiée
+      if (isNimes && document.getElementById('address-street').value.trim()) scheduleQuote(0);
+    }
+
+    // ── Calcul de la zone d'après l'adresse (Nîmes : Écusson ou hors Écusson) ──
+    function showQuote(kind, html) {
+      const el = document.getElementById('address-quote');
+      el.className = 'mt-3 px-4 py-2.5 text-sm border ' + ({
+        ok: 'border-green-200 bg-green-50 text-green-800',
+        warn: 'border-amber-200 bg-amber-50 text-amber-800',
+        error: 'border-red-200 bg-red-50 text-red-700',
+        info: 'border-gray-200 bg-gray-50 text-gray-500',
+      }[kind]);
+      el.innerHTML = html;
+    }
+
+    function scheduleQuote(delay = 600) {
+      clearTimeout(quoteTimer);
+      quoteSeq++;
+      deliveryVerified = false;
+      deliveryZone = null;
+      deliveryChecking = false;
+      if (!deliveryIsNimes) return;
+      const street = document.getElementById('address-street').value.trim();
+      if (street.length < 3) {
+        document.getElementById('address-quote').classList.add('hidden');
+        renderCartSummary();
+        updateNextBtn();
+        return;
+      }
+      deliveryChecking = true;
+      showQuote('info', 'Vérification de l\'adresse…');
+      renderCartSummary();
+      updateNextBtn();
+      quoteTimer = setTimeout(requestQuote, delay);
+    }
+
+    async function requestQuote() {
+      const seq = ++quoteSeq;
+      const street = document.getElementById('address-street').value.trim();
+      try {
+        const res = await fetch(`${API}/api/delivery/quote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ street, zip: deliveryZip, city: deliveryCommune })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (seq !== quoteSeq) return;   // adresse modifiée entre-temps
+        deliveryChecking = false;
+        if (!res.ok) {
+          deliveryVerified = false;
+          deliveryZone = null;
+          showQuote('error', data.error || 'Impossible de vérifier cette adresse.');
+        } else {
+          deliveryZone = data.zone;
+          deliveryFee = data.fee;
+          deliveryVerified = true;
+          if (Number.isFinite(data.freeThreshold)) {
+            DELIVERY.THRESHOLDS[data.zone === 'outside' ? 'outside' : 'nimes'] = data.freeThreshold;
+          }
+          if (data.verified) {
+            showQuote('ok', `<strong>${data.zoneLabel}</strong> — frais de livraison <strong>${data.fee} €</strong>
+              <span class="text-green-700/70">(offerts dès ${DELIVERY.fmt(data.freeThreshold)})</span>`);
+          } else {
+            showQuote('warn', `Votre adresse n'a pas pu être localisée automatiquement : le tarif <strong>${data.zoneLabel} (${data.fee} €)</strong> s'applique.
+              Pour un doute, appelez la boutique au <a href="tel:0434390429" class="underline">04 34 39 04 29</a>.`);
+          }
+        }
+      } catch {
+        if (seq !== quoteSeq) return;
+        deliveryChecking = false;
+        deliveryVerified = false;
+        deliveryZone = null;
+        showQuote('error', 'Connexion impossible : le tarif de livraison n\'a pas pu être calculé. Réessayez dans un instant.');
+      }
       renderCartSummary();
       updateNextBtn();
     }
@@ -599,20 +711,22 @@
       btn.addEventListener('click', () => {
         input.value = '';
         btn.classList.add('hidden');
-        updateNextBtn();
+        if (inputId === 'address-street' && deliveryIsNimes) scheduleQuote(); else updateNextBtn();
         input.focus();
       });
     });
     zoneOptions.addEventListener('click', e => {
       const opt = e.target.closest('.zone-opt');
       if (!opt) return;
-      selectZone(opt.dataset.zip, parseFloat(opt.dataset.fee), opt.dataset.commune);
+      selectZone(opt.dataset.zip, opt.dataset.commune, opt.dataset.nimes === '1');
     });
     // Ferme la liste au clic extérieur
     document.addEventListener('click', e => {
       if (!document.getElementById('zone-combo').contains(e.target)) closeZoneOptions();
     });
-    document.getElementById('address-street').addEventListener('input', updateNextBtn);
+    document.getElementById('address-street').addEventListener('input', () => {
+      if (deliveryIsNimes) scheduleQuote(); else updateNextBtn();
+    });
 
     // Affiche/masque date + créneaux selon le mode et la validité de la zone
     function updateFlowVisibility() {
@@ -681,6 +795,10 @@
           ok = false; msg = 'Choisissez d\'abord votre commune de livraison';
         } else if (!document.getElementById('address-street').value.trim()) {
           ok = false; msg = 'Renseignez votre numéro et rue';
+        } else if (deliveryChecking) {
+          ok = false; msg = 'Vérification de l\'adresse en cours…';
+        } else if (!deliveryVerified) {
+          ok = false; msg = 'Adresse à corriger pour calculer la livraison';
         }
       }
       if (ok && selectedSlotId === null) {
@@ -714,6 +832,10 @@
         alert('Veuillez renseigner votre numéro et rue.');
         return;
       }
+      if (isDelivery && !deliveryVerified) {
+        alert('Le tarif de livraison n\'est pas encore confirmé pour cette adresse.');
+        return;
+      }
       if (!selectedSlotId) return;
 
       // Récapitulatif dans la modale
@@ -726,7 +848,7 @@
       if (isDelivery) {
         recap += `<div class="text-gray-400">${address.street}${address.extra ? ' — ' + address.extra : ''}, ${address.zip} ${address.city}</div>`;
         recap += delivery > 0
-          ? `<div class="text-gray-400">Frais de livraison : ${delivery.toFixed(2)} €</div>`
+          ? `<div class="text-gray-400">Frais de livraison (${DELIVERY.LABELS[deliveryZone]}) : ${delivery.toFixed(2)} €</div>`
           : `<div class="text-green-700 text-xs">Livraison offerte</div>`;
       } else {
         recap += `<div class="text-gray-400">📍 Fleurs de Nila, Nîmes</div>`;
@@ -752,6 +874,7 @@
         mode: selectedMode,
         address: buildOrderAddress(),
         deliveryFee: delivery,
+        zone: deliveryZone,        // 'ecusson' | 'nimes' | 'outside' (confirmée par le serveur à la commande)
         zoneBaseFee: deliveryFee   // tarif brut de la zone, pour recalculer si le panier change à l'étape paiement
       }));
 
@@ -797,6 +920,6 @@
     setMode('delivery');   // établit la visibilité initiale (zone à choisir, créneaux masqués)
   </script>
   <script src="../script.js"></script>
-  <script src="cart-drawer.js?v=3"></script>
+  <script src="cart-drawer.js?v=4"></script>
 </body>
 </html>

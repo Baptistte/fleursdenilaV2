@@ -84,6 +84,8 @@
 
       <h1 class="font-display text-5xl lg:text-6xl text-primary mb-4">Merci !</h1>
       <p class="text-gray-600 leading-relaxed mb-2">Votre commande a bien été reçue et votre paiement confirmé.</p>
+      <p id="order-number" class="hidden font-display text-3xl text-primary my-4"></p>
+      <p id="invoice-note" class="hidden text-sm text-gray-500 mb-2">🧾 Votre facture vous sera adressée par la boutique.</p>
       <p class="text-sm text-gray-500 mb-2">Votre créneau sera confirmé par la fleuriste — nous vous contacterons en cas d'imprévu.</p>
       <p id="confirm-email" class="text-sm text-gray-400 mb-10"></p>
 
@@ -112,11 +114,23 @@
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const orderSlot = JSON.parse(localStorage.getItem('order_slot') || 'null');
     const email = localStorage.getItem('order_email') || '';
+    // Numéro de commande : transmis dans l'URL en mode test, sinon mémorisé avant la redirection de paiement
+    const orderNumber = new URLSearchParams(window.location.search).get('orderId') || localStorage.getItem('order_number') || '';
+    const invoiceAsked = localStorage.getItem('order_invoice_sent') === '1';
 
     localStorage.removeItem('cart');
     localStorage.removeItem('order_slot');
     localStorage.removeItem('order_email');
     localStorage.removeItem('order_note');
+    localStorage.removeItem('order_number');
+    localStorage.removeItem('order_invoice_sent');
+
+    if (/^\d+$/.test(orderNumber)) {
+      const el = document.getElementById('order-number');
+      el.textContent = `Commande n°${orderNumber}`;
+      el.classList.remove('hidden');
+    }
+    if (invoiceAsked) document.getElementById('invoice-note').classList.remove('hidden');
 
     if (email) {
       document.getElementById('confirm-email').textContent = `Un email de confirmation a été envoyé à ${email}`;

@@ -102,7 +102,11 @@ const TEMPLATES = {
         H(`Merci ${esc(d.firstName)} !`) +
         P(`Votre commande <strong>n°${d.id}</strong> et votre paiement sont bien enregistrés. ` +
           `Votre créneau sera confirmé très prochainement par la fleuriste — nous vous préviendrons en cas d'imprévu.`) +
-        orderRecap(d)
+        orderRecap(d) +
+        (d.invoice_requested
+          ? P(`<span style="font-size:13px;">🧾 Vous avez demandé une facture : elle vous sera adressée par la boutique. ` +
+              `Pour toute question, rappelez le <strong>n°${d.id}</strong> de votre commande.</span>`)
+          : '')
       )
     })
   },
@@ -231,6 +235,12 @@ const TEMPLATES = {
         P(`<strong>${esc(d.customer_name)}</strong> · <a href="tel:${esc(d.customer_phone)}" style="color:${BRAND.navy2};">${esc(d.customer_phone)}</a>` +
           (d.customer_email ? ` · ${esc(d.customer_email)}` : '')) +
         orderRecap(d) +
+        (d.invoice_requested
+          ? `<div style="margin:16px 0;padding:14px 16px;background:#fef3c7;border:1px solid #fde68a;font-size:13px;line-height:1.7;color:#92400e;">` +
+            `<strong>🧾 Facture demandée</strong>` +
+            (d.invoice_info ? `<br>${esc(d.invoice_info).replace(/\n/g, '<br>')}` : '') +
+            `</div>`
+          : '') +
         P(`<span style="font-size:12.5px;color:#8a97a8;">Pensez à valider (ou refuser) le créneau depuis l'espace de gestion.</span>`) +
         BTN('Ouvrir l\'espace de gestion', `${BRAND.siteUrl}/admin/login.html`)
       )
@@ -316,7 +326,7 @@ function sampleData(template) {
   const base = {
     id: 42, firstName: 'Marie', customer_name: 'Marie Dupont',
     customer_phone: '06 12 34 56 78', customer_email: 'marie@exemple.fr',
-    total: 61, delivery_type: 'delivery',
+    total: 61, delivery_type: 'delivery', invoice_requested: 1, invoice_info: 'SARL Les Jardins du Sud\n12 rue de la République, 30000 Nîmes',
     slot_date: '2026-08-14', start_time: '09:00', end_time: '10:00',
     address: { street: '12 rue de la République', extra: 'Bât. B', zip: '30000', city: 'Nîmes' },
     items: [

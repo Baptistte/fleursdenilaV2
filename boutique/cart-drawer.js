@@ -1,12 +1,18 @@
 /* Volet panier — chargé dans toutes les pages boutique */
 (function () {
-  let DELIVERY_THRESHOLD = 60;   // valeur par défaut, remplacée par le réglage admin via /api/config
+  // Grille de livraison (copie de api/deliveryZones.js) et seuils de livraison offerte
+  // par zone, remplacés par le réglage admin via /api/config. La commune n'est connue
+  // qu'à l'étape livraison : le volet suit le seuil Nîmes, puis celui de l'extérieur.
+  const FEES = { ecusson: 5, nimes: 9, outside: 15 };
+  let THRESHOLD_NIMES = 50;
+  let THRESHOLD_OUTSIDE = 80;
+  const eur = n => (Number.isInteger(n) ? n : n.toFixed(2).replace('.', ',')) + ' €';
 
   fetch(`${window.API_URL}/api/config`).then(r => r.json()).then(c => {
-    if (Number.isFinite(c.freeDeliveryThreshold)) {
-      DELIVERY_THRESHOLD = c.freeDeliveryThreshold;
-      if (typeof renderDrawer === 'function') renderDrawer();
-    }
+    let changed = false;
+    if (Number.isFinite(c.freeDeliveryThresholdNimes)) { THRESHOLD_NIMES = c.freeDeliveryThresholdNimes; changed = true; }
+    if (Number.isFinite(c.freeDeliveryThresholdOutside)) { THRESHOLD_OUTSIDE = c.freeDeliveryThresholdOutside; changed = true; }
+    if (changed && typeof renderDrawer === 'function') renderDrawer();
   }).catch(() => {});
 
   /* ── Injection HTML ── */
@@ -250,20 +256,29 @@
         </div>`;
     }).join('');
 
-    // Totaux — les frais réels dépendent de la commune (calculés à l'étape livraison)
+    // Totaux — les frais réels dépendent de l'adresse (calculés à l'étape livraison)
     const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
-    const remaining = Math.max(0, DELIVERY_THRESHOLD - sub);
-    const pct = Math.min(100, (sub / DELIVERY_THRESHOLD) * 100);
+    const freeNimes = sub >= THRESHOLD_NIMES;
+    const freeOutside = sub >= THRESHOLD_OUTSIDE;
+    const target = freeNimes ? THRESHOLD_OUTSIDE : THRESHOLD_NIMES;
+    const remaining = Math.max(0, target - sub);
+    const pct = Math.min(100, (sub / target) * 100);
 
     document.getElementById('delivery-bar-fill').style.width = pct + '%';
-    document.getElementById('delivery-bar-text').innerHTML = remaining > 0
-      ? `Plus que <strong>${remaining.toFixed(2)} €</strong> pour la livraison offerte`
-      : `<span style="color:#2d6a4f;font-weight:500">✓ Livraison offerte</span>`;
+    document.getElementById('delivery-bar-text').innerHTML = freeOutside
+      ? `<span style="color:#2d6a4f;font-weight:500">✓ Livraison offerte</span>`
+      : freeNimes
+        ? `<span style="color:#2d6a4f;font-weight:500">✓ Offerte à Nîmes</span> — plus que <strong>${remaining.toFixed(2)} €</strong> hors Nîmes`
+        : `Plus que <strong>${remaining.toFixed(2)} €</strong> pour la livraison offerte à Nîmes`;
 
+    const deliveryNote = freeOutside
+      ? ''
+      : `<div class="cart-total-row" style="font-size:11px;color:#9b8f80"><span>Livraison</span><span>${freeNimes ? `offerte à Nîmes · ${eur(FEES.outside)} hors Nîmes` : `${eur(FEES.ecusson)} à ${eur(FEES.outside)} selon l'adresse`}</span></div>
+         <div class="cart-total-row" style="font-size:11px;color:#9b8f80"><span>Nîmes Écusson ${eur(FEES.ecusson)} · hors Écusson ${eur(FEES.nimes)}</span><span>Hors Nîmes ${eur(FEES.outside)}</span></div>`;
     document.getElementById('cart-totals').innerHTML = `
       <div class="cart-total-row"><span>Sous-total</span><span>${sub.toFixed(2)} €</span></div>
-      ${remaining > 0 ? `<div class="cart-total-row" style="font-size:11px;color:#9b8f80"><span>Livraison selon la commune</span><span>à l'étape suivante</span></div>` : ''}
-      <div class="cart-total-row main"><span>Total${remaining > 0 ? ' (hors livraison)' : ''}</span><span>${sub.toFixed(2)} €</span></div>`;
+      ${deliveryNote}
+      <div class="cart-total-row main"><span>Total${freeOutside ? '' : ' (hors livraison)'}</span><span>${sub.toFixed(2)} €</span></div>`;
 
     footerEl.style.display = 'block';
 

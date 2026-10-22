@@ -5,3 +5,5 @@ api/db/*.sqlite
 api/db/*.sqlite-shm
 api/db/*.sqlite-wal
 api/db/sessions.sqlite
+api/db/*.sql
+images/wetransfer_*/

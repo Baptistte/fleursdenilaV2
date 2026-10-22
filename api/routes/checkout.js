@@ -1,15 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
-const { feeForZip } = require('../deliveryZones');
+const { quoteDelivery, thresholdForZone } = require('../deliveryZones');
+const { getThresholds } = require('../services/deliveryConfig');
 const { sendOrderEmails } = require('../services/mailer');
-
-// Seuil de livraison offerte : réglable depuis l'admin (settings), 60 € par défaut
-function freeDeliveryThreshold() {
-  const row = db.prepare("SELECT value FROM settings WHERE key = 'free_delivery_threshold'").get();
-  const v = parseFloat(row?.value);
-  return Number.isFinite(v) && v >= 0 ? v : 60;
-}
 
 async function getSumUpToken() {
   const res = await fetch('https://api.sumup.com/token', {
@@ -33,9 +27,21 @@ router.post('/', async (req, res) => {
   const { customer_name, customer_email, customer_phone, customer_note, cart, slot_id, slot_token, delivery_type, delivery_address } = req.body;
   // Commentaire libre du client au fleuriste, distinct du message par article joint au bouquet
   const note = typeof customer_note === 'string' ? customer_note.trim().slice(0, 500) : '';
+  // Demande de facture : case cochée + coordonnées de facturation facultatives
+  const invoiceRequested = req.body.invoice_requested ? 1 : 0;
+  const invoiceInfo = invoiceRequested && typeof req.body.invoice_info === 'string'
+    ? req.body.invoice_info.trim().slice(0, 500) : '';
 
-  if (!customer_name || !customer_phone || !Array.isArray(cart) || !cart.length || !slot_id || !delivery_type) {
+  if (typeof customer_name !== 'string' || !customer_name.trim() || typeof customer_phone !== 'string'
+      || !Array.isArray(cart) || !cart.length || !slot_id || !['delivery', 'pickup'].includes(delivery_type)) {
     return res.status(400).json({ error: 'Données manquantes' });
+  }
+  // Acceptation des CGV obligatoire (case à cocher bloquante côté front, revérifiée ici)
+  if (req.body.cgv_accepted !== true) {
+    return res.status(400).json({ error: 'Vous devez accepter les conditions générales de vente pour commander.' });
+  }
+  if (customer_name.length > 100 || customer_phone.length > 30 || (customer_email && String(customer_email).length > 200) || cart.length > 50) {
+    return res.status(400).json({ error: 'Données trop longues.' });
   }
   if (!/^(\+33\s?|0)[1-9]([\s.\-]?\d{2}){4}$/.test(customer_phone)) {
     return res.status(400).json({ error: 'Numéro de téléphone invalide.' });
@@ -117,15 +123,25 @@ router.post('/', async (req, res) => {
 
   const subtotal = pricedCart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
-  // Tarif de livraison basé sur le code postal (zone). Livraison offerte dès 60 €.
+  // Tarif de livraison : la zone (Écusson / Nîmes hors Écusson / hors Nîmes) est déduite
+  // de l'adresse côté serveur — jamais du client. Livraison offerte au-delà du seuil de la zone.
   let deliveryCost = 0;
+  let deliveryAddress = delivery_address || null;
   if (delivery_type === 'delivery') {
-    const zip = delivery_address && delivery_address.zip;
-    const zoneFee = feeForZip(zip);
-    if (zoneFee === null) {
-      return res.status(400).json({ error: 'Nous ne livrons pas à ce code postal. Merci de contacter la boutique.' });
-    }
-    deliveryCost = subtotal >= freeDeliveryThreshold() ? 0 : zoneFee;
+    const quote = await quoteDelivery(delivery_address);
+    if (!quote.ok) return res.status(quote.status).json({ error: quote.error });
+    const threshold = thresholdForZone(quote.zone, getThresholds());
+    deliveryCost = subtotal >= threshold ? 0 : quote.fee;
+    // La zone retenue est conservée avec l'adresse (visible dans la tournée)
+    // (champs recopiés un à un : rien d'autre venant du navigateur n'est conservé)
+    deliveryAddress = {
+      street: String(delivery_address.street || '').trim().slice(0, 150),
+      extra: delivery_address.extra ? String(delivery_address.extra).trim().slice(0, 150) : null,
+      zip: String(delivery_address.zip || '').trim(),
+      city: String(delivery_address.city || '').trim().slice(0, 80),
+      zone: quote.zone,
+      zoneLabel: quote.label,
+    };
   }
   const total = Math.round((subtotal + deliveryCost) * 100) / 100;
 
@@ -138,19 +154,23 @@ router.post('/', async (req, res) => {
       const result = db.prepare(`
         INSERT INTO orders
           (sumup_checkout_id, customer_name, customer_email, customer_phone,
-           customer_address, slot_id, items, total, delivery_type, status, customer_note)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'paid', ?)
+           customer_address, slot_id, items, total, delivery_type, status, customer_note,
+           invoice_requested, invoice_info, cgv_accepted_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'paid', ?, ?, ?, ?)
       `).run(
         checkoutRef,
         customer_name,
         customer_email || '',
         customer_phone,
-        delivery_address ? JSON.stringify(delivery_address) : null,
+        deliveryAddress ? JSON.stringify(deliveryAddress) : null,
         slot_id,
         JSON.stringify(pricedCart),
         total,
         delivery_type,
-        note
+        note,
+        invoiceRequested,
+        invoiceInfo,
+        nowIso
       );
       // La commande occupe la place : le hold est consommé. Décrément des stocks (pas de webhook en simulation)
       db.prepare('DELETE FROM slot_holds WHERE token = ?').run(slot_token);
@@ -194,28 +214,34 @@ router.post('/', async (req, res) => {
 
     const checkout = await checkoutRes.json();
 
-    db.prepare(`
+    const inserted = db.prepare(`
       INSERT INTO orders
         (sumup_checkout_id, customer_name, customer_email, customer_phone,
-         customer_address, slot_id, items, total, delivery_type, status, customer_note)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+         customer_address, slot_id, items, total, delivery_type, status, customer_note,
+         invoice_requested, invoice_info, cgv_accepted_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)
     `).run(
       checkout.id,
       customer_name,
       customer_email || '',
       customer_phone,
-      delivery_address ? JSON.stringify(delivery_address) : null,
+      deliveryAddress ? JSON.stringify(deliveryAddress) : null,
       slot_id,
       JSON.stringify(pricedCart),
       total,
       delivery_type,
-      note
+      note,
+      invoiceRequested,
+      invoiceInfo,
+      nowIso
     );
 
     // La commande pending occupe la place pendant 30 min (cf. slotAvailability) : hold consommé
     db.prepare('DELETE FROM slot_holds WHERE token = ?').run(slot_token);
 
-    res.json({ checkoutUrl: `https://pay.sumup.com/b2c/${checkout.id}` });
+    // orderId : numéro de commande, mémorisé par le front pour la page de confirmation
+    // (le retour SumUp ne le transmet pas)
+    res.json({ checkoutUrl: `https://pay.sumup.com/b2c/${checkout.id}`, orderId: Number(inserted.lastInsertRowid) });
 
   } catch (err) {
     console.error('Checkout error:', err);

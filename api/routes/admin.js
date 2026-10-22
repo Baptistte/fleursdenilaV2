@@ -7,6 +7,7 @@ const db = require('../db/database');
 const requireAdmin = require('../middleware/requireAdmin');
 const { purgeExpiredHolds, takenCount, defaultCapacity } = require('../services/slotAvailability');
 const { TEMPLATES, renderTemplate, sendEmail, sendOrderEmails, sampleData } = require('../services/mailer');
+const { getThresholds, setThreshold } = require('../services/deliveryConfig');
 
 router.use(requireAdmin);
 
@@ -563,29 +564,31 @@ router.post('/messages/send', async (req, res) => {
 
 // GET /api/admin/settings — réglages de la boutique
 router.get('/settings', (req, res) => {
-  const row = db.prepare("SELECT value FROM settings WHERE key = 'free_delivery_threshold'").get();
-  const v = parseFloat(row?.value);
+  const thresholds = getThresholds();
   res.json({
-    freeDeliveryThreshold: Number.isFinite(v) && v >= 0 ? v : 60,
+    freeDeliveryThresholdNimes: thresholds.nimes,
+    freeDeliveryThresholdOutside: thresholds.outside,
     defaultSlotCapacity: defaultCapacity()
   });
 });
 
 // PUT /api/admin/settings — mettre à jour les réglages
 router.put('/settings', (req, res) => {
-  const { freeDeliveryThreshold, defaultSlotCapacity } = req.body;
+  const { freeDeliveryThresholdNimes, freeDeliveryThresholdOutside, defaultSlotCapacity } = req.body;
   const upsert = db.prepare(`
     INSERT INTO settings (key, value) VALUES (?, ?)
     ON CONFLICT(key) DO UPDATE SET value = excluded.value
   `);
 
-  if (freeDeliveryThreshold != null) {
-    const v = parseFloat(freeDeliveryThreshold);
-    if (!Number.isFinite(v) || v < 0 || v > 10000) {
-      return res.status(400).json({ error: 'Seuil invalide (entre 0 et 10 000 €)' });
-    }
-    upsert.run('free_delivery_threshold', String(v));
+  const validThreshold = v => Number.isFinite(v) && v >= 0 && v <= 10000;
+  const nimes = freeDeliveryThresholdNimes != null ? parseFloat(freeDeliveryThresholdNimes) : null;
+  const outside = freeDeliveryThresholdOutside != null ? parseFloat(freeDeliveryThresholdOutside) : null;
+  if ((nimes != null && !validThreshold(nimes)) || (outside != null && !validThreshold(outside))) {
+    return res.status(400).json({ error: 'Seuil invalide (entre 0 et 10 000 €)' });
   }
+  if (nimes != null) setThreshold('nimes', nimes);
+  if (outside != null) setThreshold('outside', outside);
+
   if (defaultSlotCapacity != null) {
     const c = parseInt(defaultSlotCapacity);
     if (!Number.isInteger(c) || c < 1 || c > 100) {

@@ -7,7 +7,6 @@
 
 
     <!-- Preconnect & Preload pour performances -->
-    <link rel="preconnect" href="https://maps.googleapis.com">
     <link rel="preconnect" href="https://maps.gstatic.com" crossorigin>
     <link rel="preload" as="font" href="FleurDeLeah-Regular.woff2" type="font/woff2" crossorigin>
     <link rel="preload" as="image"
@@ -60,7 +59,7 @@
     <meta name="ICBM" content="43.835957, 4.358892">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="tailwind.css">
-    <script src="https://elfsightcdn.com/platform.js" async></script>
+    <script src="cookie-consent.js" defer></script>
 
     <!-- Schema.org Structured Data - LocalBusiness -->
     <script type="application/ld+json">
@@ -205,7 +204,7 @@
             "@type": "Offer",
             "priceSpecification": {
                 "@type": "PriceSpecification",
-                "minPrice": "10",
+                "minPrice": "5",
                 "maxPrice": "15",
                 "priceCurrency": "EUR"
             },
@@ -340,9 +339,8 @@
     <!-- Instagram : aperçu fictif du feed en attendant un widget en direct -->
     <!-- Remplace l'ancien bloc « Nos Collections / Catalogue 2026 » (4 catégories +
          bannière « commander » avec la photo d'hortensia). Les vignettes ci-dessous
-         réutilisent des photos déjà présentes sur le site et renvoient toutes vers le
-         vrai profil Instagram ; ce n'est pas un flux en direct (ça nécessiterait un
-         widget tiers, ex. Elfsight/SnapWidget, à décider avant intégration). -->
+         servent de repli. Dès qu'un jeton Instagram est configuré côté API (INSTAGRAM_ACCESS_TOKEN),
+         le script « loadInstagram » les remplace par les dernières publications du compte. -->
     <section id="instagram" class="w-full bg-white">
         <div class="max-w-6xl mx-auto px-6 lg:px-16 py-16 lg:py-20">
             <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 lg:mb-10">
@@ -356,7 +354,7 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-2">
+            <div id="instagram-grid" class="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-2">
                 <a href="https://www.instagram.com/fleurs_de_nila" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
                     <img src="images/bouquet-multicolore-artisanal-nimes-400w.webp" loading="lazy" alt="Bouquet multicolore artisanal - Fleurs de Nila Nîmes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                     <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300 flex items-center justify-center">
@@ -839,6 +837,7 @@
                     <div class="flex flex-col gap-2 mb-4">
                         <a href="mentions-legales.html" class="text-xs text-white/60 hover:text-white transition-colors">Mentions légales</a>
                         <a href="politique-confidentialite.html" class="text-xs text-white/60 hover:text-white transition-colors">Politique de confidentialité</a>
+                        <button type="button" data-consent="manage" class="text-xs text-white/60 hover:text-white transition-colors text-left">Gérer les cookies</button>
                         <a href="plan-du-site.html" class="text-xs text-white/60 hover:text-white transition-colors">Plan du site</a>
                     </div>
                     <p class="text-xs text-white/40">© 2026 Fleurs de Nila — Tous droits réservés</p>
@@ -896,6 +895,25 @@
     <!-- Vitrine : chargement des produits mis en avant depuis l'API -->
     <script>
       (function () {
+        // Flux Instagram : remplace les vignettes statiques par les dernières publications.
+        // Sans jeton configuré ou en cas de panne, les vignettes statiques restent affichées.
+        (async function loadInstagram() {
+            const grid = document.getElementById('instagram-grid');
+            if (!grid || !window.API_URL) return;
+            try {
+                const res = await fetch(`${window.API_URL}/api/instagram`);
+                if (!res.ok) return;
+                const { items } = await res.json();
+                if (!Array.isArray(items) || items.length < 4) return;
+                const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+                grid.innerHTML = items.slice(0, 8).map(i => `
+                <a href="${esc(i.link)}" target="_blank" rel="noopener noreferrer" class="group relative block aspect-square overflow-hidden">
+                    <img src="${esc(i.image)}" loading="lazy" alt="${esc(i.caption || 'Publication Instagram Fleurs de Nila')}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-colors duration-300"></div>
+                </a>`).join('');
+            } catch { /* vignettes statiques conservées */ }
+        })();
+
         const API = window.API_URL;
 
         // Convertit un chemin image stocké côté boutique (../images/) vers la racine (images/)
@@ -1017,99 +1035,40 @@
                 </button>
             </div>
 
-            <!-- Tableau codes postaux -->
+            <!-- Grille tarifaire -->
             <div class="px-8 pt-6 pb-4">
-                <p class="text-xs uppercase tracking-widest text-secondary mb-4">Codes postaux desservis</p>
-                <div class="grid grid-cols-2 gap-x-6">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-primary/20">
-                                <th
-                                    class="text-left pb-2 text-xs uppercase tracking-widest text-primary/60 font-medium">
-                                    Code</th>
-                                <th
-                                    class="text-right pb-2 text-xs uppercase tracking-widest text-primary/60 font-medium">
-                                    Tarif</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-gray-700">
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30000</td>
-                                <td class="text-right font-medium">10 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30128</td>
-                                <td class="text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30129</td>
-                                <td class="text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30132</td>
-                                <td class="text-right font-medium">10 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30190</td>
-                                <td class="text-right font-medium">10 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30230</td>
-                                <td class="text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30300</td>
-                                <td class="text-right font-medium">15 €</td>
-                            </tr>
-                            <tr>
-                                <td class="py-1.5">30320</td>
-                                <td class="text-right font-medium">10 €</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-primary/20">
-                                <th
-                                    class="text-left pb-2 text-xs uppercase tracking-widest text-primary/60 font-medium">
-                                    Code</th>
-                                <th
-                                    class="text-right pb-2 text-xs uppercase tracking-widest text-primary/60 font-medium">
-                                    Tarif</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-gray-700">
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30540</td>
-                                <td class="text-right font-medium">10 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30620</td>
-                                <td class="text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30730</td>
-                                <td class="text-right font-medium">10 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30820</td>
-                                <td class="text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30870</td>
-                                <td class="text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-100">
-                                <td class="py-1.5">30900</td>
-                                <td class="text-right font-medium">10 €</td>
-                            </tr>
-                            <tr>
-                                <td class="py-1.5">30980</td>
-                                <td class="text-right font-medium">15 €</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <p class="text-xs uppercase tracking-widest text-secondary mb-4">Tarifs de livraison</p>
+                <table class="w-full text-sm">
+                    <tbody class="text-gray-700">
+                        <tr class="border-b border-gray-100">
+                            <td class="py-2">Nîmes — Écusson</td>
+                            <td class="text-right font-medium">5 €</td>
+                        </tr>
+                        <tr class="border-b border-gray-100">
+                            <td class="py-2">Nîmes — hors Écusson</td>
+                            <td class="text-right font-medium">9 €</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2">Hors Nîmes (communes ci-dessous)</td>
+                            <td class="text-right font-medium">15 €</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="text-xs text-gray-500 leading-relaxed mt-4">
+                    Livraison <strong>offerte dès 50 €</strong> d'achat à Nîmes et <strong>dès 80 €</strong> hors Nîmes.
+                    Retrait en boutique gratuit.
+                </p>
+            </div>
+
+            <!-- Communes desservies -->
+            <div class="px-8 pb-5">
+                <p class="text-xs uppercase tracking-widest text-secondary mb-3">Communes desservies</p>
+                <p class="text-sm text-gray-700 leading-relaxed">
+                    <strong class="font-medium">Nîmes</strong> (30000, 30900) ·
+                    Caissargues (30132) · Bouillargues (30230) · Milhaud (30540) · Garons (30128) ·
+                    Marguerittes (30320) · Manduel (30129) · Redessan (30129) · Caveirac (30820) ·
+                    Bernis (30620) · Générac (30510) · Saint-Gilles (30800) · Vauvert (30600)
+                </p>
             </div>
 
             <!-- Horaires de livraison -->

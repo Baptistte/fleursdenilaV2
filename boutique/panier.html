@@ -127,6 +127,9 @@
               </div>
             </div>
 
+            <!-- Grille des frais de livraison, visible avant même le choix du créneau -->
+            <div data-delivery-info class="mt-5 border border-gray-100 bg-cream/60 px-4 py-3"></div>
+
             <!-- Barre de progression livraison offerte -->
             <div id="delivery-progress-wrap" class="mt-4">
               <div class="flex justify-between text-xs text-gray-400 mb-1">
@@ -165,14 +168,12 @@
     </div>
   </footer>
 
+  <script src="delivery-zones.js?v=2"></script>
   <script>
-    let DELIVERY_THRESHOLD = 60;   // valeur par défaut, remplacée par le réglage admin via /api/config
-    fetch(`${window.API_URL}/api/config`).then(r => r.json()).then(c => {
-      if (Number.isFinite(c.freeDeliveryThreshold)) {
-        DELIVERY_THRESHOLD = c.freeDeliveryThreshold;
-        render();
-      }
-    }).catch(() => {});
+    // Seuils de livraison offerte par zone (réglables en admin) : chargés depuis /api/config.
+    // Au panier, la commune n'est pas encore connue : on suit le seuil Nîmes (le plus bas)
+    // et on indique celui de l'extérieur de Nîmes.
+    DELIVERY.onConfig(() => render());
 
     function getCart() {
       return JSON.parse(localStorage.getItem('cart') || '[]');
@@ -229,34 +230,43 @@
 
     function renderSummary(cart) {
       const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-      const freeDelivery = subtotal >= DELIVERY_THRESHOLD;
+      const T = DELIVERY.THRESHOLDS;
+      const freeNimes = subtotal >= T.nimes;
+      const freeOutside = subtotal >= T.outside;
 
-      // Les frais réels dépendent de la commune (10–15 €) et sont calculés à
-      // l'étape livraison — on n'affiche pas de montant arbitraire ici.
+      // Le montant exact dépend de l'adresse (calculée à l'étape livraison) :
+      // on affiche ici la fourchette réelle plutôt qu'une promesse floue.
       document.getElementById('subtotal').textContent = subtotal.toFixed(2) + ' €';
-      document.getElementById('total').textContent = subtotal.toFixed(2) + ' €' + (freeDelivery ? '' : ' *');
+      document.getElementById('total').textContent = subtotal.toFixed(2) + ' €' + (freeOutside ? '' : ' *');
 
       const deliveryEl = document.getElementById('delivery-cost');
-      if (freeDelivery) {
+      if (freeOutside) {
         deliveryEl.textContent = 'Offerte';
         deliveryEl.className = 'text-green-700 text-sm';
+      } else if (freeNimes) {
+        deliveryEl.textContent = `Offerte à Nîmes · ${DELIVERY.fmt(DELIVERY.FEES.outside)} hors Nîmes`;
+        deliveryEl.className = 'text-xs text-green-700';
       } else {
-        deliveryEl.textContent = '* selon la commune, à l\'étape suivante';
+        deliveryEl.textContent = `* de ${DELIVERY.fmt(DELIVERY.FEES.ecusson)} à ${DELIVERY.fmt(DELIVERY.FEES.outside)} selon l'adresse`;
         deliveryEl.className = 'text-xs text-gray-400';
       }
 
-      // Barre de progression
-      const remaining = Math.max(0, DELIVERY_THRESHOLD - subtotal);
-      const pct = Math.min(100, (subtotal / DELIVERY_THRESHOLD) * 100);
+      // Barre de progression vers la livraison offerte (seuil Nîmes, puis hors Nîmes)
+      const target = freeNimes ? T.outside : T.nimes;
+      const remaining = Math.max(0, target - subtotal);
+      const pct = Math.min(100, (subtotal / target) * 100);
       document.getElementById('delivery-bar').style.width = pct + '%';
-      document.getElementById('delivery-threshold-label').textContent = DELIVERY_THRESHOLD + ' €';
+      document.getElementById('delivery-threshold-label').textContent = DELIVERY.fmt(target);
 
       const msg = document.getElementById('delivery-msg');
-      if (freeDelivery) {
+      if (freeOutside) {
         msg.textContent = 'Livraison offerte ✓';
         msg.className = 'text-xs text-green-700';
+      } else if (freeNimes) {
+        msg.textContent = `Offerte à Nîmes ✓ — plus que ${remaining.toFixed(2)} € pour l'offrir hors Nîmes`;
+        msg.className = 'text-xs text-green-700';
       } else {
-        msg.textContent = `Plus que ${remaining.toFixed(2)} € pour la livraison offerte`;
+        msg.textContent = `Plus que ${remaining.toFixed(2)} € pour la livraison offerte à Nîmes`;
         msg.className = 'text-xs text-gray-400';
       }
     }

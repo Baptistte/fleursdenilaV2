@@ -153,6 +153,12 @@ try {
 try { db.exec('ALTER TABLE slots ADD COLUMN capacity INTEGER NOT NULL DEFAULT 3'); } catch { /* déjà appliquée */ }
 // Commentaire libre du client au fleuriste (distinct du message par article, joint au bouquet)
 try { db.exec("ALTER TABLE orders ADD COLUMN customer_note TEXT DEFAULT ''"); } catch { /* déjà appliquée */ }
+// Demande de facture au moment de la commande (case à cocher + nom/société et adresse
+// de facturation facultatifs, à reprendre sur la facture)
+try { db.exec('ALTER TABLE orders ADD COLUMN invoice_requested INTEGER NOT NULL DEFAULT 0'); } catch { /* déjà appliquée */ }
+try { db.exec("ALTER TABLE orders ADD COLUMN invoice_info TEXT DEFAULT ''"); } catch { /* déjà appliquée */ }
+// Horodatage d'acceptation des CGV (preuve de l'acceptation à la commande)
+try { db.exec('ALTER TABLE orders ADD COLUMN cgv_accepted_at TEXT'); } catch { /* déjà appliquée */ }
 // Catégories de produits (colonne ajoutée après coup sur une base déjà en place)
 try { db.exec('ALTER TABLE products ADD COLUMN category_id INTEGER DEFAULT NULL REFERENCES categories(id) ON DELETE SET NULL'); } catch { /* déjà appliquée */ }
 // Taux de TVA par produit (20% par défaut à l'ajout de la colonne, voir backfill ciblé plus bas)
@@ -190,7 +196,7 @@ try {
 if (process.env.ADMIN_USER && process.env.ADMIN_PASSWORD) {
   const n = db.prepare('SELECT COUNT(*) AS n FROM admins').get().n;
   if (n === 0) {
-    const hash = crypto.createHash('sha256').update(process.env.ADMIN_PASSWORD).digest('hex');
+    const hash = require('../services/passwords').hashPassword(process.env.ADMIN_PASSWORD);
     db.prepare('INSERT INTO admins (username, password_hash) VALUES (?, ?)').run(process.env.ADMIN_USER, hash);
     console.log(`Compte admin « ${process.env.ADMIN_USER} » créé (bootstrap).`);
   }

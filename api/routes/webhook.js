@@ -10,13 +10,21 @@ router.post('/sumup', express.raw({ type: 'application/json' }), (req, res) => {
   const signature = req.headers['x-payload-signature'];
   const secret = process.env.SUMUP_WEBHOOK_SECRET;
 
-  // Vérification HMAC si secret configuré
-  if (secret && signature) {
-    const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-    if (signature !== expected) {
-      console.warn('Webhook SumUp : signature invalide');
-      return res.status(401).json({ error: 'Signature invalide' });
-    }
+  // Signature HMAC obligatoire : sans secret configuré ou sans signature valide,
+  // le webhook est refusé (sinon n'importe qui pourrait déclarer une commande payée).
+  if (!secret) {
+    console.error('Webhook SumUp refusé : SUMUP_WEBHOOK_SECRET non configuré');
+    return res.status(503).json({ error: 'Webhook non configuré' });
+  }
+  if (!signature || !Buffer.isBuffer(rawBody)) {
+    return res.status(401).json({ error: 'Signature manquante' });
+  }
+  const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+  const a = Buffer.from(String(signature));
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+    console.warn('Webhook SumUp : signature invalide');
+    return res.status(401).json({ error: 'Signature invalide' });
   }
 
   let event;

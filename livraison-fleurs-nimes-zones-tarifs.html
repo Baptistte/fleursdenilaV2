@@ -88,7 +88,7 @@
         ],
         "offers": {
             "@type": "AggregateOffer",
-            "minPrice": "10",
+            "minPrice": "5",
             "maxPrice": "15",
             "priceCurrency": "EUR",
             "availability": "https://schema.org/InStock"
@@ -245,92 +245,48 @@
                     nîmoise. Voici nos zones de livraison et les tarifs associés :
                 </p>
 
-                <!-- Tableau des zones -->
+                <!-- Grille tarifaire -->
                 <div class="overflow-x-auto mb-8">
                     <table class="w-full border border-primary text-sm">
                         <thead>
                             <tr class="bg-primary text-white">
-                                <th class="text-left px-4 py-3 font-medium uppercase tracking-wider text-xs">Commune
-                                </th>
-                                <th class="text-left px-4 py-3 font-medium uppercase tracking-wider text-xs">Code postal
-                                </th>
+                                <th class="text-left px-4 py-3 font-medium uppercase tracking-wider text-xs">Zone</th>
                                 <th class="text-right px-4 py-3 font-medium uppercase tracking-wider text-xs">Tarif</th>
+                                <th class="text-right px-4 py-3 font-medium uppercase tracking-wider text-xs">Offerte dès</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-700">
                             <tr class="border-b border-gray-200">
-                                <td class="px-4 py-2 font-medium">Nîmes centre</td>
-                                <td class="px-4 py-2">30000</td>
-                                <td class="px-4 py-2 text-right font-medium">10 €</td>
+                                <td class="px-4 py-2 font-medium">Nîmes — Écusson</td>
+                                <td class="px-4 py-2 text-right font-medium">5 €</td>
+                                <td class="px-4 py-2 text-right">50 €</td>
                             </tr>
                             <tr class="border-b border-gray-200 bg-cream">
-                                <td class="px-4 py-2 font-medium">Nîmes ouest</td>
-                                <td class="px-4 py-2">30900</td>
-                                <td class="px-4 py-2 text-right font-medium">10 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-200">
-                                <td class="px-4 py-2 font-medium">Caissargues</td>
-                                <td class="px-4 py-2">30132</td>
-                                <td class="px-4 py-2 text-right font-medium">10 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-200 bg-cream">
-                                <td class="px-4 py-2 font-medium">Bouillargues</td>
-                                <td class="px-4 py-2">30230</td>
-                                <td class="px-4 py-2 text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-200">
-                                <td class="px-4 py-2 font-medium">Milhaud</td>
-                                <td class="px-4 py-2">30540</td>
-                                <td class="px-4 py-2 text-right font-medium">10 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-200 bg-cream">
-                                <td class="px-4 py-2 font-medium">Garons</td>
-                                <td class="px-4 py-2">30128</td>
-                                <td class="px-4 py-2 text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-200">
-                                <td class="px-4 py-2 font-medium">Marguerittes</td>
-                                <td class="px-4 py-2">30320</td>
-                                <td class="px-4 py-2 text-right font-medium">10 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-200 bg-cream">
-                                <td class="px-4 py-2 font-medium">Manduel</td>
-                                <td class="px-4 py-2">30129</td>
-                                <td class="px-4 py-2 text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-200">
-                                <td class="px-4 py-2 font-medium">Caveirac</td>
-                                <td class="px-4 py-2">30820</td>
-                                <td class="px-4 py-2 text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-200 bg-cream">
-                                <td class="px-4 py-2 font-medium">Redessan</td>
-                                <td class="px-4 py-2">30129</td>
-                                <td class="px-4 py-2 text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-200">
-                                <td class="px-4 py-2 font-medium">Bernis</td>
-                                <td class="px-4 py-2">30620</td>
-                                <td class="px-4 py-2 text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-200 bg-cream">
-                                <td class="px-4 py-2 font-medium">Générac</td>
-                                <td class="px-4 py-2">30510</td>
-                                <td class="px-4 py-2 text-right font-medium">15 €</td>
-                            </tr>
-                            <tr class="border-b border-gray-200">
-                                <td class="px-4 py-2 font-medium">Saint-Gilles</td>
-                                <td class="px-4 py-2">30800</td>
-                                <td class="px-4 py-2 text-right font-medium">15 €</td>
+                                <td class="px-4 py-2 font-medium">Nîmes — hors Écusson</td>
+                                <td class="px-4 py-2 text-right font-medium">9 €</td>
+                                <td class="px-4 py-2 text-right">50 €</td>
                             </tr>
                             <tr>
-                                <td class="px-4 py-2 font-medium">Vauvert</td>
-                                <td class="px-4 py-2">30600</td>
+                                <td class="px-4 py-2 font-medium">Hors Nîmes</td>
                                 <td class="px-4 py-2 text-right font-medium">15 €</td>
+                                <td class="px-4 py-2 text-right">80 €</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+
+                <p class="text-gray-700 leading-relaxed mb-6">
+                    Le tarif est calculé automatiquement à partir de l'adresse de livraison saisie lors de la commande.
+                    L'<strong>Écusson</strong> correspond au centre historique de Nîmes, à l'intérieur des grands
+                    boulevards (Gambetta, Amiral Courbet, Victor Hugo, Alphonse Daudet).
+                </p>
+
+                <h3 class="font-display text-2xl text-primary mt-8 mb-4">Communes desservies hors Nîmes</h3>
+                <p class="text-gray-700 leading-relaxed mb-6">
+                    Caissargues (30132), Bouillargues (30230), Milhaud (30540), Garons (30128), Marguerittes (30320),
+                    Manduel (30129), Redessan (30129), Caveirac (30820), Bernis (30620), Générac (30510),
+                    Saint-Gilles (30800) et Vauvert (30600).
+                </p>
 
                 <p class="text-gray-700 leading-relaxed mb-6">
                     Votre commune ne figure pas dans la liste ? Contactez-nous au <a href="tel:0434390429"

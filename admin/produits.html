@@ -1359,8 +1359,13 @@
         </div>
         <div style="padding:22px 20px">
           <div class="field-group" style="margin:0;max-width:280px">
-            <label class="field-label">Livraison offerte à partir de (€)</label>
-            <input type="number" id="setting-threshold" class="field-input" min="0" max="10000" step="1" value="60">
+            <label class="field-label">Livraison offerte à Nîmes à partir de (€)</label>
+            <input type="number" id="setting-threshold-nimes" class="field-input" min="0" max="10000" step="1" value="50">
+          </div>
+          <div class="field-group" style="margin:14px 0 0;max-width:280px">
+            <label class="field-label">Livraison offerte hors Nîmes à partir de (€)</label>
+            <input type="number" id="setting-threshold-outside" class="field-input" min="0" max="10000" step="1" value="80">
+            <p style="font-size:11px;color:#94a3b8;margin-top:5px">Tarifs de livraison : Nîmes Écusson 5 € · Nîmes hors Écusson 9 € · hors Nîmes 15 €</p>
           </div>
           <div class="field-group" style="margin:14px 0 0;max-width:280px">
             <label class="field-label">Capacité par défaut des créneaux</label>
@@ -2079,6 +2084,8 @@ let currentCategoryFilter = '';
 })();
 
 // ─── AUTH ───
+// Échappement HTML : toute donnée saisie par un client ou un tiers doit passer par esc() avant innerHTML
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const adminToken = localStorage.getItem('admin_token');
 if (!adminToken) window.location.href = 'login.html';
 
@@ -2207,14 +2214,16 @@ function renderTournee(date, orders) {
       <div class="tournee-order">
         <div>
           <div class="to-line" style="font-weight:700">#${o.id} — ${esc(o.customer_name)}
-            ${o.validated ? '' : ' <span class="badge badge-amber">À valider</span>'}</div>
+            ${o.validated ? '' : ' <span class="badge badge-amber">À valider</span>'}
+            ${o.invoice_requested ? ' <span class="badge badge-amber" title="Le client a demandé une facture">🧾 Facture</span>' : ''}</div>
           <div class="to-line">${esc(o.customer_phone || '')}</div>
           <div class="to-line" style="margin-top:4px">
             ${o.delivery_type === 'delivery'
               ? `<span class="badge" style="background:#dbeafe;color:#1e40af">Livraison</span>`
               : `<span class="badge" style="background:#fef3c7;color:#b45309">Retrait boutique</span>`}
           </div>
-          ${addr ? `<div class="to-line to-muted" style="margin-top:4px">${esc(addr.street)}${addr.extra ? ' — ' + esc(addr.extra) : ''}<br>${esc(addr.zip)} ${esc(addr.city)}</div>` : ''}
+          ${addr ? `<div class="to-line to-muted" style="margin-top:4px">${esc(addr.street)}${addr.extra ? ' — ' + esc(addr.extra) : ''}<br>${esc(addr.zip)} ${esc(addr.city)}${addr.zoneLabel ? ` <span class="badge badge-gray">${esc(addr.zoneLabel)}</span>` : ''}</div>` : ''}
+          ${o.invoice_requested && o.invoice_info ? `<div class="to-line" style="margin-top:6px;padding:6px 8px;background:#fef3c7;border-radius:6px;font-size:12px;white-space:pre-line">🧾 ${esc(o.invoice_info)}</div>` : ''}
           ${o.customer_note ? `<div class="to-line" style="margin-top:6px;padding:6px 8px;background:#fef3c7;border-radius:6px;font-size:12px">💬 ${esc(o.customer_note)}</div>` : ''}
         </div>
         <div>
@@ -2269,9 +2278,9 @@ function renderClients() {
     const last = new Date(c.lastOrderAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' });
     return `
     <tr onclick="toggleClientOrders(${i})" style="cursor:pointer" data-idx="${i}">
-      <td style="font-weight:600">${c.name}</td>
-      <td style="white-space:nowrap"><a href="tel:${c.phone}" onclick="event.stopPropagation()" style="color:var(--navy2)">${formatPhone(c.phone)}</a></td>
-      <td style="font-size:12px;color:#64748b">${c.email || '<span style="color:#cbd5e1">—</span>'}</td>
+      <td style="font-weight:600">${esc(c.name)}</td>
+      <td style="white-space:nowrap"><a href="tel:${esc(c.phone)}" onclick="event.stopPropagation()" style="color:var(--navy2)">${formatPhone(c.phone)}</a></td>
+      <td style="font-size:12px;color:#64748b">${c.email ? esc(c.email) : '<span style="color:#cbd5e1">—</span>'}</td>
       <td>${c.ordersCount}${c.paidCount !== c.ordersCount ? ` <span style="color:#94a3b8;font-size:11px">(${c.paidCount} payée${c.paidCount > 1 ? 's' : ''})</span>` : ''}</td>
       <td style="font-weight:700" class="tabular">${c.totalSpent.toFixed(2)} €</td>
       <td style="font-size:12px;color:#94a3b8">${last}</td>
@@ -2281,7 +2290,7 @@ function renderClients() {
         ${c.orders.map(o => `
           <div style="display:flex;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px">
             <span style="color:#94a3b8;font-weight:700">#${o.id}</span>
-            <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.items.map(it => `${it.name} ×${it.qty}`).join(', ')}</span>
+            <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.items.map(it => `${esc(it.name)} ×${it.qty}`).join(', ')}</span>
             <span class="badge ${o.delivery_type === 'delivery' ? 'badge-blue' : 'badge-gray'}">${o.delivery_type === 'delivery' ? 'Livraison' : 'Retrait'}</span>
             ${statusBadge(o.status)}
             <span style="font-weight:700;white-space:nowrap" class="tabular">${o.total.toFixed(2)} €</span>
@@ -2345,13 +2354,13 @@ function renderFactures() {
   }
 
   tbody.innerHTML = list.map(o => {
-    const items = (o.items || []).map(i => `${i.name} ×${i.qty}`).join(', ');
+    const items = (o.items || []).map(i => `${esc(i.name)} ×${i.qty}`).join(', ');
     const d = o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '—';
     return `<tr>
       <td><input type="checkbox" class="inv-check" data-id="${o.id}" ${_invSelection.has(o.id) ? 'checked' : ''} style="width:15px;height:15px;cursor:pointer"></td>
       <td style="font-size:11px;color:#94a3b8;font-weight:700">#${o.id}</td>
-      <td style="font-weight:600">${o.customer_name}</td>
-      <td style="white-space:nowrap;font-size:12px">${o.customer_phone || '—'}</td>
+      <td style="font-weight:600">${esc(o.customer_name)}${o.invoice_requested ? ` <span class="badge badge-amber" title="${o.invoice_info ? ('Facturer : ' + esc(o.invoice_info)) : 'Facture demandée par le client'}" style="cursor:help">🧾 demandée</span>` : ''}</td>
+      <td style="white-space:nowrap;font-size:12px">${esc(o.customer_phone) || '—'}</td>
       <td style="font-size:12px;color:#64748b;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${items}</td>
       <td style="font-weight:700" class="tabular">${o.total.toFixed(2)} €</td>
       <td style="font-size:12px;color:#94a3b8;white-space:nowrap">${d}</td>
@@ -2500,6 +2509,8 @@ function openInvoice(ids) {
     <div class="partie" style="text-align:right">
       <h3>Client</h3>
       <div><strong>${esc(c.customer_name)}</strong></div>
+      ${(orders.slice().reverse().find(o => o.invoice_info) || {}).invoice_info
+        ? `<div style="white-space:pre-line">${esc(orders.slice().reverse().find(o => o.invoice_info).invoice_info)}</div>` : ''}
       <div>${esc(c.customer_phone || '')}</div>
       ${c.customer_email ? `<div>${esc(c.customer_email)}</div>` : ''}
     </div>
@@ -2580,11 +2591,11 @@ function renderMessagesLog(messages) {
     return;
   }
   tbody.innerHTML = messages.map(m => `
-    <tr title="${m.error ? String(m.error).replace(/"/g, '&quot;') : ''}">
+    <tr title="${m.error ? esc(m.error) : ''}">
       <td style="font-size:12px;color:#94a3b8;white-space:nowrap">${new Date(m.created_at + 'Z').toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
       <td><span class="badge badge-gray">${m.channel === 'email' ? '✉ Email' : '📱 SMS'}</span></td>
       <td style="font-size:12px;font-weight:600">${tplLabel(m.template)}</td>
-      <td style="font-size:12px;color:#64748b;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.recipient}</td>
+      <td style="font-size:12px;color:#64748b;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.recipient)}</td>
       <td style="font-size:12px;color:#94a3b8">${m.order_id ? '#' + m.order_id : '—'}</td>
       <td>${msgStatusBadge(m.status)}</td>
     </tr>`).join('');
@@ -2783,7 +2794,7 @@ function renderUpcomingTasks(tasks, date) {
     <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #f8fafc">
       <div style="width:10px;height:10px;border-radius:50%;background:${t.color};flex-shrink:0"></div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">${t.title}</div>
+        <div style="font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">${esc(t.title)}</div>
         <div style="font-size:11px;color:var(--muted)">${t.start_time} – ${t.end_time}</div>
       </div>
     </div>
@@ -2849,7 +2860,7 @@ function renderDayOrders(orders, date) {
       const statusColor = o.status === 'paid' ? '#059669' : o.status === 'pending' ? '#d97706' : '#94a3b8';
       return `<div style="display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid #f8fafc">
         <div style="flex:1;min-width:0">
-          <div style="font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">${o.customer_name}</div>
+          <div style="font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">${esc(o.customer_name)}</div>
           <div style="font-size:11px;color:var(--muted)">${slotTime} · ${(o.total || 0).toFixed(2)} €</div>
         </div>
         <div style="font-size:10px;font-weight:600;color:${statusColor};background:${statusColor}18;padding:2px 8px;border-radius:20px;white-space:nowrap">
@@ -2937,8 +2948,8 @@ function renderRecentOrders(orders) {
     <tr>
       <td style="color:#94a3b8;font-size:11px;font-weight:600">#${o.id}</td>
       <td>
-        <div style="font-weight:500;color:var(--text)">${o.customer_name}</div>
-        <div style="font-size:11px;color:#94a3b8">${o.customer_email}</div>
+        <div style="font-weight:500;color:var(--text)">${esc(o.customer_name)}</div>
+        <div style="font-size:11px;color:#94a3b8">${esc(o.customer_email)}</div>
       </td>
       <td style="font-weight:600" class="tabular">${o.total.toFixed(2)} €</td>
       <td style="font-size:12px;color:#64748b">${o.date ? o.date + (o.start_time ? ' · ' + o.start_time : '') : '<span style="color:#cbd5e1">—</span>'}</td>
@@ -2962,7 +2973,7 @@ function renderStockAlerts(products) {
         ? `<img src="${p.images[0]}" class="alert-img" alt="">`
         : `<div class="alert-img-ph"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01"/></svg></div>`}
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
       </div>
       <span class="badge ${p.stock === 0 ? 'badge-red' : 'badge-amber'}">${p.stock === 0 ? 'Épuisé' : p.stock + ' restant' + (p.stock > 1 ? 's' : '')}</span>
     </div>`).join('');
@@ -3030,7 +3041,7 @@ function renderProductTable() {
             : `<div class="prod-img-placeholder"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>`}
         </td>
         <td>
-          <div style="font-weight:600;color:var(--text)">${p.name}</div>
+          <div style="font-weight:600;color:var(--text)">${esc(p.name)}</div>
           <div style="font-size:11.5px;color:#94a3b8;margin-top:2px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.description || ''}</div>
         </td>
         <td>${p.category_name ? `<span class="badge badge-gray">${p.category_name}</span>` : '<span style="color:#cbd5e1">—</span>'}</td>
@@ -3146,7 +3157,7 @@ function renderCategoriesTable() {
   }
   tbody.innerHTML = allCategories.map(c => `
     <tr>
-      <td style="font-weight:600;color:var(--text)">${c.name}</td>
+      <td style="font-weight:600;color:var(--text)">${esc(c.name)}</td>
       <td><span class="badge badge-gray">${typeLabel(c.type)}</span></td>
       <td>${c.product_count}</td>
       <td>${c.active ? '<span class="badge badge-green">Visible</span>' : '<span class="badge badge-gray">Masquée</span>'}</td>
@@ -3160,13 +3171,13 @@ function populateCategorySelects() {
   const filterSel = document.getElementById('prod-category-filter');
   const current = filterSel.value;
   filterSel.innerHTML = '<option value="">Toutes catégories</option>' +
-    allCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    allCategories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
   filterSel.value = current;
 
   const formSel = document.getElementById('f-category');
   const currentForm = formSel.value;
   formSel.innerHTML = '<option value="">— Aucune —</option>' +
-    allCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    allCategories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
   formSel.value = currentForm;
 }
 
@@ -3208,7 +3219,7 @@ function renderCategoryProductsChecklist(categoryId) {
   wrap.innerHTML = allProducts.map(p => `
     <label style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;cursor:pointer">
       <input type="checkbox" class="cat-product-check" data-id="${p.id}" ${p.category_id === categoryId ? 'checked' : ''}>
-      ${p.name}
+      ${esc(p.name)}
       ${p.category_id && p.category_id !== categoryId ? `<span style="font-size:10px;color:#94a3b8">(actuellement : ${p.category_name || '—'})</span>` : ''}
     </label>`).join('');
 
@@ -3332,20 +3343,22 @@ async function loadSettings() {
   try {
     const res = await apiFetch('/api/admin/settings');
     const s = await res.json();
-    document.getElementById('setting-threshold').value = s.freeDeliveryThreshold;
+    document.getElementById('setting-threshold-nimes').value = s.freeDeliveryThresholdNimes;
+    document.getElementById('setting-threshold-outside').value = s.freeDeliveryThresholdOutside;
     document.getElementById('setting-capacity').value = s.defaultSlotCapacity;
   } catch { /* valeur par défaut du champ conservée */ }
 }
 
 async function saveSettings() {
-  const v = parseFloat(document.getElementById('setting-threshold').value);
+  const vNimes = parseFloat(document.getElementById('setting-threshold-nimes').value);
+  const vOutside = parseFloat(document.getElementById('setting-threshold-outside').value);
   const c = parseInt(document.getElementById('setting-capacity').value);
-  if (!Number.isFinite(v) || v < 0) { alert('Seuil invalide.'); return; }
+  if (!Number.isFinite(vNimes) || vNimes < 0 || !Number.isFinite(vOutside) || vOutside < 0) { alert('Seuil invalide.'); return; }
   if (!Number.isInteger(c) || c < 1) { alert('Capacité par défaut invalide.'); return; }
   const res = await apiFetch('/api/admin/settings', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ freeDeliveryThreshold: v, defaultSlotCapacity: c })
+    body: JSON.stringify({ freeDeliveryThresholdNimes: vNimes, freeDeliveryThresholdOutside: vOutside, defaultSlotCapacity: c })
   });
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
@@ -3372,7 +3385,7 @@ async function loadHomeProducts() {
 
 function renderHomeSlots(selectedIds) {
   const options = allProducts.map(p =>
-    `<option value="${p.id}">${p.name}${p.active ? '' : ' (masqué)'}</option>`
+    `<option value="${p.id}">${esc(p.name)}${p.active ? '' : ' (masqué)'}</option>`
   ).join('');
   document.querySelectorAll('.home-slot').forEach((sel, i) => {
     sel.innerHTML = `<option value="">— Aucun —</option>${options}`;
@@ -3428,17 +3441,17 @@ async function loadOrders() {
       return;
     }
     tbody.innerHTML = orders.map(o => {
-      const items = Array.isArray(o.items) ? o.items.map(i => `${i.name} ×${i.qty}`).join(', ') : '—';
+      const items = Array.isArray(o.items) ? o.items.map(i => `${esc(i.name)} ×${i.qty}`).join(', ') : '—';
       const modeLabel = o.delivery_type === 'delivery' ? 'Livraison' : 'Retrait';
       const dateStr = o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' }) : '—';
       const creneau = o.date ? `${o.date}${o.start_time ? ' · '+o.start_time : ''}` : '—';
       return `<tr>
-        <td style="font-size:11px;color:#94a3b8;font-weight:700">#${o.id}</td>
+        <td style="font-size:11px;color:#94a3b8;font-weight:700">#${o.id}${o.invoice_requested ? ` <span title="Facture demandée${o.invoice_info ? ' : ' + esc(o.invoice_info) : ''}" style="cursor:help">🧾</span>` : ''}</td>
         <td>
-          <div style="font-weight:600">${o.customer_name}</div>
-          <div style="font-size:11px;color:#94a3b8">${o.customer_email}</div>
+          <div style="font-weight:600">${esc(o.customer_name)}</div>
+          <div style="font-size:11px;color:#94a3b8">${esc(o.customer_email)}</div>
         </td>
-        <td style="font-size:12px;color:#64748b;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" ${o.customer_note ? `title="Commentaire client : ${o.customer_note.replace(/"/g, '&quot;')}"` : ''}>${items}${o.customer_note ? ' 💬' : ''}</td>
+        <td style="font-size:12px;color:#64748b;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" ${o.customer_note ? `title="Commentaire client : ${esc(o.customer_note)}"` : ''}>${items}${o.customer_note ? ' 💬' : ''}</td>
         <td style="font-weight:700" class="tabular">${o.total.toFixed(2)} €</td>
         <td><span class="badge ${o.delivery_type === 'delivery' ? 'badge-blue' : 'badge-gray'}">${modeLabel}</span></td>
         <td style="font-size:12px;color:#64748b;white-space:nowrap">${creneau}</td>
@@ -3512,7 +3525,12 @@ function exportOrdersCSV() {
     o.start_time ? `${o.start_time}-${o.end_time}` : '',
     o.status,
     o.created_at ? new Date(o.created_at).toLocaleString('fr-FR') : ''
-  ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(';'));
+  ].map(v => {
+    // Neutralise l'injection de formule (Excel) : une cellule ne doit pas commencer par = + - @
+    let t = String(v);
+    if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+    return `"${t.replace(/"/g, '""')}"`;
+  }).join(';'));
   const csv = [headers.join(';'), ...rows].join('\n');
   const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -4235,9 +4253,9 @@ function placeEvents(monday) {
         color: #fff;
       `;
       el.innerHTML = `
-        <div class="cal-event-title">${ev.title}</div>
+        <div class="cal-event-title">${esc(ev.title)}</div>
         ${height > 36 && lanes < 3 ? `<div class="cal-event-time">${ev.start_time} – ${ev.end_time}</div>` : ''}
-        ${height > 56 && ev.subtitle && lanes === 1 ? `<div class="cal-event-type">${ev.subtitle}</div>` : ''}
+        ${height > 56 && ev.subtitle && lanes === 1 ? `<div class="cal-event-type">${esc(ev.subtitle)}</div>` : ''}
       `;
       el.addEventListener('click', e => { e.stopPropagation(); showEventPopup(e, ev); });
       col.appendChild(el);
@@ -4265,7 +4283,7 @@ function showEventPopup(mouseEvent, ev) {
       ? ev.items.map(i => {
           const opts = i.options ? Object.values(i.options).join(', ') : '';
           return `<div style="display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-bottom:1px solid #f8fafc">
-            <span style="color:#374151">${i.name}${opts ? ` <span style="color:#94a3b8;font-size:11px">(${opts})</span>` : ''} ×${i.qty}</span>
+            <span style="color:#374151">${esc(i.name)}${opts ? ` <span style="color:#94a3b8;font-size:11px">(${opts})</span>` : ''} ×${i.qty}</span>
             <span style="font-weight:600;white-space:nowrap">${(i.price * i.qty).toFixed(2)} €</span>
           </div>`;
         }).join('')
@@ -4275,7 +4293,7 @@ function showEventPopup(mouseEvent, ev) {
       <!-- En-tête -->
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px">
         <div>
-          <div style="font-weight:700;font-size:15px;color:var(--text);line-height:1.2">${ev.title}</div>
+          <div style="font-weight:700;font-size:15px;color:var(--text);line-height:1.2">${esc(ev.title)}</div>
           <div style="font-size:11px;color:${sColor};font-weight:600;margin-top:3px;background:${sBg};display:inline-block;padding:2px 7px;border-radius:20px">${sLabel}</div>
         </div>
         <div style="text-align:right;font-size:11px;color:var(--muted);flex-shrink:0">
@@ -4294,15 +4312,15 @@ function showEventPopup(mouseEvent, ev) {
       <div style="font-size:12px;color:#475569;margin-bottom:10px;line-height:1.8">
         <div style="display:flex;align-items:center;gap:6px">
           <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          ${ev.subtitle}
+          ${esc(ev.subtitle)}
         </div>
         ${ev.phone ? `<div style="display:flex;align-items:center;gap:6px">
           <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-          ${ev.phone}
+          ${esc(ev.phone)}
         </div>` : ''}
       ${ev.address ? `<div style="display:flex;align-items:flex-start;gap:6px;margin-top:2px">
           <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          <span>${ev.address.street}, ${ev.address.zip} ${ev.address.city}</span>
+          <span>${esc(ev.address.street)}, ${esc(ev.address.zip)} ${esc(ev.address.city)}</span>
         </div>` : ''}
       </div>
 
@@ -4321,11 +4339,11 @@ function showEventPopup(mouseEvent, ev) {
   } else {
     // Tâche
     inner += `
-      <div class="event-popup-title" style="color:${ev.color}">${ev.title}</div>
+      <div class="event-popup-title" style="color:${ev.color}">${esc(ev.title)}</div>
       <div class="event-popup-meta">
         ${dateFmt} · ${ev.start_time} – ${ev.end_time}
       </div>
-      ${ev.subtitle ? `<div style="font-size:12px;color:var(--muted);margin-bottom:12px">${ev.subtitle}</div>` : ''}
+      ${ev.subtitle ? `<div style="font-size:12px;color:var(--muted);margin-bottom:12px">${esc(ev.subtitle)}</div>` : ''}
       <button class="btn btn-danger btn-sm" style="width:100%;margin-top:4px" onclick="deleteTask(${ev.taskId})">Supprimer la tâche</button>`;
   }
 
