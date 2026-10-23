@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist — Refonte site Fleurs de Nila</title>
+<style>
+  :root {
+    --primary: #7a3b52;
+    --done-bg: #eaf1ea; --done-fg: #34613f; --done-border: #bcd8bf;
+    --clarify-bg: #fdf3e7; --clarify-fg: #8a6416; --clarify-border: #eccf9a;
+    --todo-bg: #f4e9ee; --todo-fg: #7a3b52; --todo-border: #ddbccb;
+    --text: #2b2b2b; --muted: #888; --bg: #fafafa; --card: #ffffff; --border: #e5e5e5;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: var(--text);
+    background: var(--bg); margin: 0; padding: 32px 20px 60px; line-height: 1.5; }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 26px; color: var(--primary); margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 28px; font-size: 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+  .legend .l-done { background: var(--done-bg); color: var(--done-fg); }
+  .legend .l-clarify { background: var(--clarify-bg); color: var(--clarify-fg); }
+  .legend .l-todo { background: var(--todo-bg); color: var(--todo-fg); }
+  h2 { font-size: 16px; text-transform: uppercase; letter-spacing: .06em; padding: 10px 16px;
+    border-radius: 8px; margin: 30px 0 14px; }
+  h2.done { background: var(--done-bg); color: var(--done-fg); }
+  h2.clarify { background: var(--clarify-bg); color: var(--clarify-fg); }
+  h2.todo { background: var(--todo-bg); color: var(--todo-fg); }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: #555;
+    margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  ul.items { list-style: none; margin: 0 0 6px; padding: 0; }
+  ul.items li { background: var(--card); border: 1px solid var(--border); border-left-width: 4px;
+    border-radius: 6px; padding: 10px 14px; margin-bottom: 8px; font-size: 14px; }
+  .done > ul.items li { border-left-color: var(--done-border); }
+  .clarify > ul.items li { border-left-color: var(--clarify-border); }
+  .todo > ul.items li { border-left-color: var(--todo-border); }
+  ul.items li::before { content: ""; }
+  .done ul.items li::marker { content: none; }
+  .done ul.items li { position: relative; padding-left: 34px; }
+  .done ul.items li::before { content: "✓"; position: absolute; left: 12px; color: var(--done-fg); font-weight: 700; }
+  .clarify ul.items li { position: relative; padding-left: 34px; }
+  .clarify ul.items li::before { content: "?"; position: absolute; left: 14px; color: var(--clarify-fg); font-weight: 700; }
+  .todo ul.items li { position: relative; padding-left: 34px; }
+  .todo ul.items li::before { content: "○"; position: absolute; left: 12px; color: var(--todo-fg); font-weight: 700; }
+  .note { color: var(--muted); font-size: 12.5px; font-style: italic; margin-top: 2px; display: block; }
+  code { background: #f0f0f0; padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+  footer { margin-top: 40px; font-size: 11.5px; color: var(--muted); border-top: 1px solid var(--border); padding-top: 14px; }
+  .flag { display: inline-block; font-size: 10.5px; background: #fee2e2; color: #b91c1c; border-radius: 4px;
+    padding: 1px 7px; margin-left: 6px; font-weight: 600; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Fleurs de Nila — Checklist refonte du site</h1>
+  <p class="subtitle">Mise à jour le 28 septembre 2026 — basée sur demande_site.pdf, Site_soc_manon.pdf et l'état réel du dépôt Git</p>
+
+  <div class="legend">
+    <span class="l-done">✓ Fait</span>
+    <span class="l-clarify">? À clarifier avec Manon</span>
+    <span class="l-todo">○ Reste à faire</span>
+  </div>
+
+  <!-- ================= FAIT ================= -->
+  <section class="done">
+    <h2 class="done">✓ Fait</h2>
+
+    <h3>Boutique / e-commerce</h3>
+    <ul class="items">
+      <li>Galerie photo produit : plusieurs images par produit, avec vignettes, flèches et balayage tactile sur la fiche produit.</li>
+      <li>Admin : éditeur de galerie (ajout multiple, réordonnancement, suppression) remplaçant le champ image unique.</li>
+      <li>Correctif du panier détaillé : l'article et le récapitulatif ne restent plus affichés en même temps que le message « panier vide ».</li>
+      <li>Nouveau champ « commentaire au fleuriste » dans le tunnel de commande, distinct du message cadeau — visible côté admin dans la tournée du jour et le tableau des commandes. Replié par défaut derrière un lien pour alléger la page paiement.</li>
+      <li>Champs de prix (admin) : pas de 1 € au lieu de 0,01 €.</li>
+      <li>Liens « Voir toute la boutique » / « e-shop » renommés en « Voir tout l'e-shop ».</li>
+    </ul>
+
+    <h3>Accueil — textes et contenus</h3>
+    <ul class="items">
+      <li>Nouvelle phrase du hero (« Au gré des saisons… », coquille « grès »/« gré » corrigée) et retrait du badge « Élégance » sur la photo d'accueil.</li>
+      <li>Relecture orthographique et grammaticale complète du site (accueil, à propos, blog, mariage, articles, boutique, pages légales) : une dizaine de fautes corrigées (accords, accents manquants).</li>
+      <li>Nouvelle photo hero (fournie par Manon, réorientée et optimisée en plusieurs tailles).</li>
+      <li>Bloc « Chaque Pétale Compte » renommé « Une vague de fraîcheur » avec le nouveau texte de présentation.</li>
+      <li>Blocs « Nous contacter » / « Venir en boutique » et bandeau « Retours clients » réduits en taille.</li>
+      <li>Photo de la boutique posée à la place de l'ancien bloc Abonnement (accolée à la FAQ).</li>
+      <li>Page <code>a-propos.html</code> supprimée : contenu fusionné avec « Identité / valeurs » dans une même section (texte 3/5 + photo des deux fondatrices 2/5, récit complet en dessous), liens du menu et boutons mis à jour sur tout le site.</li>
+      <li>Section fusionnée resserrée en largeur (n'occupe plus 100% de l'écran).</li>
+      <li>Champ « message à joindre au bouquet » ajouté au panneau d'ajout rapide de la grille boutique (manquait par rapport à la fiche produit).</li>
+      <li>Commentaire au fleuriste rendu accessible aussi depuis la fiche produit, en plus du paiement (valeur partagée entre les deux).</li>
+      <li>Stock par défaut d'un nouveau produit passé à 10 000 (au lieu de 0).</li>
+      <li>Nouvelle page « Plan du site », liée depuis le pied de page de tout le site.</li>
+      <li>Bento « Fleurs de Nila », section Événementiel (4 catégories) et galerie photo mosaïque retirés de l'accueil — ce contenu ira dans la future page « Nos prestations ». Menu et liens « Voir les collections » nettoyés sur tout le site en conséquence.</li>
+      <li>Bloc « Nos collections / Catalogue 2026 » remplacé par un aperçu Instagram (vignettes cliquables vers le vrai profil, en attendant un widget en direct).</li>
+      <li>Section e-shop mis en avant : « La boutique » → « E-shop », « Coups de cœur du moment » → « Les incontournables », retrait du mot « Vitrine ».</li>
+      <li>Section avis : « Ce qu'ils disent de nous » → « Retours clients », retrait du mot « Avis ».</li>
+      <li>Bloc « Venir en boutique » : « atelier » remplacé par « boutique » dans le texte.</li>
+      <li>FAQ : les 4 questions/réponses mises à jour avec les nouveaux textes fournis.</li>
+    </ul>
+
+    <h3>Suppressions</h3>
+    <ul class="items">
+      <li>Tous les liens TikTok retirés (menu, footer, données structurées JSON-LD) sur les 7 pages concernées.</li>
+      <li>Carte Google Maps intégrée supprimée sous le bloc contact ; le bouton « Voir sur Google Maps » reste seul et fonctionnel.</li>
+      <li>Résumé « AI-Generated Summary » du widget d'avis Elfsight retiré directement depuis l'éditeur Elfsight — le widget est repassé en pleine largeur, plus besoin de correctif côté code.</li>
+      <li>Numéros décoratifs « 01 » / « 02 » retirés à côté des blocs « Nous contacter » et « Venir en boutique ».</li>
+      <li>Titre « E-shop » forcé sur une seule ligne.</li>
+    </ul>
+
+    <h3>Technique / référencement</h3>
+    <ul class="items">
+      <li>Sitemap remis à jour : ajout de la page boutique, dates <code>lastmod</code> rafraîchies sur toutes les pages.</li>
+    </ul>
+
+    <h3>Catalogue e-commerce</h3>
+    <ul class="items">
+      <li>Logique de catégories créée : table dédiée en base, modifiable dans son nom et dans les produits qui en font partie (panneau « Catégories » de l'admin), sans jamais supprimer un produit si sa catégorie est supprimée.</li>
+      <li>23 produits créés dans 4 catégories : bouquets permanents (9), bouquets de saison (8), bouquet séché (1), deuil (5 — coussin/croix/couronne/seau/gerbe avec leur propre grille tarifaire).</li>
+      <li>Tailles S/M/L remplacées par des options « Format » nommées par leur prix (25/30/40/50/60 €), comme demandé.
+        <span class="note">Choix par défaut faute de précision : couleurs disponibles, répartition petit/grand du « Bouquet blanc », et aucune photo assignée pour l'instant. <span class="flag">à affiner</span></span>
+      </li>
+      <li>Description type ajoutée automatiquement sur les bouquets concernés (mention saison/arrivage).</li>
+    </ul>
+  </section>
+
+  <!-- ================= A CLARIFIER ================= -->
+  <section class="clarify">
+    <h2 class="clarify">? À clarifier avec Manon</h2>
+    <p class="note" style="margin-bottom:12px">Ces points bloquent le développement tant qu'ils n'ont pas de réponse.</p>
+    <ul class="items">
+      <li>Prix affiché « 30 € » en tête de la section e-shop — marqué « à clarifier » dans son propre document de demandes.</li>
+      <li>Question de Manon restée sans réponse : « Je ne peux pas ajouter de dépliant avec les prix ??? » — veut-elle un PDF tarifaire téléchargeable côté boutique, ou un outil admin pour le créer ?</li>
+      <li>Photo de « Ron » — devenue sans objet, le bloc Abonnement a été remplacé par une photo de la boutique ; à revoir si une place doit spécifiquement être faite à « Ron » ailleurs.</li>
+      <li>Photo des deux fondatrices, pour le futur bloc « histoire de la boutique » sur l'accueil — fichier à transmettre.</li>
+      <li>Version anglaise du site — à confirmer si toujours souhaitée.</li>
+      <li>Compte client + programme de fidélité — fonctionnalité lourde, à chiffrer et cadrer séparément avant tout développement.</li>
+      <li>Flux Instagram en direct sur l'accueil — nécessite un outil tiers (type widget Elfsight/SnapWidget), potentiellement payant : solution à valider avant de l'intégrer (aperçu fictif en place en attendant).</li>
+      <li>Couleurs disponibles par bouquet (unicolore, champêtre coloré, roses, varié) — une liste par défaut a été mise en place, à ajuster selon les fleurs réellement disponibles.</li>
+      <li>Répartition des prix entre « Bouquet blanc (petit) » et « Bouquet blanc (grand) » — choix par défaut faute de tarifs distincts précisés dans le document.</li>
+      <li>Photos des 23 nouveaux produits du catalogue — aucune n'est assignée pour l'instant, à ajouter depuis l'admin.</li>
+      <li>Lien « Boutique » du menu pointant vers un site externe (sessile.fr) au lieu de la vraie boutique, repéré sur plusieurs pages (à propos, mariage, articles de blog, pages légales) — anomalie ancienne à confirmer avant correction.</li>
+    </ul>
+  </section>
+
+  <!-- ================= RESTE A FAIRE ================= -->
+  <section class="todo">
+    <h2 class="todo">○ Reste à faire</h2>
+
+    <h3>Restructuration de la page d'accueil</h3>
+    <ul class="items">
+      <li>Passer le menu à 5 entrées (Accueil / e-Shop / Nos prestations / Découvrir / Contact) — dépend de la création des deux nouvelles pages ci-dessous.</li>
+    </ul>
+
+    <h3>Nouvelles pages</h3>
+    <ul class="items">
+      <li>Page « Nos prestations » : sections Mariages, Événements, Pro (+ abonnement), avec photos et formulaire de demande de devis.</li>
+      <li>Page « Découvrir » : galerie photo de la vie de la boutique (produits en magasin non vendus en ligne, livraisons, etc.).</li>
+    </ul>
+
+    <h3>Catalogue et tarification e-commerce</h3>
+    <ul class="items">
+      <li>Retirer plantes, pots et vases de la vente en ligne, remplacer par « nous contacter si besoin ».</li>
+      <li>Ajouter des photos aux 23 nouveaux produits (aucune assignée pour l'instant).</li>
+      <li>Affiner les couleurs disponibles et la répartition petit/grand du bouquet blanc avec Manon (valeurs par défaut en place, voir « à clarifier »).</li>
+    </ul>
+
+    <h3>Tunnel de commande et livraison</h3>
+    <ul class="items">
+      <li>Réorganiser le formulaire de coordonnées : destinataire d'abord, commande ensuite.</li>
+      <li>Ajouter l'option « demander une facture ».</li>
+      <li>Afficher un numéro de commande sur la confirmation.</li>
+      <li>Bloquer la validation si des informations obligatoires manquent.</li>
+      <li>Indiquer les horaires de retrait en boutique dans le tunnel de commande.</li>
+      <li>Refondre la grille de livraison par zone (écusson / hors écusson / hors Nîmes) avec calcul automatique à partir de l'adresse saisie.</li>
+      <li>Afficher les frais de port dès le début du parcours d'achat.</li>
+    </ul>
+
+    <h3>Juridique</h3>
+    <ul class="items">
+      <li>Rédiger et publier les CGV.</li>
+      <li>Revoir mentions légales et politique de confidentialité pour la conformité RGPD (dont la mention obsolète sur la carte Google Maps intégrée, retirée du site).</li>
+    </ul>
+  </section>
+
+  <footer>
+    Document de suivi interne, à mettre à jour au fil des sessions. Sources : demandeclient/demande_site.pdf,
+    demandeclient/Site_soc_manon.pdf, demandeclient/refonte-accueil-extraction-et-plan-actions.pdf, et l'état du dépôt Git au 28/09/2026.
+  </footer>
+
+</div>
+</body>
+</html>

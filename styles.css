@@ -627,3 +627,8 @@ section:has(.auto-rows-\[200px\]) {
 .floral-pattern:hover svg {
     transform: rotate(15deg) scale(1.1);
 }
+
+/* Ancres : la barre de navigation fixe (≈ 96 px) ne doit pas masquer le haut de la section atteinte */
+#devis, #contact {
+    scroll-margin-top: 6.5rem;
+}
