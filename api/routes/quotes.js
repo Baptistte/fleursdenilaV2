@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
-const { sendEmail } = require('../services/mailer');
+const { sendEmail, adminEmail } = require('../services/mailer');
 
 const CATEGORY_LABELS = {
   mariage: 'Mariage',
@@ -55,9 +55,7 @@ router.post('/', (req, res) => {
       if (clean.email) {
         await sendEmail({ template: 'quote_request_client', to: clean.email, data });
       }
-      if (process.env.ADMIN_NOTIF_EMAIL) {
-        await sendEmail({ template: 'quote_request_admin', to: process.env.ADMIN_NOTIF_EMAIL, data });
-      }
+      await sendEmail({ template: 'quote_request_admin', to: adminEmail(), data });
     } catch (e) {
       console.error('Erreur email demande de devis :', e.message);
     }

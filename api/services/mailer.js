@@ -255,6 +255,13 @@ function renderTemplate(name, data) {
   return t.build(data);
 }
 
+// Destinataire des notifications internes (nouvelle commande, demande de devis).
+// ADMIN_NOTIF_EMAIL (variable d'environnement) l'emporte sur l'adresse par défaut.
+const DEFAULT_ADMIN_EMAIL = 'staff.daffodil@gmail.com';
+function adminEmail() {
+  return process.env.ADMIN_NOTIF_EMAIL || DEFAULT_ADMIN_EMAIL;
+}
+
 async function sendEmail({ template, to, data = {}, orderId = null }) {
   const { subject, html } = renderTemplate(template, data);
   let status = 'simulated', error = null;
@@ -312,8 +319,8 @@ function sendOrderEmails(template, orderId, { notifyAdmin = false } = {}) {
       const d = orderEmailData(orderId);
       if (!d) return;
       if (d.customer_email) await sendEmail({ template, to: d.customer_email, data: d, orderId });
-      if (notifyAdmin && process.env.ADMIN_NOTIF_EMAIL) {
-        await sendEmail({ template: 'admin_new_order', to: process.env.ADMIN_NOTIF_EMAIL, data: d, orderId });
+      if (notifyAdmin) {
+        await sendEmail({ template: 'admin_new_order', to: adminEmail(), data: d, orderId });
       }
     } catch (e) {
       console.error(`Email ${template} (commande ${orderId}) :`, e.message);
@@ -345,4 +352,4 @@ function sampleData(template) {
   return base;
 }
 
-module.exports = { TEMPLATES, renderTemplate, sendEmail, sendOrderEmails, orderEmailData, sampleData };
+module.exports = { adminEmail, TEMPLATES, renderTemplate, sendEmail, sendOrderEmails, orderEmailData, sampleData };
