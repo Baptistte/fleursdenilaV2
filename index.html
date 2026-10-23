@@ -600,7 +600,6 @@
                         <option value="mariage">Mariage</option>
                         <option value="professionnel">Professionnel</option>
                         <option value="reception">Réception</option>
-                        <option value="deuil">Deuil</option>
                         <option value="autre">Autre demande / contact ouvert</option>
                     </select>
                 </div>
@@ -896,8 +895,8 @@
     <script>
       (function () {
         // Flux Instagram : remplace les vignettes statiques par les dernières publications.
-        // Dernière publication en grand (2 rangées de haut) à gauche, les précédentes à droite sur
-        // 2 rangées. Sans jeton configuré ou en cas de panne, les vignettes statiques restent affichées.
+        // Les 8 dernières publications en grille régulière (4 colonnes × 2 rangées).
+        // Sans jeton configuré ou en cas de panne, les vignettes statiques restent affichées.
         (async function loadInstagram() {
             const grid = document.getElementById('instagram-grid');
             if (!grid || !window.API_URL) return;
@@ -914,14 +913,7 @@
                     <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/25 transition-colors duration-300"></div>
                     ${i.type === 'VIDEO' ? play : ''}
                 </a>`;
-                if (items.length >= 7) {
-                    // 5 colonnes : grande publication = 2 colonnes × 2 rangées, 6 précédentes = 3 colonnes × 2 rangées
-                    grid.className = 'grid grid-cols-2 md:grid-cols-5 gap-1 md:gap-2';
-                    grid.innerHTML = tile(items[0], 'col-span-2 md:col-span-2 md:row-span-2 aspect-square md:aspect-auto')
-                        + items.slice(1, 7).map(i => tile(i, 'aspect-square')).join('');
-                } else {
-                    grid.innerHTML = items.slice(0, 8).map(i => tile(i, 'aspect-square')).join('');
-                }
+                grid.innerHTML = items.slice(0, 8).map(i => tile(i, 'aspect-square')).join('');
             } catch { /* vignettes statiques conservées */ }
         })();
 
