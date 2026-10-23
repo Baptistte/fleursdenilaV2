@@ -37,8 +37,13 @@
     box.style.display = show ? 'none' : '';
   }
 
+  // Le widget (chargement différé) ne s'initialise correctement que si son script est présent
+  // dès le chargement de la page : si l'accord est déjà donné, on le charge immédiatement.
+  const acceptedAtStart = read() === 'accepted';
+  if (acceptedAtStart) loadWidget();
+
   function apply(choice) {
-    if (choice === 'accepted') { setPlaceholder(false); loadWidget(); }
+    if (choice === 'accepted') setPlaceholder(false);
     else setPlaceholder(true);
   }
 
@@ -50,6 +55,8 @@
   function decide(choice) {
     write(choice);
     closeBanner();
+    // Accord donné maintenant : rechargement pour que le widget démarre comme à une visite normale
+    if (choice === 'accepted' && !acceptedAtStart) { location.reload(); return; }
     apply(choice);
   }
 
