@@ -175,6 +175,16 @@
   <!-- Grille produits -->
   <main class="px-6 lg:px-16 max-w-6xl mx-auto" style="padding-top:36px;padding-bottom:60px">
 
+    <!-- Recherche -->
+    <form id="search-form" role="search" onsubmit="return false" style="position:relative;max-width:460px;margin-bottom:20px">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#9a8f82;pointer-events:none"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg>
+      <input id="search-input" type="search" autocomplete="off" aria-label="Rechercher un produit" placeholder="Rechercher un bouquet, une plante…"
+        style="width:100%;border:1px solid #ede8df;background:#fff;padding:12px 40px 12px 40px;font-size:14px;color:#1a365d;outline:none;border-radius:0;-webkit-appearance:none;appearance:none"
+        onfocus="this.style.borderColor='#1a365d'" onblur="this.style.borderColor='#ede8df'">
+      <button id="search-clear" type="button" aria-label="Effacer la recherche" class="hidden"
+        style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;cursor:pointer;color:#9a8f82;font-size:22px;line-height:1;padding:6px 10px">×</button>
+    </form>
+
     <!-- Filtres par catégorie (injectés par JS) -->
     <div id="category-filters" class="hidden" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px"></div>
 
@@ -381,6 +391,8 @@
         const res = await fetch(`${API}/api/categories`);
         if (!res.ok) throw new Error();
         const categories = (await res.json()).filter(c => c.product_count > 0);
+        categories.forEach(c => { categoryNames[c.id] = c.name; });
+        if (searchTerm) renderGrid();   // la catégorie compte aussi dans la recherche
         const wrap = document.getElementById('category-filters');
         if (!categories.length) return;
 
@@ -399,12 +411,27 @@
       } catch { /* pas de catégories : la grille reste affichée sans filtre */ }
     }
 
+    // ── Recherche : nom, description et catégorie, sans accents ni casse ──
+    let searchTerm = '', searchRaw = '';
+    const categoryNames = {};
+    const norm = t => String(t ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    function matchesSearch(p) {
+      if (!searchTerm) return true;
+      const hay = norm(`${p.name} ${p.description || ''} ${categoryNames[p.category_id] || ''}`);
+      return searchTerm.split(/\s+/).every(w => hay.includes(w));   // tous les mots doivent figurer
+    }
+
     function renderGrid() {
       const grid = document.getElementById('products-grid');
-      const list = currentCategoryId ? allProducts.filter(p => p.category_id === currentCategoryId) : allProducts;
+      const list = allProducts.filter(p => (!currentCategoryId || p.category_id === currentCategoryId) && matchesSearch(p));
 
       if (list.length === 0) {
-        grid.innerHTML = '<p class="col-span-3 text-center py-20 text-gray-500">Aucun produit dans cette catégorie pour le moment.</p>';
+        grid.innerHTML = searchTerm
+          ? `<div class="text-center py-20 text-gray-500" style="grid-column:1/-1"><p>Aucun produit ne correspond à « ${searchRaw.replace(/[&<>"']/g, '')} ».</p><button type="button" id="search-reset" class="cat-pill" style="margin-top:16px">Effacer la recherche</button></div>`
+          : '<p class="text-center py-20 text-gray-500" style="grid-column:1/-1">Aucun produit dans cette catégorie pour le moment.</p>';
+        document.getElementById('search-reset')?.addEventListener('click', () => {
+          const i = document.getElementById('search-input'); i.value = ''; i.dispatchEvent(new Event('input')); i.focus();
+        });
         return;
       }
       grid.innerHTML = list.map(renderCard).join('');
@@ -449,6 +476,17 @@
       setTimeout(() => m.classList.add('hidden'), 500);
       document.body.style.overflow = '';
     });
+
+    const searchInput = document.getElementById('search-input');
+    const searchClear = document.getElementById('search-clear');
+    let searchTimer = null;
+    searchInput.addEventListener('input', () => {
+      searchClear.classList.toggle('hidden', !searchInput.value);
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => { searchRaw = searchInput.value.trim(); searchTerm = norm(searchRaw); renderGrid(); }, 120);
+    });
+    searchClear.addEventListener('click', () => { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); });
+    searchInput.addEventListener('keydown', e => { if (e.key === 'Escape' && searchInput.value) searchClear.click(); });
 
     updateCartBadge();
     loadProducts();
