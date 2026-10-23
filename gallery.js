@@ -1,4 +1,4 @@
-/* Books photo : filtres par thème, « voir tout » et visionneuse plein écran.
+/* Galeries photo : « voir tout » et visionneuse plein écran (filtres par thème optionnels).
    - Un book : <div data-book> contenant des boutons [data-filter="groupe|all"], des vignettes
      <a class="book-item" data-gallery="nom" data-group="groupe" data-caption="…" href="grande-image">
      et éventuellement un bouton [data-more].
@@ -27,7 +27,7 @@
       if (more) {
         const hiddenCount = matching - shown;
         more.classList.toggle('hidden', hiddenCount <= 0 || !limit);
-        more.textContent = `Voir tout le book (${matching})`;
+        more.textContent = `Voir toutes les photos (${matching})`;
       }
       book.querySelectorAll('[data-filter]').forEach(b => {
         const on = b.dataset.filter === filter;
